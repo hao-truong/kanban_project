@@ -1,0 +1,7 @@
+back-end/vendor
+back-end/composer.lock
+back-end/.env
+
+front-end/node_modules
+front-end/.env.local
+front-end/package-lock.json

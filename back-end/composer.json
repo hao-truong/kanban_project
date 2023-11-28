@@ -1,0 +1,28 @@
+{
+  "name": "h003018/back-end",
+  "description": "practice project kanban board",
+  "license": "MIT",
+  "scripts": {
+    "start": [
+      "Composer\\Config::disableProcessTimeout",
+      "php -S localhost:8080 -t public"
+    ],
+    "install": "composer dump-autoload"
+  },
+  "autoload": {
+    "psr-4": {
+      "app\\": "src/application",
+      "shared\\": "src/shared"
+    }
+  },
+  "authors": [
+    {
+      "name": "TruongVanHao"
+    }
+  ],
+  "require": {
+    "php-di/php-di": "^7.0",
+    "vlucas/phpdotenv": "^5.6",
+    "firebase/php-jwt": "^6.9"
+  }
+}

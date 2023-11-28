@@ -1,0 +1,43 @@
+<?php
+declare(strict_types=1);
+
+namespace app\middlewares;
+
+use app\models\UserModel;
+use app\services\JwtService;
+use app\services\UserService;
+use shared\enums\StatusCode;
+use shared\enums\TypeJwt;
+use shared\exceptions\ResponseException;
+
+class AuthorizeRequest implements IMiddleware
+{
+
+    public function __construct(
+        private readonly JwtService $jwtService,
+        private readonly UserModel  $userModel
+    ) {
+    }
+
+    public function execute()
+    {
+        if (!array_key_exists("Authorization", getallheaders())) {
+            throw new ResponseException(StatusCode::FORBIDDEN, "No token", StatusCode::FORBIDDEN->name);
+        }
+
+        $token = getallheaders()["Authorization"];
+        $token = str_replace("Bearer ", "", $token);
+
+        $matched_token = $this->userModel->findOne('access_token', $token);
+
+        if(!$matched_token) {
+            throw new ResponseException(StatusCode::FORBIDDEN, "Invalid token", StatusCode::FORBIDDEN->name);
+        }
+
+        $payload = $this->jwtService->verifyToken(TypeJwt::ACCESS_TOKEN, $token);
+        $user_id = $payload->userId;
+        $_SESSION["user_id"] = $user_id;
+
+        return true;
+    }
+}
