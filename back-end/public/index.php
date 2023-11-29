@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use app\controllers\AuthController;
+use app\controllers\UserController;
 use app\core\Application;
 use app\middlewares\AuthorizeRequest;
 use shared\enums\RequestMethod;
@@ -50,6 +51,12 @@ $app->router->addRoute(
                           AuthController::class,
                           'logout'
                       ]
+);
+$app->router->addRoute(
+    RequestMethod::GET, '/users/me', [AuthorizeRequest::class], [
+                           UserController::class,
+                           'getProfile'
+                       ]
 );
 
 $app->run();
