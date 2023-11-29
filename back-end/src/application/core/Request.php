@@ -45,9 +45,7 @@ class Request
 
         switch ($this->getMethod()) {
             case RequestMethod::POST:
-                foreach ($_POST as $key => $value) {
-                    $body[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-                }
+                $body = json_decode(file_get_contents('php://input'), true);
                 break;
             default:
                 break;

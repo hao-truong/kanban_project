@@ -63,17 +63,15 @@ class AuthService
             throw new ResponseException(StatusCode::BAD_REQUEST, "Username or password is wrong!", StatusCode::BAD_REQUEST->name);
         }
 
-        $tokens = [
-            "access_token"  => $this->jwtService->generateToken(TypeJwt::ACCESS_TOKEN, $matched_user['id']),
-            "refresh_token" => $this->jwtService->generateToken(TypeJwt::REFRESH_TOKEN, $matched_user['id']),
-        ];
-
-        $matched_user['access_token'] = $tokens['access_token'];
-        $matched_user['refresh_token'] = $tokens['refresh_token'];
+        $matched_user['access_token'] = $this->jwtService->generateToken(TypeJwt::ACCESS_TOKEN, $matched_user['id']);
+        $matched_user['refresh_token'] = $this->jwtService->generateToken(TypeJwt::REFRESH_TOKEN, $matched_user['id']);
 
         $this->userModel->update($matched_user);
 
-        return $tokens;
+        return [
+            "accessToken"  => $this->jwtService->generateToken(TypeJwt::ACCESS_TOKEN, $matched_user['id']),
+            "refreshToken" => $this->jwtService->generateToken(TypeJwt::REFRESH_TOKEN, $matched_user['id']),
+        ];
     }
 
     public function handleLogout(): void

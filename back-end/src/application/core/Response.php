@@ -25,7 +25,8 @@ class Response
         }
 
         if ($data) {
-            $response_content['data'] = $data;
+            echo json_encode($data);
+            die();
         }
 
         echo json_encode($response_content);
