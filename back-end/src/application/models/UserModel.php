@@ -23,7 +23,7 @@ class UserModel extends Model implements IModel
 
     /**
      * @param $entity array ["username" => string, "password" => string, "alias" => string]
-     * @return false|string
+     * @return array
      * @throws ResponseException
      */
     public function save(array $entity): array

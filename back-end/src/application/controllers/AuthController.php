@@ -20,18 +20,18 @@ class AuthController
     public function register(): mixed
     {
         $this->authService->handleRegister($this->request->getBody());
-        return $this->response->content(StatusCode::CREATED, "Register successfully!", null, null);
+        return $this->response->content(StatusCode::CREATED, 'Register successfully!', null, 'Register successfully!');
     }
 
     public function login(): mixed
     {
         $tokens = $this->authService->handleLogin($this->request->getBody());
-        return $this->response->content(StatusCode::OK, "Login successfully!", null, $tokens);
+        return $this->response->content(StatusCode::OK, 'Login successfully!', null, $tokens);
     }
 
     public function logout(): mixed
     {
         $this->authService->handleLogout();
-        return $this->response->content(StatusCode::OK, 'Logout successfully!', null, null);
+        return $this->response->content(StatusCode::OK, 'Logout successfully!', null, 'Logout successfully!');
     }
 }
