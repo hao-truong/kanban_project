@@ -1,0 +1,3 @@
+type BoardReq = {
+    title: string;
+}

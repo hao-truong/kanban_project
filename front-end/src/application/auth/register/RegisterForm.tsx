@@ -48,22 +48,22 @@ const schemaValidation = yup
             .oneOf([yup.ref("password"), ""], "Confirm password must match"),
         alias: yup
             .string()
-            .required("Fullname is required")
+            .required("Alias name is required")
             .min(
                 MIN_LENGTH_INPUT_STRING,
-                `Confirm password must be at least ${MIN_LENGTH_INPUT_STRING} characters long`
+                `Alias name must be at least ${MIN_LENGTH_INPUT_STRING} characters long`
             )
             .max(
                 MAX_LENGTH_INPUT_STRING,
-                `Confirm password must be at least ${MAX_LENGTH_INPUT_STRING} characters long`
+                `Alias name must be at least ${MAX_LENGTH_INPUT_STRING} characters long`
             ),
         username: yup.string().required("Username is required").min(
             MIN_LENGTH_PASSWORD,
-            `Confirm password must be at least ${MIN_LENGTH_PASSWORD} characters long`
+            `Username must be at least ${MIN_LENGTH_PASSWORD} characters long`
         )
             .max(
                 MAX_LENGTH_PASSWORD,
-                `Confirm password must be at least ${MAX_LENGTH_PASSWORD} characters long`
+                `Username must be at least ${MAX_LENGTH_PASSWORD} characters long`
             ),
     })
     .required();

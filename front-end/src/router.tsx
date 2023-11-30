@@ -3,7 +3,7 @@ import RegisterPage from "./application/auth/register/page";
 import LoginPage from "./application/auth/login/page";
 import AuthGuard from "./shared/components/guards/AuthGuard";
 import MainLayout from "./shared/components/layouts/MainLayout";
-import KanbanBoard from "./application/home/KanbanBoard";
+import HomePage from "./application/home/page";
 
 const router = createBrowserRouter([
   {
@@ -11,10 +11,7 @@ const router = createBrowserRouter([
     element: (
       <AuthGuard>
         <MainLayout>
-          <KanbanBoard />
-        <div>
-          <h1>Hello World</h1>
-        </div>
+          <HomePage />
         </MainLayout>
       </AuthGuard>
     ),

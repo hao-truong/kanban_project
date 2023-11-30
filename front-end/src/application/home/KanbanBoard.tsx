@@ -1,28 +1,16 @@
-import { Plus } from "lucide-react";
-import KanbanColumn from "./KanbanColumn";
+import Helper from "@/shared/utils/helper";
 
-const KanbanBoard = () => {
+interface itemProps {
+    board: Board;
+}
+
+const KanbanBoard = ({board}: itemProps) => {
     return (
-        <div>
-            <div className="flex flex-row justify-between my-10">
-                <h2 className="uppercase">KANBAN BOARD TEST</h2>
-                <button className="flex flex-row items-center gap-2 px-4 py-2 hover:bg-slate-400">
-                    <Plus />
-                    <span>Create column</span>
-                </button>
-            </div>
-            <div className="flex flex-row gap-4 overflow-auto">
-                <KanbanColumn />
-                <KanbanColumn />
-                <KanbanColumn />
-                <KanbanColumn />
-                <KanbanColumn />
-                <KanbanColumn />
-                <KanbanColumn />
-                <KanbanColumn />
-            </div>
+        <div className="bg-slate-200 max-w-[400px] p-4 text-center flex flex-col gap-5 rounded-xl">
+            <h2 className="uppercase text-xl font-bold">{board.title}</h2>
+            <div className="flex flex-row justify-between"><strong className="text-red-700">Created At:</strong> <span>{Helper.formatDate(board.created_at)}</span></div>
+            <div className="flex flex-row justify-between"><strong className="text-red-700">Updated At:</strong> <span>{Helper.formatDate(board.updated_at)}</span></div>
         </div>
-
     )
 }
 
