@@ -10,6 +10,9 @@ import { toast } from "react-toastify";
 import * as yup from "yup";
 import { useQueryClient } from 'react-query';
 import { Link } from "react-router-dom";
+import DialogAddMember from "./DialogAddMember";
+import { useGlobalState } from "@/shared/storages/GlobalStorage";
+import DialogViewMembers from "./DialogViewMembers";
 
 interface itemProps {
     board: Board;
@@ -31,10 +34,14 @@ const schemaValidation = yup
 
 const KanbanBoard = ({ board }: itemProps) => {
     const queryClient = useQueryClient();
+    const [isOpenDialogAddMember, setIsOpenDialogAddMember] = useState<boolean>(false);
+    const [isOpenDialogViewMembers, setIsOpenDialogViewMembers] = useState<boolean>(false);
     const [isClickTilte, setIsClickTitle] = useState<boolean>(false);
     const [isHoverTitle, setIsHoverTitle] = useState<boolean>(false);
     const [isShowMenu, setIsShowMenu] = useState<boolean>(false);
     const titleRef = useRef<HTMLFormElement | null>(null);
+    const { user } = useGlobalState();
+    const [isCreator, setIsCreator] = useState<boolean>(false);
     const {
         register,
         handleSubmit,
@@ -55,6 +62,10 @@ const KanbanBoard = ({ board }: itemProps) => {
     };
 
     useEffect(() => {
+        setIsCreator(board.creator_id === user?.id);
+    }, [user])
+
+    useEffect(() => {
         setValue('title', board.title);
     }, [board])
 
@@ -65,12 +76,25 @@ const KanbanBoard = ({ board }: itemProps) => {
 
         if (!isHoverTitle) {
             setIsShowMenu(false);
+            setIsOpenDialogAddMember(false);
+            setIsOpenDialogViewMembers(false);
         }
     }, [isClickTilte, isHoverTitle])
 
     const handleDeleteBoard = async () => {
         try {
             const { data } = await BoardService.deleteBoard(board.id);
+
+            queryClient.invalidateQueries('getMyBoards');
+            toast.success(data);
+        } catch (error: any) {
+            toast.error(error.message);
+        }
+    }
+
+    const handleLeaveBoard = async () => {
+        try {
+            const { data } = await BoardService.leaveBoard(board.id);
 
             queryClient.invalidateQueries('getMyBoards');
             toast.success(data);
@@ -105,12 +129,18 @@ const KanbanBoard = ({ board }: itemProps) => {
                             <X size={40} className="p-2 bg-white hover:bg-slate-100 rounded-sm shadow-lg cursor-pointer" onClick={() => setIsClickTitle(false)} />
                         </div>
                     </form>
-
                 }
                 {
                     !isClickTilte &&
                     <div className="flex flex-row justify-between items-center gap-4">
-                        <h2 className="w-full uppercase text-xl font-bold py-2 hover:bg-white cursor-pointer text-left" onClick={() => setIsClickTitle(true)}>{board.title}</h2>
+                        <h2 className="w-full uppercase text-xl font-bold py-2 hover:bg-white cursor-pointer text-left"
+                            onClick={() => {
+                                if (isCreator) {
+                                    setIsClickTitle(true);
+                                }
+                            }}>
+                            {board.title}
+                        </h2>
                         {
                             isHoverTitle &&
                             (
@@ -118,8 +148,20 @@ const KanbanBoard = ({ board }: itemProps) => {
                                     <MoreHorizontal className="cursor-pointer hover:bg-slate-100 p-2" size={40} onClick={() => setIsShowMenu(!isShowMenu)} />
                                     {
                                         isShowMenu &&
-                                        <ul className="absolute bg-white top-full right-0 py-1">
-                                            <li className="py-1 px-4 text-left hover:bg-slate-100 cursor-pointer" onClick={handleDeleteBoard}>Delete</li>
+                                        <ul className="absolute bg-white top-full right-0 py-1 w-max">
+                                            {
+                                                isCreator
+                                                    ? <div>
+                                                        <li className="py-1 px-4 text-left hover:bg-slate-100 cursor-pointer" onClick={handleDeleteBoard}>Delete</li>
+                                                        <li className="py-1 px-4 text-left hover:bg-slate-100 cursor-pointer" onClick={() => setIsOpenDialogAddMember(!isOpenDialogAddMember)}>Add member</li>
+                                                        <DialogAddMember isOpen={isOpenDialogAddMember} setIsOpen={setIsOpenDialogAddMember} boardId={board.id} />
+                                                    </div>
+                                                    : <div>
+                                                        <li className="py-1 px-4 text-left hover:bg-slate-100 cursor-pointer" onClick={handleLeaveBoard}>Leave</li>
+                                                    </div>
+                                            }
+                                            <li className="py-1 px-4 text-left hover:bg-slate-100 cursor-pointer" onClick={() => setIsOpenDialogViewMembers(!isOpenDialogViewMembers)}>Members</li>
+                                            <DialogViewMembers isOpen={isOpenDialogViewMembers} setIsOpen={setIsOpenDialogViewMembers} board={board} />
                                         </ul>
                                     }
                                 </div>
@@ -128,11 +170,12 @@ const KanbanBoard = ({ board }: itemProps) => {
                     </div>
                 }
             </div>
+            <div className="flex flex-row justify-between"><strong className="text-red-700">Members:</strong> <span>{board.number_of_members}</span></div>
             <div className="flex flex-row justify-between"><strong className="text-red-700">Created At:</strong> <span>{Helper.formatDate(board.created_at)}</span></div>
             <div className="flex flex-row justify-between"><strong className="text-red-700">Updated At:</strong> <span>{Helper.formatDate(board.updated_at)}</span></div>
             <div>
                 <Link to={`/boards/${board.id}`} className="flex w-full flex-row justify-end ">
-                    <ArrowRightSquare size={40} className="p-1 hover:bg-white rounded-lg"/>
+                    <ArrowRightSquare size={40} className="p-1 hover:bg-white rounded-lg" />
                 </Link>
             </div>
         </div>

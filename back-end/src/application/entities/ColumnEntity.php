@@ -46,10 +46,6 @@ class ColumnEntity {
             $errors['title'] = "Title should be less than 20 characters long";
         }
 
-        if($data_to_validate['board_id'])
-        {
-
-        }
         return $errors;
     }
 }

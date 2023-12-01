@@ -21,6 +21,7 @@ class UserService
         }
 
         return [
+            'id' => $matched_user['id'],
             'username' => $matched_user['username'],
             'email' => $matched_user['email'],
             'alias' => $matched_user['alias'],

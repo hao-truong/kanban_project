@@ -42,7 +42,7 @@ class UserBoardModel extends Model implements IModel
                 'user_id',
                 'board_id'
             ], [
-                'user_id' => $entity['userId'],
+                'user_id'  => $entity['userId'],
                 'board_id' => $entity['boardId'],
             ]
         );
@@ -106,8 +106,30 @@ class UserBoardModel extends Model implements IModel
         try {
             $stmt->execute(
                 [
-                    "user_id" => $id[0],
+                    "user_id"  => $id[0],
                     "board_id" => $id[1],
+                ]
+            );
+        } catch (PDOException $exception) {
+            error_log($exception->getMessage());
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+        }
+    }
+
+    public function delete(string $field, mixed $value): void
+    {
+        if (!in_array($field, $this->ALLOW_FIELDS)) {
+            error_log("Field is not allowed");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+        }
+
+        $query_sql = "delete from user_board where " . $field . " = :value";
+        $stmt = $this->database->getConnection()->prepare($query_sql);
+
+        try {
+            $stmt->execute(
+                [
+                    "value" => $value,
                 ]
             );
         } catch (PDOException $exception) {
@@ -122,14 +144,18 @@ class UserBoardModel extends Model implements IModel
         $fields = $tables_to_join['select'];
 
         if (!empty($fields)) {
-            $query_sql .= implode(", ", array_map(function ($field) use ($tables_to_join) {
-                return "{$tables_to_join['as']}.$field";
-            }, $fields));
+            $query_sql .= implode(
+                ", ", array_map(
+                function ($field) use ($tables_to_join) {
+                    return "{$tables_to_join['as']}.$field";
+                }, $fields
+            )
+            );
         }
-        $query_sql = $query_sql."\n";
-        $query_sql = $query_sql."from user_board as ub \n";
-        $query_sql = $query_sql."join {$tables_to_join['table']} as {$tables_to_join['as']} on ub.{$tables_to_join['condition'][0]} = {$tables_to_join['as']}.{$tables_to_join['condition'][1]} \n";
-        $query_sql = $query_sql."where ub.{$condition['where'][0]} = {$condition['where'][1]}";
+        $query_sql .= "\n";
+        $query_sql .= "from user_board as ub \n";
+        $query_sql .= "join {$tables_to_join['table']} as {$tables_to_join['as']} on ub.{$tables_to_join['condition'][0]} = {$tables_to_join['as']}.{$tables_to_join['condition'][1]} \n";
+        $query_sql .= "where ub.{$condition['where'][0]} = {$condition['where'][1]}";
         $stmt = $this->database->getConnection()->prepare($query_sql);
 
         try {
@@ -142,5 +168,28 @@ class UserBoardModel extends Model implements IModel
         }
 
         return $result;
+    }
+
+    public function count(string $field, mixed $value): int {
+        if (!in_array($field, $this->ALLOW_FIELDS)) {
+            error_log("Field is not allowed");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+        }
+
+        $query_sql = "select count(*) from user_board where ".$field." = :value";
+        $stmt = $this->database->getConnection()->prepare($query_sql);
+
+        try {
+            $stmt->execute(
+                [
+                    "value" => $value,
+                ]
+            );
+        } catch (PDOException $exception) {
+            error_log($exception->getMessage());
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+        }
+
+        return $stmt->fetchColumn();
     }
 }

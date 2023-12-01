@@ -5,13 +5,14 @@ namespace app\services;
 
 use app\models\BoardModel;
 use app\models\UserBoardModel;
+use app\models\UserModel;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
 use shared\utils\Checker;
 
 class BoardService
 {
-    public function __construct(private BoardModel $boardModel, private UserBoardModel $userBoardModel)
+    public function __construct(private BoardModel $boardModel, private UserBoardModel $userBoardModel, private UserModel $userModel)
     {
 
     }
@@ -47,16 +48,35 @@ class BoardService
     {
         $user_id = $_SESSION['user_id'];
 
-        return $this->userBoardModel->join(
+        $boards = $this->userBoardModel->join(
             [
-                'table'    => 'boards',
-                'as' => 'b',
-                'condition' => ['board_id', 'id'],
-                'select' => ['id', 'title', 'created_at', 'updated_at'],
+                'table'     => 'boards',
+                'as'        => 'b',
+                'condition' => [
+                    'board_id',
+                    'id'
+                ],
+                'select'    => [
+                    'id',
+                    'title',
+                    'created_at',
+                    'updated_at',
+                    'creator_id',
+                ],
             ],
             [
-                'where' => ['user_id', $user_id]
+                'where' => [
+                    'user_id',
+                    $user_id
+                ]
             ]
+        );
+
+        return array_map(
+            function ($board) {
+                $board["number_of_members"] = $this->userBoardModel->count('board_id', $board['id']);
+                return $board;
+            }, $boards
         );
     }
 
@@ -86,7 +106,7 @@ class BoardService
         $board_to_delete = $this->boardModel->findOne('id', strval($board_id));
 
         if ($board_to_delete['creator_id'] !== $user_id) {
-            throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, "You don't have permission to update board with id [{$board_id}]");
+            throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, "You don't have permission to view the information of board with id [{$board_id}]");
         }
 
         $this->userBoardModel->deleteById(
@@ -95,22 +115,126 @@ class BoardService
                 $board_id
             ]
         );
-        $this->boardModel->deleteById($board_id);
+        $this->userBoardModel->delete('board_id', $board_id);
     }
 
     public function handleGetBoard(int $board_id): array
     {
         $user_id = $_SESSION['user_id'];
         $board = $this->boardModel->findOne('id', strval($board_id));
-        $is_member = $this->userBoardModel->findOne([], [
-            'user_id' => $user_id,
-            'board_id' => $board['id'],
-        ]);
+        $is_member = $this->userBoardModel->findOne(
+            [], [
+                  'user_id'  => $user_id,
+                  'board_id' => $board['id'],
+              ]
+        );
 
         if (!$is_member) {
-            throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, "you don't have permission to update board with id [{$board_id}]");
+            throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, "you are not the member of board with id [{$board_id}]");
         }
 
         return $board;
+    }
+
+    public function handleAddMemberToBoard(int $board_id, array $req_data): void
+    {
+        Checker::checkMissingFields(
+            [
+                'member',
+            ], $req_data
+        );
+
+        $user_id = $_SESSION['user_id'];
+        $board = $this->boardModel->findOne('id', $board_id);
+        if ($board['creator_id'] !== $user_id) {
+            throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, "you don't have permission to add member to board with id [{$board_id}]");
+        }
+
+        $member_to_add = $this->userModel->findOne('username', $req_data['member']);
+
+        if (!$member_to_add) {
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "User with username [{$req_data['member']}] not found!");
+        }
+
+        $is_joined = $this->userBoardModel->findOne(
+            [], [
+                  'user_id'  => $member_to_add['id'],
+                  'board_id' => $board_id,
+              ]
+        );
+
+        if ($is_joined) {
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "User with username [{$req_data['member']}] is a member of this board!");
+        }
+
+        $this->userBoardModel->save(
+            [
+                'userId'  => $member_to_add['id'],
+                'boardId' => $board_id,
+            ]
+        );
+    }
+
+    public function handleLeaveBoard(int $board_id)
+    {
+        $user_id = $_SESSION['user_id'];
+        $board = $this->boardModel->findOne('id', strval($board_id));
+        $is_member = $this->userBoardModel->findOne(
+            [], [
+                  'user_id'  => $user_id,
+                  'board_id' => $board['id'],
+              ]
+        );
+
+        if (!$is_member) {
+            throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, "you are not the member of board with id [{$board_id}]");
+        }
+
+        $this->userBoardModel->deleteById(
+            [
+                $user_id,
+                $board_id
+            ]
+        );
+    }
+
+    public function handleGetMembersOfBoard(int $board_id): array
+    {
+        $user_id = $_SESSION['user_id'];
+        $is_member = $this->userBoardModel->findOne(
+            [], [
+                  'user_id'  => $user_id,
+                  'board_id' => $board_id,
+              ]
+        );
+
+        if (!$is_member) {
+            throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, "you are not the member of board with id [{$board_id}]");
+        }
+
+        $members = $this->userBoardModel->join(
+            [
+                'table'     => 'users',
+                'as'        => 'u',
+                'condition' => [
+                    'user_id',
+                    'id'
+                ],
+                'select'    => [
+                    'id',
+                    'username',
+                    'alias',
+                    'email',
+                ],
+            ],
+            [
+                'where' => [
+                    'board_id',
+                    $board_id
+                ]
+            ]
+        );
+
+        return $members;
     }
 }

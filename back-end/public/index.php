@@ -89,5 +89,23 @@ $app->router->addRoute(
                           'getBoard'
                       ]
 );
+$app->router->addRoute(
+    RequestMethod::POST, '/boards/{boardId}/members', [AuthorizeRequest::class], [
+                           BoardController::class,
+                           'addMemberToBoard'
+                       ]
+);
+$app->router->addRoute(
+    RequestMethod::DELETE, '/boards/{boardId}/members/leave', [AuthorizeRequest::class], [
+                             BoardController::class,
+                             'leaveBoard'
+                         ]
+);
+$app->router->addRoute(
+    RequestMethod::GET, '/boards/{boardId}/members', [AuthorizeRequest::class], [
+                          BoardController::class,
+                          'getMembersOfBoard'
+                      ]
+);
 
 $app->run();

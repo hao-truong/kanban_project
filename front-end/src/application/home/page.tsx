@@ -30,7 +30,7 @@ const HomePage = () => {
                     <InputBase
                         className="py-3"
                         sx={{ ml: 1, flex: 1 }}
-                        placeholder="Search Google Maps"
+                        placeholder="Search board"
                         inputProps={{ 'aria-label': 'search google maps' }}
                     />
                     <Search className="cursor-pointer" size={25} />
