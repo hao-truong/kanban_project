@@ -49,7 +49,7 @@ class UserModel extends Model implements IModel
         return $this->findOne('id', $last_insert_id);
     }
 
-    public function findOne(string $field, string $value): array|null
+    public function findOne(mixed $field, mixed $value): array|null
     {
         if (!in_array($field, $this->ALLOW_FIELD)) {
             error_log("Field is not allowed");
@@ -102,5 +102,10 @@ class UserModel extends Model implements IModel
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return $result ?: [];
+    }
+
+    public function deleteById(mixed $id): void
+    {
+        // TODO: Implement deleteById() method.
     }
 }

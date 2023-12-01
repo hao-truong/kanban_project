@@ -3,7 +3,7 @@ import UserService from "@/shared/services/UserService";
 import { useGlobalState } from "@/shared/storages/GlobalStorage";
 import JwtStorage from "@/shared/storages/JwtStorage";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const SignInUser = () => {
@@ -76,9 +76,9 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
     return (
         <div className="container mx-auto">
             <header className="flex flex-row justify-between items-center py-5">
-                <h1 className="text-4xl">
+                <Link className="text-4xl" to={"/"}>
                     KANBAN BOARD PROBATION
-                </h1>
+                </Link>
                 <SignInUser />
             </header>
             <div>

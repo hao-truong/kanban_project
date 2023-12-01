@@ -18,6 +18,7 @@ enum RequestMethod
             self::POST->name => self::POST,
             self::PUT->name => self::PUT,
             self::DELETE->name => self::DELETE,
+            self::PATCH->name => self::PATCH,
             default => throw new Exception("Invalid method"),
         };
     }

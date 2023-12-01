@@ -45,6 +45,8 @@ class Request
 
         switch ($this->getMethod()) {
             case RequestMethod::POST:
+            case RequestMethod::PUT:
+            case RequestMethod::PATCH:
                 $body = json_decode(file_get_contents('php://input'), true);
                 break;
             default:

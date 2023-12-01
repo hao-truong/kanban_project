@@ -23,11 +23,11 @@ axiosClient.interceptors.response.use(
     async (error) => {
         const responseError: ResponseError = error.response.data;
 
-        if(responseError.statusCode === 403) {
-            JwtStorage.deleteToken();
-            window.location.href = "/auth/sign-in";
-            return;
-        }
+        // if(responseError.statusCode === 403) {
+        //     JwtStorage.deleteToken();
+        //     window.location.href = "/auth/sign-in";
+        //     return;
+        // }
 
         return Promise.reject<ResponseError>(responseError);
     }
