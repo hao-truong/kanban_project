@@ -21,6 +21,10 @@ class Application
         try {
             // run migration
             $this->database->runMigration("migration_user_create_table_1.sql");
+            $this->database->runMigration("board_create_table.sql");
+            $this->database->runMigration("user_board_create_table.sql");
+            $this->database->runMigration("column_create_table.sql");
+            $this->database->runMigration("card_create_table.sql");
 
             echo $this->router->resolve($this->request, $this->response);
         } catch (ResponseException $exception) {

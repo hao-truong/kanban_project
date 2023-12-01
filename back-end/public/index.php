@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use app\controllers\AuthController;
+use app\controllers\BoardController;
 use app\controllers\UserController;
 use app\core\Application;
 use app\middlewares\AuthorizeRequest;
@@ -48,14 +49,26 @@ $app->router->addRoute(
 );
 $app->router->addRoute(
     RequestMethod::POST, '/auth/logout', [AuthorizeRequest::class], [
-                          AuthController::class,
-                          'logout'
-                      ]
+                           AuthController::class,
+                           'logout'
+                       ]
 );
 $app->router->addRoute(
     RequestMethod::GET, '/users/me', [AuthorizeRequest::class], [
-                           UserController::class,
-                           'getProfile'
+                          UserController::class,
+                          'getProfile'
+                      ]
+);
+$app->router->addRoute(
+    RequestMethod::POST, '/boards', [AuthorizeRequest::class], [
+                           BoardController::class,
+                           'createBoard'
+                       ]
+);
+$app->router->addRoute(
+    RequestMethod::GET, '/boards/me', [AuthorizeRequest::class], [
+                           BoardController::class,
+                           'getMyBoards'
                        ]
 );
 

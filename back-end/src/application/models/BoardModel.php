@@ -4,40 +4,31 @@ declare(strict_types=1);
 namespace app\models;
 
 use app\core\Model;
-use app\entities\UserEntity;
-use app\models\IModel;
+use app\entities\BoardEntity;
 use PDO;
 use PDOException;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
 
-class UserModel extends Model implements IModel
+class  BoardModel extends Model implements IModel
 {
     private array $ALLOW_FIELD = [
-        'username',
         'id',
-        'email',
-        'access_token',
-        'refresh_token'
+        'creator_id'
     ];
 
-    /**
-     * @param $entity array ["username" => string, "password" => string, "alias" => string]
-     * @return array
-     * @throws ResponseException
-     */
     public function save(array $entity): array
     {
-        $user_entity = new UserEntity(
-            $entity["username"], $entity["password"], $entity["email"], $entity["alias"]
+        new BoardEntity(
+            $entity['title'], $entity['creatorId']
         );
 
-        $query_sql = "insert into users (username, password, alias, email) values (:username, :password, :alias, :email)";
+        $query_sql = "insert into boards (title, creator_id) values (:title, :creatorId)";
         $stmt = $this->database->getConnection()->prepare($query_sql);
 
         try {
             $stmt->execute(
-                $user_entity->toArray()
+                $entity
             );
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
@@ -56,7 +47,7 @@ class UserModel extends Model implements IModel
             throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
         }
 
-        $query_sql = "select * from users where " . $field . " = :value";
+        $query_sql = "select * from boards where " . $field . " = :value";
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute(
             [
@@ -71,17 +62,8 @@ class UserModel extends Model implements IModel
 
     public function update(array $entity): array
     {
-        $query_sql = "UPDATE users SET username = :username, password = :password, alias = :alias, email = :email, access_token = :access_token, refresh_token = :refresh_token WHERE id = :id";
-        $stmt = $this->database->getConnection()->prepare($query_sql);
-
-        try {
-            $stmt->execute($entity);
-        } catch (PDOException $exception) {
-            error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
-        }
-
-        return $this->findOne('id', strval($entity['id']));
+        // TODO: Implement update() method.
+        return [];
     }
 
     public function find(string $field, mixed $value): array
@@ -91,7 +73,7 @@ class UserModel extends Model implements IModel
             throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
         }
 
-        $query_sql = "select * from users where " . $field . " = :value";
+        $query_sql = "select * from boards where " . $field . " = :value";
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute(
             [

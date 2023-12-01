@@ -36,6 +36,11 @@ class AuthorizeRequest implements IMiddleware
 
         $payload = $this->jwtService->verifyToken(TypeJwt::ACCESS_TOKEN, $token);
         $user_id = $payload->userId;
+
+        if($matched_token['id'] != $user_id) {
+            throw new ResponseException(StatusCode::FORBIDDEN, "Invalid token", StatusCode::FORBIDDEN->name);
+        }
+
         $_SESSION["user_id"] = $user_id;
 
         return true;
