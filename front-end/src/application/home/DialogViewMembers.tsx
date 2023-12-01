@@ -26,13 +26,14 @@ const MemberComponent = ({ member, orderNumber, creatorId }: memberProps) => {
     }, [user])
 
     return (
-        <div className={`flex flex-row justify-between items-center w-full min-w-[200px]`}>
+        <div className={`grid grid-cols-3 w-full min-w-[500px]`}>
             <div className="flex flex-row gap-4">
                 <strong >{orderNumber}</strong>
                 {isMe && <Sparkle color="red" />}
                 {isCreator && <Crown color='blue' />}
             </div>
-            <span>{member.username}</span>
+            <span className="text-left">{member.username}</span>
+            <span className="text-left">{member.alias}</span>
         </div>
     )
 }
