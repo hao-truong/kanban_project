@@ -1,29 +1,27 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import KanbanBoard from "./KanbanBoard";
-import { toast } from "react-toastify";
 import BoardService from "@/shared/services/BoardService";
 import { InputBase } from "@mui/material";
 import { Plus, Search } from "lucide-react";
 import DialogCreateBoard from "./DialogCreateBoard";
+import { useQuery, useQueryClient } from 'react-query';
+import { toast } from "react-toastify";
+
+const getMyBoards = async (): Promise<Board[]> => {
+    try {
+        const { data } = await BoardService.getMyBoards(); // Adjust this line based on your BoardService implementation
+        return data;
+    } catch (error: any) {
+        toast.error(error.message);
+        return [];
+    }
+};
 
 const HomePage = () => {
-    const [boards, setBoards] = useState<Board[]>([]);
+    useQueryClient()
     const [isOpenDialogCreateBoard, setIsOpenDialogCreateBoard] = useState<boolean>(false);
-
-    useEffect(() => {
-        const getBoards = async () => {
-            try {
-                const { data } = await BoardService.getMyBoards();
-
-                setBoards(data);
-            } catch (error: any) {
-                toast.error(error.message);
-            }
-        }
-
-        getBoards();
-    }, [])
-
+    const { data: boards } = useQuery<Board[]>('getMyBoards', getMyBoards);
+    
     return (
         <div className="">
             <h2 className="w-full text-center font-bold text-5xl my-10">YOUR BOARDS</h2>
@@ -40,12 +38,12 @@ const HomePage = () => {
                 <div className="h-fit flex flex-row items-center gap-4 px-4 py-2 cursor-pointer hover:bg-slate-400" onClick={() => setIsOpenDialogCreateBoard(!isOpenDialogCreateBoard)}>
                     <Plus />
                     <span>Create board</span>
-                    <DialogCreateBoard isOpen={isOpenDialogCreateBoard} setIsOpen={setIsOpenDialogCreateBoard} setBoards={setBoards} />
+                    <DialogCreateBoard isOpen={isOpenDialogCreateBoard} setIsOpen={setIsOpenDialogCreateBoard} />
                 </div>
             </div>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-3 gap-4">
                 {
-                    boards.map((board) => (
+                    boards && boards?.length !== 0 && boards.map((board) => (
                         <KanbanBoard board={board} key={board.id} />
                     ))
                 }

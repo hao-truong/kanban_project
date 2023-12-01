@@ -6,9 +6,10 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     const isLogin = useCheckLogin();
     const navigate = useNavigate();
     const location = useLocation();
+    const disallowPath = ["/"];
 
     useEffect(() => {
-        if(location.pathname === "/" && !isLogin) {
+        if(disallowPath.includes(location.pathname) && !isLogin) {
             navigate("/auth/sign-in")
         }
 

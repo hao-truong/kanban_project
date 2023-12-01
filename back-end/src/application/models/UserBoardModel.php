@@ -4,27 +4,28 @@ declare(strict_types=1);
 namespace app\models;
 
 use app\core\Model;
-use app\entities\BoardEntity;
+use app\entities\ColumnEntity;
+use app\entities\UserBoardEntity;
 use PDO;
 use PDOException;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
 
-class  BoardModel extends Model implements IModel
+class UserBoardModel extends Model implements IModel
 {
-    private array $ALLOW_FIELD = [
-        'id',
-        'creator_id',
-        'title',
+
+    private array $ALLOW_FIELDS = [
+        'user_id',
+        'board_id'
     ];
 
     public function save(array $entity): array
     {
-        new BoardEntity(
-            $entity['title'], $entity['creatorId']
+        new UserBoardEntity(
+            $entity['userId'], $entity['boardId']
         );
 
-        $query_sql = "insert into boards (title, creator_id) values (:title, :creatorId)";
+        $query_sql = "insert into user_board (user_id, board_id) values (:userId, :boardId)";
         $stmt = $this->database->getConnection()->prepare($query_sql);
 
         try {
@@ -36,26 +37,25 @@ class  BoardModel extends Model implements IModel
             throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
         }
 
-        $last_insert_id = $this->database->getConnection()->lastInsertId();
-
-        return $this->findOne('id', $last_insert_id);
+        return $this->findOne(
+            [
+                'user_id',
+                'board_id'
+            ], [
+                'user_id' => $entity['userId'],
+                'board_id' => $entity['boardId'],
+            ]
+        );
     }
 
     public function findOne(mixed $field, mixed $value): array|null
     {
-        if (!in_array($field, $this->ALLOW_FIELD)) {
-            error_log("Field is not allowed");
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
-        }
-
-        $query_sql = "select * from boards where " . $field . " = :value";
+        $query_sql = "select * from user_board where user_id = :user_id and board_id = :board_id";
         $stmt = $this->database->getConnection()->prepare($query_sql);
 
         try {
             $stmt->execute(
-                [
-                    "value" => $value,
-                ]
+                $value,
             );
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
@@ -69,31 +69,17 @@ class  BoardModel extends Model implements IModel
 
     public function update(array $entity): array
     {
-        new BoardEntity(
-            $entity['title'], $entity['creator_id']
-        );
-
-        $query_sql = "UPDATE boards SET title = :title, created_at = :created_at, updated_at = :updated_at, creator_id = :creator_id WHERE id = :id";
-        $stmt = $this->database->getConnection()->prepare($query_sql);
-
-        try {
-            $stmt->execute($entity);
-        } catch (PDOException $exception) {
-            error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
-        }
-
-        return $this->findOne('id', strval($entity['id']));
+        return [];
     }
 
     public function find(string $field, mixed $value): array
     {
-        if (!in_array($field, $this->ALLOW_FIELD)) {
+        if (!in_array($field, $this->ALLOW_FIELDS)) {
             error_log("Field is not allowed");
             throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
         }
 
-        $query_sql = "select * from boards where " . $field . " = :value";
+        $query_sql = "select * from user_board where " . $field . " = :value";
         $stmt = $this->database->getConnection()->prepare($query_sql);
 
         try {
@@ -114,18 +100,47 @@ class  BoardModel extends Model implements IModel
 
     public function deleteById(mixed $id): void
     {
-        $query_sql = "delete from boards where id = :id";
+        $query_sql = "delete from user_board where user_id = :user_id and board_id = :board_id";
         $stmt = $this->database->getConnection()->prepare($query_sql);
 
         try {
             $stmt->execute(
                 [
-                    "id" => $id,
+                    "user_id" => $id[0],
+                    "board_id" => $id[1],
                 ]
             );
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
             throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
         }
+    }
+
+    public function join(array $tables_to_join, array $condition)
+    {
+        $query_sql = "select ";
+        $fields = $tables_to_join['select'];
+
+        if (!empty($fields)) {
+            $query_sql .= implode(", ", array_map(function ($field) use ($tables_to_join) {
+                return "{$tables_to_join['as']}.$field";
+            }, $fields));
+        }
+        $query_sql = $query_sql."\n";
+        $query_sql = $query_sql."from user_board as ub \n";
+        $query_sql = $query_sql."join {$tables_to_join['table']} as {$tables_to_join['as']} on ub.{$tables_to_join['condition'][0]} = {$tables_to_join['as']}.{$tables_to_join['condition'][1]} \n";
+        $query_sql = $query_sql."where ub.{$condition['where'][0]} = {$condition['where'][1]}";
+        $stmt = $this->database->getConnection()->prepare($query_sql);
+
+        try {
+            $stmt->execute();
+
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $exception) {
+            error_log($exception->getMessage());
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+        }
+
+        return $result;
     }
 }

@@ -12,7 +12,7 @@ class Response
         http_response_code($status_code->value);
     }
 
-    public function content(StatusCode $status_code, string $message, array | string | null $errors, int | string | array | null $data): void
+    public function content(StatusCode $status_code, string $message, mixed $errors, mixed $data): void
     {
         header('Content-Type: application/json');
         http_response_code($status_code->value);
@@ -24,7 +24,12 @@ class Response
             $response_content["errors"] = $errors;
         }
 
-        if ($data) {
+        if(is_array($data)) {
+            echo json_encode($data);
+            die();
+        }
+
+        if ($data != null) {
             echo json_encode($data);
             die();
         }

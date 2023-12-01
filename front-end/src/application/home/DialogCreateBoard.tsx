@@ -1,16 +1,16 @@
 import BoardService from "@/shared/services/BoardService";
-import { MAX_LENGTH_INPUT_STRING, MIN_LENGTH_INPUT_STRING } from "@/shared/utils/constant";
+import { MAX_LENGTH_INPUT_STRING, MAX_TITLE_LENGTH, MIN_LENGTH_INPUT_STRING } from "@/shared/utils/constant";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { TextField } from "@mui/material";
 import { useEffect, useRef } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import * as yup from "yup";
+import { useQueryClient } from 'react-query';
 
 interface itemProps {
     isOpen: boolean;
     setIsOpen: Function;
-    setBoards: Function;
 }
 
 const schemaValidation = yup
@@ -29,7 +29,8 @@ const schemaValidation = yup
     })
     .required();
 
-const DialogCreateBoard = ({ isOpen, setIsOpen, setBoards }: itemProps) => {
+const DialogCreateBoard = ({ isOpen, setIsOpen }: itemProps) => {
+    const queryClient = useQueryClient();
     const dialogRef = useRef<HTMLDialogElement | null>(null);
     const bodyDialogRef = useRef<HTMLDivElement | null>(null);
     const {
@@ -42,10 +43,10 @@ const DialogCreateBoard = ({ isOpen, setIsOpen, setBoards }: itemProps) => {
     });
     const onSubmit: SubmitHandler<BoardReq> = async (boardReqData) => {
         try {
-            const { data } = await BoardService.createBoard(boardReqData);
+            await BoardService.createBoard(boardReqData);
 
             toast.success("Create new board successfully!");
-            setBoards((preBoards: Board[]) => [...preBoards, data]);
+            queryClient.invalidateQueries('getMyBoards');
             reset();
             if (dialogRef.current) {
                 dialogRef.current.close();
@@ -79,7 +80,7 @@ const DialogCreateBoard = ({ isOpen, setIsOpen, setBoards }: itemProps) => {
             <div ref={bodyDialogRef} className="flex flex-col items-end justify-center gap-4">
                 <form className="min-w-[500px] text-center flex flex-col gap-5 rounded-xl" onSubmit={handleSubmit(onSubmit)}>
                     <TextField id="outlined-basic" label="Title board" variant="outlined" {...register('title')} error={errors.title ? true : false}
-                        helperText={errors.title?.message} />
+                        helperText={errors.title?.message} inputProps={{ maxLength: MAX_TITLE_LENGTH }}/>
                     <div className="flex flex-row justify-end">
                         <button className="w-fit py-2 px-6 bg-blue-500 text-white rounded-lg" type="submit">
                             Create

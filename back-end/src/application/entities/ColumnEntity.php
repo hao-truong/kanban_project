@@ -7,22 +7,22 @@ use DateTime;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
 
-class BoardEntity
-{
+class ColumnEntity {
     private int $id;
+    private int $boardId;
     private string $title;
+    private int $creatorId;
     private DateTime $createdAt;
     private DateTime $updatedAt;
-    private int $creatorId;
     private static $MIN_LENGTH_TITLE = 2;
     private static $MAX_LENGTH_TITLE = 20;
 
-    public function __construct(string $title, int $creator_id)
-    {
+    public function __construct(int $board_id, string $title, int $creator_id) {
         $errors = $this->validate(
             [
                 'title'     => $title,
-                'creatorId' => $creator_id
+                'creator_id' => $creator_id,
+                'board_id' => $board_id,
             ]
         );
 
@@ -46,6 +46,10 @@ class BoardEntity
             $errors['title'] = "Title should be less than 20 characters long";
         }
 
+        if($data_to_validate['board_id'])
+        {
+
+        }
         return $errors;
     }
 }
