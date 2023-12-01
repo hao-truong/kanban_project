@@ -20,10 +20,10 @@ const MemberComponent = ({ member, orderNumber, creatorId }: memberProps) => {
             setIsMe(true);
         }
 
-        if (user?.id === creatorId) {
+        if (member?.id === creatorId) {
             setIsCreator(true);
         }
-    }, [])
+    }, [user])
 
     return (
         <div className={`flex flex-row justify-between items-center w-full min-w-[200px]`}>
