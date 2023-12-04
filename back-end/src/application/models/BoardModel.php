@@ -82,10 +82,6 @@ class  BoardModel extends Model implements IModel
      */
     public function update(array $entity): array
     {
-        new BoardEntity(
-            $entity['title'], $entity['creator_id']
-        );
-
         $query_sql = "UPDATE boards SET title = :title, created_at = :created_at, updated_at = :updated_at, creator_id = :creator_id WHERE id = :id";
         $stmt = $this->database->getConnection()->prepare($query_sql);
 
