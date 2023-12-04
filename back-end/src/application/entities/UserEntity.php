@@ -21,6 +21,7 @@ class UserEntity
         'email',
         'alias'
     ];
+    private static int $MIN_LENGTH_PASSWORD = 8;
 
     public function __construct(string $username, string $password, string $email, string $alias)
     {
@@ -77,8 +78,8 @@ class UserEntity
             }
         }
 
-        if(strlen($data_to_validate['password']) < 8) {
-            $errors['password'] = "Password should be at least 8 characters long!";
+        if (strlen($data_to_validate['password']) < self::$MIN_LENGTH_PASSWORD) {
+            $errors['password'] = "Password should be at least " . self::$MIN_LENGTH_PASSWORD . " characters long!";
         }
 
         return $errors;

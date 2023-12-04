@@ -14,8 +14,8 @@ class ColumnEntity {
     private int $creatorId;
     private DateTime $createdAt;
     private DateTime $updatedAt;
-    private static $MIN_LENGTH_TITLE = 2;
-    private static $MAX_LENGTH_TITLE = 20;
+    private static int $MIN_LENGTH_TITLE = 3;
+    private static int $MAX_LENGTH_TITLE = 20;
 
     /**
      * @param int $board_id
@@ -45,11 +45,11 @@ class ColumnEntity {
         $errors = [];
 
         if (strlen($data_to_validate['title']) <= self::$MIN_LENGTH_TITLE) {
-            $errors['title'] = "Title should be at least 3 characters long";
+            $errors['title'] = "Title should be at least ".self::$MIN_LENGTH_TITLE." characters long";
         }
 
         if(strlen($data_to_validate['title']) > self::$MAX_LENGTH_TITLE) {
-            $errors['title'] = "Title should be less than 20 characters long";
+            $errors['title'] = "Title should be less than ".self::$MAX_LENGTH_TITLE." characters long";
         }
 
         return $errors;

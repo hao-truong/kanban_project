@@ -168,7 +168,7 @@ class UserBoardModel extends Model implements IModel
     /**
      * @param array $tables_to_join
      * @param array $condition
-     * @return array|false
+     * @return array
      * @throws ResponseException
      */
     public function join(array $tables_to_join, array $condition): array
