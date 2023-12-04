@@ -28,16 +28,12 @@ class UserModel extends Model implements IModel
      */
     public function save(array $entity): array
     {
-        $user_entity = new UserEntity(
-            $entity["username"], $entity["password"], $entity["email"], $entity["alias"]
-        );
-
         $query_sql = "insert into users (username, password, alias, email) values (:username, :password, :alias, :email)";
         $stmt = $this->database->getConnection()->prepare($query_sql);
 
         try {
             $stmt->execute(
-                $user_entity->toArray()
+                $entity
             );
         } catch (PDOException $exception) {
             error_log($exception->getMessage());

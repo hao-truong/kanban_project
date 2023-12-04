@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace app\services;
 
+use app\entities\UserEntity;
 use app\models\UserModel;
 use shared\enums\StatusCode;
 use shared\enums\TypeJwt;
@@ -18,48 +19,34 @@ class AuthService
     }
 
     /**
+     * @param UserEntity $user_entity
+     * @return array
      * @throws ResponseException
      */
-    public function handleRegister(array $register_req_data): array
+    public function handleRegister(UserEntity $user_entity): array
     {
-        Checker::checkMissingFields(
-            [
-                'username',
-                'password',
-                'email',
-                'alias'
-            ], $register_req_data
-        );
-
-        $existed_username = $this->userModel->findOne('username', $register_req_data['username']);
+        $existed_username = $this->userModel->findOne('username', $user_entity->getUsername());
 
         if ($existed_username) {
             throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Username existed!");
         }
 
-        $register_req_data['password'] = password_hash($register_req_data['password'], PASSWORD_BCRYPT);
-        return $this->userModel->save($register_req_data);
+        $user_entity->setPassword(password_hash($user_entity->getPassword(), PASSWORD_BCRYPT));
+        return $this->userModel->save($user_entity->toArray());
     }
 
     /**
      * @throws ResponseException
      */
-    public function handleLogin(array $login_req_data): array
+    public function handleLogin(UserEntity $user_entity): array
     {
-        Checker::checkMissingFields(
-            [
-                'username',
-                'password'
-            ], $login_req_data
-        );
-
-        $matched_user = $this->userModel->findOne('username', $login_req_data['username']);
+        $matched_user = $this->userModel->findOne('username', $user_entity->getUsername());
 
         if (!$matched_user) {
             throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Username or password is wrong!");
         }
 
-        $is_correct_password = password_verify($login_req_data['password'], $matched_user['password']);
+        $is_correct_password = password_verify($user_entity->getPassword(), $matched_user['password']);
 
         if (!$is_correct_password) {
             throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Username or password is wrong!");
@@ -85,7 +72,7 @@ class AuthService
         $_SESSION = array();
         session_destroy();
 
-        $matched_user = $this->userModel->findOne('id', strval($user_id));
+        $matched_user = $this->userModel->findOne('id', $user_id);
 
         if (!$matched_user) {
             throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, "User not found!");

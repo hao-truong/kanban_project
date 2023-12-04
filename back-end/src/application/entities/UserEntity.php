@@ -22,67 +22,106 @@ class UserEntity
         'alias'
     ];
     private static int $MIN_LENGTH_PASSWORD = 8;
+    private static int $MIN_LENGTH_STRING = 3;
+    private static int $MAX_LENGTH_STRING = 256;
 
-    public function __construct(string $username, string $password, string $email, string $alias)
+    public function __construct()
     {
-        $errors = $this->validate(
-            [
-                "username" => $username,
-                "password" => $password,
-                "email"    => $email,
-                "alias"    => $alias,
-            ]
-        );
+    }
 
-        if (count($errors)) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, $errors, StatusCode::BAD_REQUEST->name);
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function setId(?int $id): void
+    {
+        $this->id = $id;
+    }
+
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    public function setUsername(string $username): void
+    {
+        if (strlen($username) < self::$MIN_LENGTH_STRING) {
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, 'Username must have ' . self::$MIN_LENGTH_STRING . ' characters at least');
+        }
+
+        if (strlen($username) > self::$MAX_LENGTH_STRING) {
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, 'Username must less than ' . self::$MAX_LENGTH_STRING . ' characters at least');
         }
 
         $this->username = $username;
+    }
+
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): void
+    {
+        if (strlen($password) < self::$MIN_LENGTH_PASSWORD) {
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Password should be at least " . self::$MIN_LENGTH_PASSWORD . " characters long!");
+        }
+
         $this->password = $password;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): void
+    {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Invalid email address: $email");
+        }
+
         $this->email = $email;
+    }
+
+
+    public function getAlias(): string
+    {
+        return $this->alias;
+    }
+
+    public function setAlias(string $alias): void
+    {
+        if (strlen($alias) < self::$MIN_LENGTH_STRING) {
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, 'Alias name must have ' . self::$MIN_LENGTH_STRING . ' characters at least');
+        }
+
+        if (strlen($alias) > self::$MAX_LENGTH_STRING) {
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, 'Alias must less than ' . self::$MAX_LENGTH_STRING . ' characters at least');
+        }
+
         $this->alias = $alias;
     }
 
-    /**
-     * @param array $data_to_validate ["username" => string, "password" => string, "email" => string, "alias" => string"]
-     * @return array
-     */
-    private function validate(array $data_to_validate): array
+    public function getAccessToken(): string
     {
-        $errors = [];
+        return $this->accessToken;
+    }
 
-        $validation_fields = [
-            "email"    => FILTER_VALIDATE_EMAIL,
-            "username" => [
-                'filter'  => FILTER_VALIDATE_REGEXP,
-                'options' => ['regexp' => '/\w+/'],
-            ],
-            "password" => [
-                'filter'  => FILTER_VALIDATE_REGEXP,
-                'options' => ['regexp' => '/\w+/'],
-            ],
-        ];
+    public function setAccessToken(string $accessToken): void
+    {
+        $this->accessToken = $accessToken;
+    }
 
-        $message_errors = [
-            "email"    => "Email is invalid!",
-            "username" => "Username cannot be null",
-            "password" => "Password cannot be null",
-        ];
+    public function getRefreshToken(): string
+    {
+        return $this->refreshToken;
+    }
 
-        $field_errors = filter_var_array($data_to_validate, $validation_fields);
-
-        foreach ($field_errors as $field => $is_error) {
-            if ($is_error === false || $is_error === null) {
-                $errors[$field] = $message_errors[$field];
-            }
-        }
-
-        if (strlen($data_to_validate['password']) < self::$MIN_LENGTH_PASSWORD) {
-            $errors['password'] = "Password should be at least " . self::$MIN_LENGTH_PASSWORD . " characters long!";
-        }
-
-        return $errors;
+    public function setRefreshToken(string $refreshToken): void
+    {
+        $this->refreshToken = $refreshToken;
     }
 
     public function toArray(): array

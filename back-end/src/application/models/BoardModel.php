@@ -5,6 +5,7 @@ namespace app\models;
 
 use app\core\Model;
 use app\entities\BoardEntity;
+use app\entities\ColumnEntity;
 use PDO;
 use PDOException;
 use shared\enums\StatusCode;
@@ -25,11 +26,7 @@ class  BoardModel extends Model implements IModel
      */
     public function save(array $entity): array
     {
-        new BoardEntity(
-            $entity['title'], $entity['creatorId']
-        );
-
-        $query_sql = "insert into boards (title, creator_id) values (:title, :creatorId)";
+        $query_sql = "insert into boards (title, creator_id) values (:title, :creator_id)";
         $stmt = $this->database->getConnection()->prepare($query_sql);
 
         try {

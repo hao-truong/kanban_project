@@ -20,7 +20,7 @@ class Response
      * @param mixed $data
      * @return void
      */
-    #[NoReturn] public function content(StatusCode $status_code, string $message, mixed $errors, mixed $data): void
+    #[NoReturn] public function content(StatusCode $status_code, ?string $message, mixed $errors, mixed $data): void
     {
         header('Content-Type: application/json');
         http_response_code($status_code->value);

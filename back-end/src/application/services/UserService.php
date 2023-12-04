@@ -28,4 +28,14 @@ class UserService
             'alias'    => $matched_user['alias'],
         ];
     }
+
+    public function getUserByUsername(string $username): array {
+        $matched_user = $this->userModel->findOne("username", $username);
+
+        if(!$matched_user) {
+            throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, "User with username [$username] not found!");
+        }
+
+        return $matched_user;
+    }
 }

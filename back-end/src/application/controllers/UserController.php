@@ -20,16 +20,10 @@ class UserController
 
     }
 
-    /**
-     * @return mixed
-     * @throws ResponseException
-     */
     #[NoReturn] public function getProfile(): mixed
     {
         $user_id = $_SESSION['user_id'];
-
         $profile = $this->userService->handleGetProfile($user_id);
-
         return $this->response->content(StatusCode::OK, "Get profile successfully!", null, $profile);
     }
 }

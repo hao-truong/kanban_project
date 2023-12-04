@@ -4,11 +4,11 @@ namespace app\controllers;
 
 use app\core\Request;
 use app\core\Response;
+use app\entities\UserEntity;
 use app\services\AuthService;
-use app\services\UserService;
 use JetBrains\PhpStorm\NoReturn;
 use shared\enums\StatusCode;
-use shared\exceptions\ResponseException;
+use shared\utils\Checker;
 
 class AuthController
 {
@@ -19,33 +19,59 @@ class AuthController
     ) {
     }
 
-    /**
-     * @return mixed
-     * @throws ResponseException
-     */
     #[NoReturn] public function register(): mixed
     {
-        $this->authService->handleRegister($this->request->getBody());
-        return $this->response->content(StatusCode::CREATED, 'Register successfully!', null, 'Register successfully!');
+        $req_data = $this->request->getBody();
+        Checker::checkMissingFields(
+            $req_data,
+            [
+                'username',
+                'password',
+                'email',
+                'alias'
+            ], [
+                'username' => 'string',
+                'password' => 'string',
+                'email'    => 'string',
+                'alias'    => 'string',
+            ]
+        );
+
+        $user_entity = new UserEntity();
+        $user_entity->setUsername($req_data['username']);
+        $user_entity->setPassword($req_data['password']);
+        $user_entity->setEmail($req_data['email']);
+        $user_entity->setAlias($req_data['alias']);
+
+        $this->authService->handleRegister($user_entity);
+        return $this->response->content(StatusCode::CREATED, null, null, 'Register successfully!');
     }
 
-    /**
-     * @return mixed
-     * @throws ResponseException
-     */
     #[NoReturn] public function login(): mixed
     {
-        $tokens = $this->authService->handleLogin($this->request->getBody());
-        return $this->response->content(StatusCode::OK, 'Login successfully!', null, $tokens);
+        $req_data = $this->request->getBody();
+        Checker::checkMissingFields(
+            $req_data,
+            [
+                'username',
+                'password'
+            ], [
+                'username' => 'string',
+                'password' => 'string',
+            ]
+        );
+
+        $user_entity = new UserEntity();
+        $user_entity->setUsername($req_data['username']);
+        $user_entity->setPassword($req_data['password']);
+
+        $tokens = $this->authService->handleLogin($user_entity);
+        return $this->response->content(StatusCode::OK, null, null, $tokens);
     }
 
-    /**
-     * @return mixed
-     * @throws ResponseException
-     */
     #[NoReturn] public function logout(): mixed
     {
         $this->authService->handleLogout();
-        return $this->response->content(StatusCode::OK, 'Logout successfully!', null, 'Logout successfully!');
+        return $this->response->content(StatusCode::OK, null, null, 'Logout successfully!');
     }
 }

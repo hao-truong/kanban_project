@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace app\models;
 
 use app\core\Model;
-use app\entities\ColumnEntity;
-use app\entities\UserBoardEntity;
 use PDO;
 use PDOException;
 use shared\enums\StatusCode;
@@ -24,11 +22,7 @@ class UserBoardModel extends Model implements IModel
      */
     public function save(array $entity): array
     {
-        new UserBoardEntity(
-            $entity['userId'], $entity['boardId']
-        );
-
-        $query_sql = "insert into user_board (user_id, board_id) values (:userId, :boardId)";
+        $query_sql = "insert into user_board (user_id, board_id) values (:user_id, :board_id)";
         $stmt = $this->database->getConnection()->prepare($query_sql);
 
         try {
@@ -41,13 +35,10 @@ class UserBoardModel extends Model implements IModel
         }
 
         return $this->findOne(
-            [
-                'user_id',
-                'board_id'
-            ], [
-                'user_id'  => $entity['userId'],
-                'board_id' => $entity['boardId'],
-            ]
+            null, [
+                    'user_id'  => $entity['user_id'],
+                    'board_id' => $entity['board_id'],
+                ]
         );
     }
 
@@ -64,7 +55,7 @@ class UserBoardModel extends Model implements IModel
 
         try {
             $stmt->execute(
-                $value,
+                $value
             );
         } catch (PDOException $exception) {
             error_log($exception->getMessage());

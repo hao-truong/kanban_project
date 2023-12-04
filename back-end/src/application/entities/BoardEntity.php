@@ -17,35 +17,73 @@ class BoardEntity
     private static int $MIN_LENGTH_TITLE = 2;
     private static int $MAX_LENGTH_TITLE = 20;
 
-    public function __construct(string $title, int $creator_id)
+    public function __construct()
     {
-        $errors = $this->validate(
-            [
-                'title'     => $title,
-                'creatorId' => $creator_id
-            ]
-        );
+    }
 
-        if (count($errors)) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, $errors, StatusCode::BAD_REQUEST->name);
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): void
+    {
+        if (strlen($title) <= self::$MIN_LENGTH_TITLE) {
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Title should be at least " . self::$MIN_LENGTH_TITLE . " characters long");
+        }
+
+        if (strlen($title) > self::$MAX_LENGTH_TITLE) {
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Title should be less than " . self::$MAX_LENGTH_TITLE . " characters long");
         }
 
         $this->title = $title;
-        $this->creatorId = $creator_id;
     }
 
-    private function validate(array $data_to_validate): array
+    public function getCreatedAt(): DateTime
     {
-        $errors = [];
+        return $this->createdAt;
+    }
 
-        if (strlen($data_to_validate['title']) <= self::$MIN_LENGTH_TITLE) {
-            $errors['title'] = "Title should be at least ".self::$MIN_LENGTH_TITLE." characters long";
-        }
+    public function setCreatedAt(DateTime $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
 
-        if(strlen($data_to_validate['title']) > self::$MAX_LENGTH_TITLE) {
-            $errors['title'] = "Title should be less than ".self::$MAX_LENGTH_TITLE." characters long";
-        }
+    public function getUpdatedAt(): DateTime
+    {
+        return $this->updatedAt;
+    }
 
-        return $errors;
+    public function setUpdatedAt(DateTime $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    public function getCreatorId(): int
+    {
+        return $this->creatorId;
+    }
+
+    public function setCreatorId(int $creatorId): void
+    {
+        $this->creatorId = $creatorId;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'creator_id' => $this->creatorId,
+            'title'      => $this->title,
+        ];
     }
 }
