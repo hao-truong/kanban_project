@@ -6,7 +6,9 @@ use app\core\Request;
 use app\core\Response;
 use app\services\AuthService;
 use app\services\UserService;
+use JetBrains\PhpStorm\NoReturn;
 use shared\enums\StatusCode;
+use shared\exceptions\ResponseException;
 
 class AuthController
 {
@@ -17,19 +19,31 @@ class AuthController
     ) {
     }
 
-    public function register(): mixed
+    /**
+     * @return mixed
+     * @throws ResponseException
+     */
+    #[NoReturn] public function register(): mixed
     {
         $this->authService->handleRegister($this->request->getBody());
         return $this->response->content(StatusCode::CREATED, 'Register successfully!', null, 'Register successfully!');
     }
 
-    public function login(): mixed
+    /**
+     * @return mixed
+     * @throws ResponseException
+     */
+    #[NoReturn] public function login(): mixed
     {
         $tokens = $this->authService->handleLogin($this->request->getBody());
         return $this->response->content(StatusCode::OK, 'Login successfully!', null, $tokens);
     }
 
-    public function logout(): mixed
+    /**
+     * @return mixed
+     * @throws ResponseException
+     */
+    #[NoReturn] public function logout(): mixed
     {
         $this->authService->handleLogout();
         return $this->response->content(StatusCode::OK, 'Logout successfully!', null, 'Logout successfully!');

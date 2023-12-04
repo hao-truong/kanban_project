@@ -12,12 +12,18 @@ use shared\utils\Checker;
 
 class BoardService
 {
-    public function __construct(private BoardModel $boardModel, private UserBoardModel $userBoardModel, private UserModel $userModel)
-    {
+    public function __construct(
+        private readonly BoardModel     $boardModel,
+        private readonly UserBoardModel $userBoardModel,
+        private readonly UserModel      $userModel
+    ) {
 
     }
 
-    public function handleCreateBoard(array $board_req_data)
+    /**
+     * @throws ResponseException
+     */
+    public function handleCreateBoard(array $board_req_data): array
     {
         Checker::checkMissingFields(
             [
@@ -44,7 +50,10 @@ class BoardService
         return $new_board;
     }
 
-    public function handleGetMyBoards()
+    /**
+     * @throws ResponseException
+     */
+    public function handleGetMyBoards(): array
     {
         $user_id = $_SESSION['user_id'];
 
@@ -67,7 +76,7 @@ class BoardService
             [
                 'where' => [
                     'user_id',
-                    $user_id
+                    $user_id,
                 ]
             ]
         );
@@ -80,6 +89,9 @@ class BoardService
         );
     }
 
+    /**
+     * @throws ResponseException
+     */
     public function handleUpdateBoard(int $board_id, array $req_data): array
     {
         Checker::checkMissingFields(
@@ -100,6 +112,9 @@ class BoardService
         return $this->boardModel->update($board_to_update);
     }
 
+    /**
+     * @throws ResponseException
+     */
     public function handleDeleteBoard(int $board_id): void
     {
         $user_id = $_SESSION['user_id'];
@@ -118,6 +133,9 @@ class BoardService
         $this->userBoardModel->delete('board_id', $board_id);
     }
 
+    /**
+     * @throws ResponseException
+     */
     public function handleGetBoard(int $board_id): array
     {
         $user_id = $_SESSION['user_id'];
@@ -136,6 +154,9 @@ class BoardService
         return $board;
     }
 
+    /**
+     * @throws ResponseException
+     */
     public function handleAddMemberToBoard(int $board_id, array $req_data): void
     {
         Checker::checkMissingFields(
@@ -175,7 +196,10 @@ class BoardService
         );
     }
 
-    public function handleLeaveBoard(int $board_id)
+    /**
+     * @throws ResponseException
+     */
+    public function handleLeaveBoard(int $board_id): void
     {
         $user_id = $_SESSION['user_id'];
         $board = $this->boardModel->findOne('id', strval($board_id));
@@ -198,6 +222,9 @@ class BoardService
         );
     }
 
+    /**
+     * @throws ResponseException
+     */
     public function handleGetMembersOfBoard(int $board_id): array
     {
         $user_id = $_SESSION['user_id'];
@@ -212,7 +239,7 @@ class BoardService
             throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, "you are not the member of board with id [{$board_id}]");
         }
 
-        $members = $this->userBoardModel->join(
+        return $this->userBoardModel->join(
             [
                 'table'     => 'users',
                 'as'        => 'u',
@@ -234,7 +261,5 @@ class BoardService
                 ]
             ]
         );
-
-        return $members;
     }
 }

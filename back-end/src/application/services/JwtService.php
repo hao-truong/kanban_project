@@ -5,6 +5,7 @@ namespace app\services;
 
 use DateTime;
 use Exception;
+use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use shared\enums\StatusCode;
@@ -34,12 +35,17 @@ class JwtService
         return JWT::encode($payload, $_ENV["JWT_{$type->name}_KEY"], 'HS256');
     }
 
-    public function verifyToken(TypeJwt $type, string $token)
+    /**
+     * @throws ResponseException
+     */
+    public function verifyToken(TypeJwt $type, string $token): \stdClass
     {
         try {
             return JWT::decode($token, new Key($_ENV["JWT_{$type->name}_KEY"], 'HS256'));
         } catch (Exception $exception) {
-            throw new ResponseException(StatusCode::UNAUTHORIZED, "Unauthorized token");
+            throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, "Unauthorized token");
+        } catch (ExpiredException $expiredException) {
+            throw new ResponseException(StatusCode::UNAUTHORIZED, StatusCode::UNAUTHORIZED->name, "Token has expired");
         }
     }
 }

@@ -9,22 +9,23 @@ use shared\exceptions\ResponseException;
 
 class UserService
 {
-    public function __construct(private UserModel $userModel) {
-
+    public function __construct(private readonly UserModel $userModel)
+    {
     }
 
-    public function handleGetProfile(int $user_id): array {
+    public function handleGetProfile(int $user_id): array
+    {
         $matched_user = $this->userModel->findOne('id', strval($user_id));
 
-        if(!$matched_user) {
-            throw new ResponseException(StatusCode::NOT_FOUND, "User not found", StatusCode::NOT_FOUND->name);
+        if (!$matched_user) {
+            throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, "User not found");
         }
 
         return [
-            'id' => $matched_user['id'],
+            'id'       => $matched_user['id'],
             'username' => $matched_user['username'],
-            'email' => $matched_user['email'],
-            'alias' => $matched_user['alias'],
+            'email'    => $matched_user['email'],
+            'alias'    => $matched_user['alias'],
         ];
     }
 }

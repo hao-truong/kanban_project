@@ -18,7 +18,7 @@ class UserModel extends Model implements IModel
         'id',
         'email',
         'access_token',
-        'refresh_token'
+        'refresh_token',
     ];
 
     /**
@@ -49,6 +49,12 @@ class UserModel extends Model implements IModel
         return $this->findOne('id', $last_insert_id);
     }
 
+    /**
+     * @param mixed $field
+     * @param mixed $value
+     * @return array|null
+     * @throws ResponseException
+     */
     public function findOne(mixed $field, mixed $value): array|null
     {
         if (!in_array($field, $this->ALLOW_FIELD)) {
@@ -69,6 +75,11 @@ class UserModel extends Model implements IModel
         return $result ?: null;
     }
 
+    /**
+     * @param array $entity
+     * @return array
+     * @throws ResponseException
+     */
     public function update(array $entity): array
     {
         $query_sql = "UPDATE users SET username = :username, password = :password, alias = :alias, email = :email, access_token = :access_token, refresh_token = :refresh_token WHERE id = :id";
@@ -84,6 +95,12 @@ class UserModel extends Model implements IModel
         return $this->findOne('id', strval($entity['id']));
     }
 
+    /**
+     * @param string $field
+     * @param mixed $value
+     * @return array
+     * @throws ResponseException
+     */
     public function find(string $field, mixed $value): array
     {
         if (!in_array($field, $this->ALLOW_FIELD)) {
@@ -104,8 +121,25 @@ class UserModel extends Model implements IModel
         return $result ?: [];
     }
 
+    /**
+     * @param int $id
+     * @return void
+     * @throws ResponseException
+     */
     public function deleteById(mixed $id): void
     {
-        // TODO: Implement deleteById() method.
+        $query_sql = "delete from users where id = :user_id";
+        $stmt = $this->database->getConnection()->prepare($query_sql);
+
+        try {
+            $stmt->execute(
+                [
+                    "user_id" => $id,
+                ]
+            );
+        } catch (PDOException $exception) {
+            error_log($exception->getMessage());
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+        }
     }
 }

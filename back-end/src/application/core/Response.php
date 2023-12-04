@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace app\core;
 
+use JetBrains\PhpStorm\NoReturn;
 use shared\enums\StatusCode;
 
 class Response
@@ -12,7 +13,14 @@ class Response
         http_response_code($status_code->value);
     }
 
-    public function content(StatusCode $status_code, string $message, mixed $errors, mixed $data): void
+    /**
+     * @param StatusCode $status_code
+     * @param string $message
+     * @param mixed $errors
+     * @param mixed $data
+     * @return void
+     */
+    #[NoReturn] public function content(StatusCode $status_code, string $message, mixed $errors, mixed $data): void
     {
         header('Content-Type: application/json');
         http_response_code($status_code->value);
@@ -24,12 +32,7 @@ class Response
             $response_content["errors"] = $errors;
         }
 
-        if(is_array($data)) {
-            echo json_encode($data);
-            die();
-        }
-
-        if ($data != null) {
+        if(is_array($data) || $data != null) {
             echo json_encode($data);
             die();
         }

@@ -64,7 +64,7 @@ class Router
     /**
      * @throws ResponseException
      */
-    public function resolve(Request $request, Response $response)
+    public function resolve(Request $request, Response $response): void
     {
         $this->request = $request;
         $path = $this->request->getPath();

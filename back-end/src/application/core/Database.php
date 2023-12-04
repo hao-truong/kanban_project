@@ -8,6 +8,9 @@ class Database
 {
     private PDO $connection;
 
+    /**
+     * @throws \Exception
+     */
     public function __construct()
     {
         $database_type = $_ENV['DB_TYPE'] ?? "";
@@ -25,12 +28,18 @@ class Database
         $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
-    public function runMigration(string $file_name) {
+    /**
+     * @param string $file_name
+     * @return void
+     */
+    public function runMigration(string $file_name): void
+    {
         $sql = file_get_contents( dirname(__DIR__)."/../shared/migrations/".$file_name);
         $this->connection->exec($sql);
     }
 
-    public function getConnection() {
+    public function getConnection(): PDO
+    {
         return $this->connection;
     }
 }

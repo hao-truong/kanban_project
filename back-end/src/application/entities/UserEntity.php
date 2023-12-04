@@ -44,7 +44,7 @@ class UserEntity
     }
 
     /**
-     * @param array $data_to_validate ["usernane" => string, "password" => string, "email" => string, "alias" => string"]
+     * @param array $data_to_validate ["username" => string, "password" => string, "email" => string, "alias" => string"]
      * @return array
      */
     private function validate(array $data_to_validate): array

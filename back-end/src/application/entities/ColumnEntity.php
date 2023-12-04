@@ -17,6 +17,12 @@ class ColumnEntity {
     private static $MIN_LENGTH_TITLE = 2;
     private static $MAX_LENGTH_TITLE = 20;
 
+    /**
+     * @param int $board_id
+     * @param string $title
+     * @param int $creator_id
+     * @throws ResponseException
+     */
     public function __construct(int $board_id, string $title, int $creator_id) {
         $errors = $this->validate(
             [

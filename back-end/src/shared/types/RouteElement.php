@@ -10,7 +10,7 @@ class RouteElement
 
     /**
      * @param string $endpoint
-     * @param array $params
+     * @param array $params [param_key => param_value]
      */
     public function __construct(string $endpoint, array $params)
     {

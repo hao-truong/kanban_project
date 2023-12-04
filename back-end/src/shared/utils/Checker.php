@@ -8,7 +8,13 @@ use shared\exceptions\ResponseException;
 
 class Checker
 {
-    public static function checkMissingFields(array $fields, array $data)
+    /**
+     * @param array $fields string[]
+     * @param array $data key value []
+     * @return void
+     * @throws ResponseException
+     */
+    public static function checkMissingFields(array $fields, array $data): void
     {
         $missing_fields = array_diff(
             $fields, array_keys($data)

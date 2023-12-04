@@ -21,7 +21,7 @@ const HomePage = () => {
     useQueryClient()
     const [isOpenDialogCreateBoard, setIsOpenDialogCreateBoard] = useState<boolean>(false);
     const { data: boards } = useQuery<Board[]>('getMyBoards', getMyBoards);
-    
+
     return (
         <div className="">
             <h2 className="w-full text-center font-bold text-5xl my-10">YOUR BOARDS</h2>
@@ -48,6 +48,12 @@ const HomePage = () => {
                     ))
                 }
             </div>
+            {
+                boards?.length === 0 &&
+                (
+                    <div className="text-center text-xl">You don't have any board.</div>
+                )
+            }
         </div>
     )
 }

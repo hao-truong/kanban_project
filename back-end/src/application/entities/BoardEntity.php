@@ -14,8 +14,8 @@ class BoardEntity
     private DateTime $createdAt;
     private DateTime $updatedAt;
     private int $creatorId;
-    private static $MIN_LENGTH_TITLE = 2;
-    private static $MAX_LENGTH_TITLE = 20;
+    private static int $MIN_LENGTH_TITLE = 2;
+    private static int $MAX_LENGTH_TITLE = 20;
 
     public function __construct(string $title, int $creator_id)
     {

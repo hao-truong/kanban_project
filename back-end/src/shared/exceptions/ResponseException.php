@@ -9,9 +9,9 @@ use Throwable;
 class ResponseException extends \Exception implements Throwable
 {
     private StatusCode $statusCode;
-    private array | string $errors;
+    private mixed $errors;
 
-    public function __construct(StatusCode $status_code, array | string | null $errors = null, string $message)
+    public function __construct(StatusCode $status_code, mixed $errors = null, string $message)
     {
         $this->statusCode = $status_code;
         $this->message = $message;

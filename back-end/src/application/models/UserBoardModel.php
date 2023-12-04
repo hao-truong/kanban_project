@@ -19,6 +19,9 @@ class UserBoardModel extends Model implements IModel
         'board_id'
     ];
 
+    /**
+     * @throws ResponseException
+     */
     public function save(array $entity): array
     {
         new UserBoardEntity(
@@ -48,6 +51,12 @@ class UserBoardModel extends Model implements IModel
         );
     }
 
+    /**
+     * @param mixed $field
+     * @param mixed $value
+     * @return array|null
+     * @throws ResponseException
+     */
     public function findOne(mixed $field, mixed $value): array|null
     {
         $query_sql = "select * from user_board where user_id = :user_id and board_id = :board_id";
@@ -69,9 +78,16 @@ class UserBoardModel extends Model implements IModel
 
     public function update(array $entity): array
     {
+        // not implementation
         return [];
     }
 
+    /**
+     * @param string $field
+     * @param mixed $value
+     * @return array
+     * @throws ResponseException
+     */
     public function find(string $field, mixed $value): array
     {
         if (!in_array($field, $this->ALLOW_FIELDS)) {
@@ -98,6 +114,11 @@ class UserBoardModel extends Model implements IModel
         return $result ?: [];
     }
 
+    /**
+     * @param mixed $id
+     * @return void
+     * @throws ResponseException
+     */
     public function deleteById(mixed $id): void
     {
         $query_sql = "delete from user_board where user_id = :user_id and board_id = :board_id";
@@ -116,6 +137,12 @@ class UserBoardModel extends Model implements IModel
         }
     }
 
+    /**
+     * @param string $field
+     * @param mixed $value
+     * @return void
+     * @throws ResponseException
+     */
     public function delete(string $field, mixed $value): void
     {
         if (!in_array($field, $this->ALLOW_FIELDS)) {
@@ -138,7 +165,13 @@ class UserBoardModel extends Model implements IModel
         }
     }
 
-    public function join(array $tables_to_join, array $condition)
+    /**
+     * @param array $tables_to_join
+     * @param array $condition
+     * @return array|false
+     * @throws ResponseException
+     */
+    public function join(array $tables_to_join, array $condition): array
     {
         $query_sql = "select ";
         $fields = $tables_to_join['select'];
@@ -146,10 +179,10 @@ class UserBoardModel extends Model implements IModel
         if (!empty($fields)) {
             $query_sql .= implode(
                 ", ", array_map(
-                function ($field) use ($tables_to_join) {
-                    return "{$tables_to_join['as']}.$field";
-                }, $fields
-            )
+                        function ($field) use ($tables_to_join) {
+                            return "{$tables_to_join['as']}.$field";
+                        }, $fields
+                    )
             );
         }
         $query_sql .= "\n";
@@ -170,13 +203,20 @@ class UserBoardModel extends Model implements IModel
         return $result;
     }
 
-    public function count(string $field, mixed $value): int {
+    /**
+     * @param string $field
+     * @param mixed $value
+     * @return int
+     * @throws ResponseException
+     */
+    public function count(string $field, mixed $value): int
+    {
         if (!in_array($field, $this->ALLOW_FIELDS)) {
             error_log("Field is not allowed");
             throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
         }
 
-        $query_sql = "select count(*) from user_board where ".$field." = :value";
+        $query_sql = "select count(*) from user_board where " . $field . " = :value";
         $stmt = $this->database->getConnection()->prepare($query_sql);
 
         try {

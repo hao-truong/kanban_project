@@ -58,12 +58,12 @@ const schemaValidation = yup
                 `Alias name must be at least ${MAX_LENGTH_INPUT_STRING} characters long`
             ),
         username: yup.string().required("Username is required").min(
-            MIN_LENGTH_PASSWORD,
-            `Username must be at least ${MIN_LENGTH_PASSWORD} characters long`
+            MIN_LENGTH_INPUT_STRING,
+            `Username must be at least ${MIN_LENGTH_INPUT_STRING} characters long`
         )
             .max(
-                MAX_LENGTH_PASSWORD,
-                `Username must be at least ${MAX_LENGTH_PASSWORD} characters long`
+                MAX_LENGTH_INPUT_STRING,
+                `Username must be at least ${MAX_LENGTH_INPUT_STRING} characters long`
             ),
     })
     .required();
