@@ -12,11 +12,17 @@ class Request
 
     public function __construct() { }
 
+    /**
+     * @return RequestMethod
+     */
     public function getMethod(): RequestMethod
     {
         return RequestMethod::from(strtoupper($_SERVER['REQUEST_METHOD']));
     }
 
+    /**
+     * @return string
+     */
     public function getPath(): string
     {
         $path = $_SERVER['REQUEST_URI'] ?? '/';
@@ -30,6 +36,10 @@ class Request
         return substr($path, 0, $position);
     }
 
+    /**
+     * @param string $path_component
+     * @return void
+     */
     public function extractQueries(string $path_component): void
     {
         $query_component_list = explode('&', $path_component);
@@ -39,6 +49,9 @@ class Request
         }
     }
 
+    /**
+     * @return array
+     */
     public function getBody(): array
     {
         $body = [];
@@ -56,12 +69,19 @@ class Request
         return $body;
     }
 
+    /**
+     * @param string $param_name
+     * @param string $param_value
+     * @return void
+     */
     public function setParam(string $param_name, string $param_value): void
     {
         $this->params[$param_name] = $param_value;
     }
 
     /**
+     * @param string $param_name
+     * @return string
      * @throws \Exception
      */
     public function getParam(string $param_name): string
@@ -74,6 +94,23 @@ class Request
         return $this->params[$param_name];
     }
 
+    /**
+     * @param string $param_name
+     * @return int
+     * @throws \Exception
+     */
+    public function getIntParam(string $param_name): int {
+        if (!array_key_exists($param_name, $this->params)) {
+            error_log("Param {$param_name} does not exist.");
+            throw new \Exception("Param {$param_name} does not exist.");
+        }
+
+        return intval($this->params[$param_name]);
+    }
+
+    /**
+     * @return array
+     */
     public function getQueries(): array
     {
         return $this->queries;

@@ -4,15 +4,17 @@ declare(strict_types=1);
 namespace app\core;
 
 use shared\exceptions\ResponseException;
+use shared\handlers\MigrationHandler;
 
 class Application
 {
     public function __construct(
-        public Response $response,
-        public Request $request,
-        public Router $router,
-        public Database $database)
-    {
+        private readonly Response         $response,
+        private readonly Request          $request,
+        public readonly Router            $router,
+        private readonly Database         $database,
+        private readonly MigrationHandler $migrationHandler
+    ) {
 
     }
 
@@ -20,11 +22,11 @@ class Application
     {
         try {
             // run migration
-            $this->database->runMigration("migration_user_create_table_1.sql");
-            $this->database->runMigration("board_create_table.sql");
-            $this->database->runMigration("user_board_create_table.sql");
-            $this->database->runMigration("column_create_table.sql");
-            $this->database->runMigration("card_create_table.sql");
+            $this->migrationHandler->runMigration("migration_user_create_table_1.sql");
+            $this->migrationHandler->runMigration("board_create_table.sql");
+            $this->migrationHandler->runMigration("user_board_create_table.sql");
+            $this->migrationHandler->runMigration("column_create_table.sql");
+            $this->migrationHandler->runMigration("card_create_table.sql");
 
             echo $this->router->resolve($this->request, $this->response);
         } catch (ResponseException $exception) {

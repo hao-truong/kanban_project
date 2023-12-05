@@ -8,6 +8,7 @@ use app\entities\UserEntity;
 use app\models\IModel;
 use PDO;
 use PDOException;
+use shared\enums\ErrorMessage;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
 
@@ -18,7 +19,7 @@ class UserModel extends Model implements IModel
         'id',
         'email',
         'access_token',
-        'refresh_token'
+        'refresh_token',
     ];
 
     /**
@@ -28,20 +29,16 @@ class UserModel extends Model implements IModel
      */
     public function save(array $entity): array
     {
-        $user_entity = new UserEntity(
-            $entity["username"], $entity["password"], $entity["email"], $entity["alias"]
-        );
-
         $query_sql = "insert into users (username, password, alias, email) values (:username, :password, :alias, :email)";
         $stmt = $this->database->getConnection()->prepare($query_sql);
 
         try {
             $stmt->execute(
-                $user_entity->toArray()
+                $entity
             );
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         $last_insert_id = $this->database->getConnection()->lastInsertId();
@@ -49,11 +46,17 @@ class UserModel extends Model implements IModel
         return $this->findOne('id', $last_insert_id);
     }
 
+    /**
+     * @param mixed $field
+     * @param mixed $value
+     * @return array|null
+     * @throws ResponseException
+     */
     public function findOne(mixed $field, mixed $value): array|null
     {
         if (!in_array($field, $this->ALLOW_FIELD)) {
             error_log("Field is not allowed");
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         $query_sql = "select * from users where " . $field . " = :value";
@@ -69,6 +72,11 @@ class UserModel extends Model implements IModel
         return $result ?: null;
     }
 
+    /**
+     * @param array $entity
+     * @return array
+     * @throws ResponseException
+     */
     public function update(array $entity): array
     {
         $query_sql = "UPDATE users SET username = :username, password = :password, alias = :alias, email = :email, access_token = :access_token, refresh_token = :refresh_token WHERE id = :id";
@@ -78,17 +86,23 @@ class UserModel extends Model implements IModel
             $stmt->execute($entity);
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         return $this->findOne('id', strval($entity['id']));
     }
 
+    /**
+     * @param string $field
+     * @param mixed $value
+     * @return array
+     * @throws ResponseException
+     */
     public function find(string $field, mixed $value): array
     {
         if (!in_array($field, $this->ALLOW_FIELD)) {
             error_log("Field is not allowed");
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         $query_sql = "select * from users where " . $field . " = :value";
@@ -104,8 +118,25 @@ class UserModel extends Model implements IModel
         return $result ?: [];
     }
 
+    /**
+     * @param int $id
+     * @return void
+     * @throws ResponseException
+     */
     public function deleteById(mixed $id): void
     {
-        // TODO: Implement deleteById() method.
+        $query_sql = "delete from users where id = :user_id";
+        $stmt = $this->database->getConnection()->prepare($query_sql);
+
+        try {
+            $stmt->execute(
+                [
+                    "user_id" => $id,
+                ]
+            );
+        } catch (PDOException $exception) {
+            error_log($exception->getMessage());
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
+        }
     }
 }

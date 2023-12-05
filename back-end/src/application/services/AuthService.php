@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace app\services;
 
+use app\entities\UserEntity;
 use app\models\UserModel;
+use shared\enums\ErrorMessage;
 use shared\enums\StatusCode;
 use shared\enums\TypeJwt;
 use shared\exceptions\ResponseException;
@@ -12,55 +14,43 @@ use shared\utils\Checker;
 class AuthService
 {
     public function __construct(
-        private UserModel  $userModel,
-        private JwtService $jwtService
+        private readonly UserModel  $userModel,
+        private readonly JwtService $jwtService
     ) {
+    }
 
+    /**
+     * @param UserEntity $user_entity
+     * @return array
+     * @throws ResponseException
+     */
+    public function handleRegister(UserEntity $user_entity): array
+    {
+        $existed_username = $this->userModel->findOne('username', $user_entity->getUsername());
+
+        if ($existed_username) {
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, ErrorMessage::EXISTED_USERNAME);
+        }
+
+        $user_entity->setPassword(password_hash($user_entity->getPassword(), PASSWORD_BCRYPT));
+        return $this->userModel->save($user_entity->toArray());
     }
 
     /**
      * @throws ResponseException
      */
-    public function handleRegister(array $register_req_data): array
+    public function handleLogin(UserEntity $user_entity): array
     {
-        Checker::checkMissingFields(
-            [
-                'username',
-                'password',
-                'email',
-                'alias'
-            ], $register_req_data
-        );
-
-        $existed_username = $this->userModel->findOne('username', $register_req_data['username']);
-
-        if ($existed_username) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, "Username existed!", StatusCode::BAD_REQUEST->name);
-        }
-
-        $register_req_data['password'] = password_hash($register_req_data['password'], PASSWORD_BCRYPT);
-        return $this->userModel->save($register_req_data);
-    }
-
-    public function handleLogin(array $login_req_data): array
-    {
-        Checker::checkMissingFields(
-            [
-                'username',
-                'password'
-            ], $login_req_data
-        );
-
-        $matched_user = $this->userModel->findOne('username', $login_req_data['username']);
+        $matched_user = $this->userModel->findOne('username', $user_entity->getUsername());
 
         if (!$matched_user) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, "Username or password is wrong!", StatusCode::BAD_REQUEST->name);
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, ErrorMessage::WRONG_USERNAME_OR_PASSWORD);
         }
 
-        $is_correct_password = password_verify($login_req_data['password'], $matched_user['password']);
+        $is_correct_password = password_verify($user_entity->getPassword(), $matched_user['password']);
 
         if (!$is_correct_password) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, "Username or password is wrong!", StatusCode::BAD_REQUEST->name);
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, ErrorMessage::WRONG_USERNAME_OR_PASSWORD);
         }
 
         $matched_user['access_token'] = $this->jwtService->generateToken(TypeJwt::ACCESS_TOKEN, $matched_user['id']);
@@ -69,21 +59,24 @@ class AuthService
         $this->userModel->update($matched_user);
 
         return [
-            "accessToken"  => $this->jwtService->generateToken(TypeJwt::ACCESS_TOKEN, $matched_user['id']),
-            "refreshToken" => $this->jwtService->generateToken(TypeJwt::REFRESH_TOKEN, $matched_user['id']),
+            "accessToken"  => $matched_user['access_token'],
+            "refreshToken" => $matched_user['refresh_token'],
         ];
     }
 
+    /**
+     * @throws ResponseException
+     */
     public function handleLogout(): void
     {
         $user_id = $_SESSION['user_id'];
         $_SESSION = array();
         session_destroy();
 
-        $matched_user = $this->userModel->findOne('id', strval($user_id));
+        $matched_user = $this->userModel->findOne('id', $user_id);
 
         if (!$matched_user) {
-            throw new ResponseException(StatusCode::NOT_FOUND, "User not found!", StatusCode::NOT_FOUND->name);
+            throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, ErrorMessage::USER_NOT_FOUND);
         }
 
         $matched_user['access_token'] = null;

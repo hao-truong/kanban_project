@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace shared\types;
+namespace shared\handlers;
 
 use Psr\Container\ContainerInterface;
 
-class MatchedRouteResult
+class MatchedRouteHandler
 {
     private array $callback;
     private array $middlewares;

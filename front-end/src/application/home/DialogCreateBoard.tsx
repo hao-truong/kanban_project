@@ -1,95 +1,114 @@
-import BoardService from "@/shared/services/BoardService";
-import { MAX_LENGTH_INPUT_STRING, MAX_TITLE_LENGTH, MIN_LENGTH_INPUT_STRING } from "@/shared/utils/constant";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { TextField } from "@mui/material";
-import { useEffect, useRef } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
-import * as yup from "yup";
+import BoardService from '@/shared/services/BoardService';
+import {
+  MAX_LENGTH_INPUT_STRING,
+  MAX_TITLE_LENGTH,
+  MIN_LENGTH_INPUT_STRING,
+} from '@/shared/utils/constant';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { TextField } from '@mui/material';
+import { useEffect, useRef } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
+import * as yup from 'yup';
 import { useQueryClient } from 'react-query';
 
 interface itemProps {
-    isOpen: boolean;
-    setIsOpen: Function;
+  isOpen: boolean;
+  setIsOpen: Function;
 }
 
 const schemaValidation = yup
-    .object({
-        title: yup
-            .string()
-            .required("Title is required")
-            .min(
-                MIN_LENGTH_INPUT_STRING,
-                `Title must be at least ${MIN_LENGTH_INPUT_STRING} characters long`
-            )
-            .max(
-                MAX_LENGTH_INPUT_STRING,
-                `Title must be at least ${MAX_LENGTH_INPUT_STRING} characters long`
-            ),
-    })
-    .required();
+  .object({
+    title: yup
+      .string()
+      .trim()
+      .required('Title is required')
+      .min(
+        MIN_LENGTH_INPUT_STRING,
+        `Title must be at least ${MIN_LENGTH_INPUT_STRING} characters long`,
+      )
+      .max(
+        MAX_LENGTH_INPUT_STRING,
+        `Title must be at least ${MAX_LENGTH_INPUT_STRING} characters long`,
+      ),
+  })
+  .required();
 
 const DialogCreateBoard = ({ isOpen, setIsOpen }: itemProps) => {
-    const queryClient = useQueryClient();
-    const dialogRef = useRef<HTMLDialogElement | null>(null);
-    const bodyDialogRef = useRef<HTMLDivElement | null>(null);
-    const {
-        register,
-        handleSubmit,
-        reset,
-        formState: { errors },
-    } = useForm<BoardReq>({
-        resolver: yupResolver(schemaValidation),
-    });
-    const onSubmit: SubmitHandler<BoardReq> = async (boardReqData) => {
-        try {
-            await BoardService.createBoard(boardReqData);
+  const queryClient = useQueryClient();
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const bodyDialogRef = useRef<HTMLDivElement | null>(null);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<BoardReq>({
+    resolver: yupResolver(schemaValidation),
+  });
+  const onSubmit: SubmitHandler<BoardReq> = async (boardReqData) => {
+    const data = await BoardService.createBoard(boardReqData)
+      .then((response) => response.data)
+      .catch((responseError: ResponseError) => toast.error(responseError.message));
 
-            toast.success("Create new board successfully!");
-            queryClient.invalidateQueries('getMyBoards');
-            reset();
-            if (dialogRef.current) {
-                dialogRef.current.close();
-            }
-        } catch (error: any) {
-            toast.error(error.message);
-        }
+    if (data) {
+      toast.success('Create new board successfully!');
+      queryClient.invalidateQueries('getMyBoards');
+      reset();
+      if (dialogRef.current) {
+        dialogRef.current.close();
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && dialogRef) {
+      dialogRef.current?.showModal();
+    }
+
+    const handleOutsideClick = (event: any) => {
+      if (
+        dialogRef.current &&
+        bodyDialogRef.current &&
+        !bodyDialogRef.current.contains(event.target)
+      ) {
+        dialogRef.current?.close();
+        setIsOpen(false);
+      }
     };
 
-    useEffect(() => {
-        if (isOpen && dialogRef) {
-            dialogRef.current?.showModal();
-        }
+    document.addEventListener('mousedown', handleOutsideClick);
 
-        const handleOutsideClick = (event: any) => {
-            if (dialogRef.current && bodyDialogRef.current && !bodyDialogRef.current.contains(event.target)) {
-                dialogRef.current?.close();
-                setIsOpen(false);
-            }
-        };
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [isOpen, dialogRef, bodyDialogRef]);
 
-        document.addEventListener("mousedown", handleOutsideClick);
-
-        return () => {
-            document.removeEventListener("mousedown", handleOutsideClick);
-        };
-    }, [isOpen, dialogRef, bodyDialogRef])
-
-    return (
-        <dialog ref={dialogRef} className=" rounded-lg p-10">
-            <div ref={bodyDialogRef} className="flex flex-col items-end justify-center gap-4">
-                <form className="min-w-[500px] text-center flex flex-col gap-5 rounded-xl" onSubmit={handleSubmit(onSubmit)}>
-                    <TextField id="outlined-basic" label="Title board" variant="outlined" {...register('title')} error={errors.title ? true : false}
-                        helperText={errors.title?.message} inputProps={{ maxLength: MAX_TITLE_LENGTH }}/>
-                    <div className="flex flex-row justify-end">
-                        <button className="w-fit py-2 px-6 bg-blue-500 text-white rounded-lg" type="submit">
-                            Create
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </dialog>
-    )
-}
+  return (
+    <dialog ref={dialogRef} className=" rounded-lg p-10">
+      <div ref={bodyDialogRef} className="flex flex-col items-end justify-center gap-4">
+        <form
+          className="min-w-[500px] text-center flex flex-col gap-5 rounded-xl"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <TextField
+            id="outlined-basic"
+            label="Title board"
+            variant="outlined"
+            {...register('title')}
+            error={errors.title ? true : false}
+            helperText={errors.title?.message}
+            inputProps={{ maxLength: MAX_TITLE_LENGTH }}
+          />
+          <div className="flex flex-row justify-end">
+            <button className="w-fit py-2 px-6 bg-blue-500 text-white rounded-lg" type="submit">
+              Create
+            </button>
+          </div>
+        </form>
+      </div>
+    </dialog>
+  );
+};
 
 export default DialogCreateBoard;

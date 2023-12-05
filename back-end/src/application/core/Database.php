@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\core;
 
@@ -25,12 +26,8 @@ class Database
         $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
-    public function runMigration(string $file_name) {
-        $sql = file_get_contents( dirname(__DIR__)."/../shared/migrations/".$file_name);
-        $this->connection->exec($sql);
-    }
-
-    public function getConnection() {
+    public function getConnection(): PDO
+    {
         return $this->connection;
     }
 }

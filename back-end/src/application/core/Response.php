@@ -7,12 +7,14 @@ use shared\enums\StatusCode;
 
 class Response
 {
-    public function setStatusCode(StatusCode $status_code): void
-    {
-        http_response_code($status_code->value);
-    }
-
-    public function content(StatusCode $status_code, string $message, mixed $errors, mixed $data): void
+    /**
+     * @param StatusCode $status_code
+     * @param string|null $message
+     * @param mixed $errors
+     * @param mixed $data
+     * @return void
+     */
+    public function content(StatusCode $status_code, ?string $message, mixed $errors, mixed $data): void
     {
         header('Content-Type: application/json');
         http_response_code($status_code->value);
@@ -24,17 +26,11 @@ class Response
             $response_content["errors"] = $errors;
         }
 
-        if(is_array($data)) {
+        if(is_array($data) || $data != null) {
             echo json_encode($data);
-            die();
-        }
-
-        if ($data != null) {
-            echo json_encode($data);
-            die();
+            return;
         }
 
         echo json_encode($response_content);
-        die();
     }
 }

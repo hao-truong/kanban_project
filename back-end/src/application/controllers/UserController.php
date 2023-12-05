@@ -7,19 +7,26 @@ use app\core\Request;
 use app\core\Response;
 use app\services\UserService;
 use shared\enums\StatusCode;
+use shared\exceptions\ResponseException;
+use shared\handlers\SessionHandler;
 
 class UserController
 {
-    public function __construct(private Request $request, private Response $response, private UserService $userService)
-    {
-
+    public function __construct(
+        private readonly Request     $request,
+        private readonly Response    $response,
+        private readonly UserService $userService
+    ) {
     }
 
-    public function getProfile(): mixed {
-        $user_id = $_SESSION['user_id'];
-
+    /**
+     * @return void
+     * @throws ResponseException
+     */
+   public function getProfile(): void
+    {
+        $user_id = SessionHandler::getUserId();
         $profile = $this->userService->handleGetProfile($user_id);
-
-        return $this->response->content(StatusCode::OK, "Get profile successfully!", null, $profile);
+        $this->response->content(StatusCode::OK, null, null, $profile);
     }
 }

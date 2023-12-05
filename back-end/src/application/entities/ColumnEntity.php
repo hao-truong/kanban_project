@@ -7,49 +7,106 @@ use DateTime;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
 
-class ColumnEntity {
+class ColumnEntity
+{
     private int $id;
     private int $boardId;
     private string $title;
     private int $creatorId;
     private DateTime $createdAt;
     private DateTime $updatedAt;
-    private static $MIN_LENGTH_TITLE = 2;
-    private static $MAX_LENGTH_TITLE = 20;
+    private int $position;
+    private static int $MIN_LENGTH_TITLE = 3;
+    private static int $MAX_LENGTH_TITLE = 20;
 
-    public function __construct(int $board_id, string $title, int $creator_id) {
-        $errors = $this->validate(
-            [
-                'title'     => $title,
-                'creator_id' => $creator_id,
-                'board_id' => $board_id,
-            ]
-        );
+    public function __construct()
+    {
+    }
 
-        if (count($errors)) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, $errors, StatusCode::BAD_REQUEST->name);
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
+    public function getBoardId(): int
+    {
+        return $this->boardId;
+    }
+
+    public function setBoardId(int $boardId): void
+    {
+        $this->boardId = $boardId;
+    }
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): void
+    {
+        if (strlen($title) <= self::$MIN_LENGTH_TITLE) {
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Title should be at least " . self::$MIN_LENGTH_TITLE . " characters long");
+        }
+
+        if (strlen($title) > self::$MAX_LENGTH_TITLE) {
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Title should be less than " . self::$MAX_LENGTH_TITLE . " characters long");
         }
 
         $this->title = $title;
-        $this->creatorId = $creator_id;
     }
 
-    private function validate(array $data_to_validate): array
+    public function getCreatorId(): int
     {
-        $errors = [];
+        return $this->creatorId;
+    }
 
-        if (strlen($data_to_validate['title']) <= self::$MIN_LENGTH_TITLE) {
-            $errors['title'] = "Title should be at least 3 characters long";
-        }
+    public function setCreatorId(int $creatorId): void
+    {
+        $this->creatorId = $creatorId;
+    }
 
-        if(strlen($data_to_validate['title']) > self::$MAX_LENGTH_TITLE) {
-            $errors['title'] = "Title should be less than 20 characters long";
-        }
+    public function getCreatedAt(): DateTime
+    {
+        return $this->createdAt;
+    }
 
-        if($data_to_validate['board_id'])
-        {
+    public function setCreatedAt(DateTime $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
 
-        }
-        return $errors;
+    public function getUpdatedAt(): DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(DateTime $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    public function getPosition(): int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(int $position): void
+    {
+        $this->position = $position;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'title'    => $this->title,
+            'board_id' => $this->boardId,
+            'creator_id' => $this->creatorId,
+        ];
     }
 }

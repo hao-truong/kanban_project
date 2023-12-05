@@ -19,7 +19,11 @@ class AuthorizeRequest implements IMiddleware
     ) {
     }
 
-    public function execute()
+    /**
+     * @return true
+     * @throws ResponseException
+     */
+    public function execute(): bool
     {
         if (!array_key_exists("Authorization", getallheaders())) {
             throw new ResponseException(StatusCode::FORBIDDEN, "No token", StatusCode::FORBIDDEN->name);
@@ -28,16 +32,16 @@ class AuthorizeRequest implements IMiddleware
         $token = getallheaders()["Authorization"];
         $token = str_replace("Bearer ", "", $token);
 
-        $matched_token = $this->userModel->findOne('access_token', $token);
+        $matched_user = $this->userModel->findOne('access_token', $token);
 
-        if(!$matched_token) {
+        if(!$matched_user) {
             throw new ResponseException(StatusCode::FORBIDDEN, "Invalid token", StatusCode::FORBIDDEN->name);
         }
 
         $payload = $this->jwtService->verifyToken(TypeJwt::ACCESS_TOKEN, $token);
         $user_id = $payload->userId;
 
-        if($matched_token['id'] != $user_id) {
+        if($matched_user['id'] != $user_id) {
             throw new ResponseException(StatusCode::FORBIDDEN, "Invalid token", StatusCode::FORBIDDEN->name);
         }
 
