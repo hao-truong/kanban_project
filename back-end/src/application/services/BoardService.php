@@ -5,6 +5,7 @@ namespace app\services;
 
 use app\controllers\UserBoardService;
 use app\entities\BoardEntity;
+use app\entities\ColumnEntity;
 use app\models\BoardModel;
 use app\models\UserBoardModel;
 use shared\enums\StatusCode;
@@ -16,6 +17,7 @@ class BoardService
         private readonly BoardModel     $boardModel,
         private readonly UserService    $userService,
         private readonly UserBoardModel $userBoardModel,
+        private readonly ColumnService $columnService,
     ) {
 
     }
@@ -99,6 +101,7 @@ class BoardService
             ]
         );
         $this->userBoardModel->delete('board_id', $board_id);
+        $this->columnService->handleDeleteColumnByBoardId($board_id);
         $this->boardModel->deleteById($board_id);
     }
 
@@ -218,5 +221,20 @@ class BoardService
         if ($user_id !== $board['creator_id']) {
             throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, "You are not the owner of this board!");
         }
+    }
+
+    public function handleCreateColumn(int $user_id, ColumnEntity $column_entity): array {
+        $this->checkExistedBoard($column_entity->getBoardId());
+        $this->checkMemberOfBoard($user_id, $column_entity->getBoardId());
+
+        $column_entity->setCreatorId($user_id);
+        return $this->columnService->handleCreateColumn($column_entity);
+    }
+
+    public function handleGetColumnsOfBoard(int $user_id, int $board_id): array {
+        $this->checkExistedBoard($board_id);
+        $this->checkMemberOfBoard($user_id, $board_id);
+
+        return $this->columnService->handleGetColumnsOfBoard($board_id);
     }
 }

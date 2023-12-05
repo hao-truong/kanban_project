@@ -6,6 +6,7 @@ namespace app\controllers;
 use app\core\Request;
 use app\core\Response;
 use app\entities\BoardEntity;
+use app\entities\ColumnEntity;
 use app\services\BoardService;
 use JetBrains\PhpStorm\NoReturn;
 use shared\enums\StatusCode;
@@ -133,5 +134,34 @@ class BoardController
 
         $members = $this->boardService->handleGetMembersOfBoard($user_id, $board_id);
         return $this->response->content(StatusCode::OK, "Get members of board with id [{$board_id}] successfully!", null, $members);
+    }
+
+    #[NoReturn] public function getColumnsOfBoard()
+    {
+        $board_id = intval($this->request->getParam('boardId'));
+        $user_id = $_SESSION['user_id'];
+
+        $columns = $this->boardService->handleGetColumnsOfBoard($user_id, $board_id);
+        return $this->response->content(StatusCode::OK, "Get members of board with id [{$board_id}] successfully!", null, $columns);
+    }
+
+    #[NoReturn] public function createColumn() {
+        $req_data = $this->request->getBody();
+        Checker::checkMissingFields(
+            $req_data,
+            [
+                'title',
+            ], [
+                'title'   => 'string',
+            ]
+        );
+
+        $user_id = $_SESSION['user_id'];
+        $column_entity = new ColumnEntity();
+        $column_entity->setBoardId(intval($this->request->getParam('boardId')));
+        $column_entity->setTitle($req_data['title']);
+
+        $new_column = $this->boardService->handleCreateColumn($user_id, $column_entity);
+        return $this->response->content(StatusCode::OK, "Create a new board successfully!", null, $new_column);
     }
 }

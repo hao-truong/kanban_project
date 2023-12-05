@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace app\models;
 
 use app\core\Model;
-use app\entities\ColumnEntity;
 use PDO;
 use PDOException;
 use shared\enums\StatusCode;
@@ -84,7 +83,7 @@ class ColumnModel extends Model implements IModel {
             throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
         }
 
-        $query_sql = "select * from columns where " . $field . " = :value";
+        $query_sql = "select * from columns where " . $field . " = :value order by position ASC";
         $stmt = $this->database->getConnection()->prepare($query_sql);
 
         try {
@@ -112,6 +111,27 @@ class ColumnModel extends Model implements IModel {
             $stmt->execute(
                 [
                     "id" => $id,
+                ]
+            );
+        } catch (PDOException $exception) {
+            error_log($exception->getMessage());
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+        }
+    }
+
+    public function delete(string $field, mixed $value): void {
+        if (!in_array($field, $this->ALLOW_FIELD)) {
+            error_log("Field is not allowed");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+        }
+
+        $query_sql = "delete from columns where ".$field." = :value";
+        $stmt = $this->database->getConnection()->prepare($query_sql);
+
+        try {
+            $stmt->execute(
+                [
+                    "value" => $value,
                 ]
             );
         } catch (PDOException $exception) {

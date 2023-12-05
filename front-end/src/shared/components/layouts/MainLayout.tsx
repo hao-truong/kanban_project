@@ -81,7 +81,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                 </Link>
                 <SignInUser />
             </header>
-            <div>
+            <div className="min-h-[700px]">
                 {children}
             </div>
             <footer className="text-center">

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 use app\controllers\AuthController;
 use app\controllers\BoardController;
-use app\controllers\ColumnController;
 use app\controllers\UserController;
 use app\core\Application;
 use app\middlewares\AuthorizeRequest;
@@ -109,8 +108,14 @@ $app->router->addRoute(
                       ]
 );
 $app->router->addRoute(
-    RequestMethod::POST, '/columns', [AuthorizeRequest::class], [
-                           ColumnController::class,
+    RequestMethod::GET, '/boards/{boardId}/columns', [AuthorizeRequest::class], [
+                          BoardController::class,
+                          'getColumnsOfBoard'
+                      ]
+);
+$app->router->addRoute(
+    RequestMethod::POST, '/boards/{boardId}/columns', [AuthorizeRequest::class], [
+                           BoardController::class,
                            'createColumn'
                        ]
 );
