@@ -1,11 +1,11 @@
-import {create} from 'zustand';
+import { create } from 'zustand';
 
 interface GlobalState {
-    user: User | null,
-    setUser: (data: User) => void;
+  user: User | null;
+  setUser: (data: User) => void;
 }
 
 export const useGlobalState = create<GlobalState>((set) => ({
-    user: null,
-    setUser: (data) => set((state) => ({...state, user: data})) 
+  user: null,
+  setUser: (data) => set((state) => ({ ...state, user: data })),
 }));

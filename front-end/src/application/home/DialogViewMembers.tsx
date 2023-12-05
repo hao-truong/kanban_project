@@ -1,99 +1,102 @@
-import BoardService from "@/shared/services/BoardService";
-import { useGlobalState } from "@/shared/storages/GlobalStorage";
-import { Crown, Sparkle } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "react-toastify";
+import BoardService from '@/shared/services/BoardService';
+import { useGlobalState } from '@/shared/storages/GlobalStorage';
+import { Crown, Sparkle } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { useQuery } from 'react-query';
 
 interface memberProps {
-    member: User;
-    orderNumber: number;
-    creatorId: number;
+  member: User;
+  orderNumber: number;
+  creatorId: number;
 }
 
 const MemberComponent = ({ member, orderNumber, creatorId }: memberProps) => {
-    const { user } = useGlobalState();
-    const [isMe, setIsMe] = useState<boolean>(false);
-    const [isCreator, setIsCreator] = useState<boolean>(false);
+  const { user } = useGlobalState();
+  const [isMe, setIsMe] = useState<boolean>(false);
+  const [isCreator, setIsCreator] = useState<boolean>(false);
 
-    useEffect(() => {
-        if (user?.id === member.id) {
-            setIsMe(true);
-        }
+  useEffect(() => {
+    if (user?.id === member.id) {
+      setIsMe(true);
+    }
 
-        if (member?.id === creatorId) {
-            setIsCreator(true);
-        }
-    }, [user])
+    if (member?.id === creatorId) {
+      setIsCreator(true);
+    }
+  }, [user]);
 
-    return (
-        <div className={`grid grid-cols-3 w-full min-w-[500px]`}>
-            <div className="flex flex-row gap-4">
-                <strong >{orderNumber}</strong>
-                {isMe && <Sparkle color="red" />}
-                {isCreator && <Crown color='blue' />}
-            </div>
-            <span className="text-left">{member.username}</span>
-            <span className="text-left">{member.alias}</span>
-        </div>
-    )
-}
+  return (
+    <div className={`grid grid-cols-3 w-full min-w-[500px]`}>
+      <div className="flex flex-row gap-4">
+        <strong>{orderNumber}</strong>
+        {isMe && <Sparkle color="red" />}
+        {isCreator && <Crown color="blue" />}
+      </div>
+      <span className="text-left">{member.username}</span>
+      <span className="text-left">{member.alias}</span>
+    </div>
+  );
+};
 
 interface itemProps {
-    isOpen: boolean;
-    setIsOpen: Function;
-    board: Board;
+  isOpen: boolean;
+  setIsOpen: Function;
+  board: Board;
 }
+
+const getMembers = async (boardId: number): Promise<User[]> => {
+  const data = await BoardService.getMembers(boardId).then((response) => response.data);
+
+  return data;
+};
+
 const DialogViewMembers = ({ board, isOpen, setIsOpen }: itemProps) => {
-    const [members, setMembers] = useState<User[]>([]);
-    const dialogRef = useRef<HTMLDialogElement | null>(null);
-    const bodyDialogRef = useRef<HTMLDivElement | null>(null);
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const bodyDialogRef = useRef<HTMLDivElement | null>(null);
+  const { data: members } = useQuery<User[]>('getMembersOfBoard', () => getMembers(board!.id), {
+    enabled: !!board,
+  });
 
-    useEffect(() => {
-        const getMembers = async () => {
-            try {
-                const { data } = await BoardService.getMembers(board.id);
+  useEffect(() => {
+    if (isOpen && dialogRef) {
+      dialogRef.current?.showModal();
+    }
 
-                setMembers(data);
-            } catch (error: any) {
-                toast.error(error.message);
-            }
-        }
+    const handleOutsideClick = (event: any) => {
+      if (
+        dialogRef.current &&
+        bodyDialogRef.current &&
+        !bodyDialogRef.current.contains(event.target)
+      ) {
+        dialogRef.current?.close();
+        setIsOpen(false);
+      }
+    };
 
-        getMembers();
-    }, [])
+    document.addEventListener('mousedown', handleOutsideClick);
 
-    useEffect(() => {
-        if (isOpen && dialogRef) {
-            dialogRef.current?.showModal();
-        }
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [isOpen, dialogRef, bodyDialogRef]);
 
-        const handleOutsideClick = (event: any) => {
-            if (dialogRef.current && bodyDialogRef.current && !bodyDialogRef.current.contains(event.target)) {
-                dialogRef.current?.close();
-                setIsOpen(false);
-            }
-        };
-
-        document.addEventListener("mousedown", handleOutsideClick);
-
-        return () => {
-            document.removeEventListener("mousedown", handleOutsideClick);
-        };
-    }, [isOpen, dialogRef, bodyDialogRef])
-
-    return (
-        <div>
-            <dialog ref={dialogRef} className=" rounded-lg p-10">
-                <div ref={bodyDialogRef} className="flex flex-col items-end justify-center gap-4">
-                    {
-                        members.map((member, _index) => (
-                            <MemberComponent member={member} orderNumber={_index + 1} key={member.id} creatorId={board.creator_id} />
-                        ))
-                    }
-                </div>
-            </dialog>
+  return (
+    <div>
+      <dialog ref={dialogRef} className=" rounded-lg p-10">
+        <div ref={bodyDialogRef} className="flex flex-col items-end justify-center gap-4">
+          {members &&
+            members.map((member, _index) => (
+              <MemberComponent
+                member={member}
+                orderNumber={_index + 1}
+                key={member.id}
+                creatorId={board.creator_id}
+              />
+            ))}
         </div>
-    )
-}
+      </dialog>
+    </div>
+  );
+};
 
 export default DialogViewMembers;

@@ -1,7 +1,7 @@
 type ColumnReq = {
-    title: string;
-}
+  title: string;
+};
 
 type UpdateColumnReq = {
-    title: string;
-}
+  title: string;
+};

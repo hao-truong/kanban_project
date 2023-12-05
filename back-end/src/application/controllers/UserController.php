@@ -6,9 +6,9 @@ namespace app\controllers;
 use app\core\Request;
 use app\core\Response;
 use app\services\UserService;
-use JetBrains\PhpStorm\NoReturn;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
+use shared\handlers\SessionHandler;
 
 class UserController
 {
@@ -17,13 +17,16 @@ class UserController
         private readonly Response    $response,
         private readonly UserService $userService
     ) {
-
     }
 
-    #[NoReturn] public function getProfile(): mixed
+    /**
+     * @return void
+     * @throws ResponseException
+     */
+   public function getProfile(): void
     {
-        $user_id = $_SESSION['user_id'];
+        $user_id = SessionHandler::getUserId();
         $profile = $this->userService->handleGetProfile($user_id);
-        return $this->response->content(StatusCode::OK, "Get profile successfully!", null, $profile);
+        $this->response->content(StatusCode::OK, null, null, $profile);
     }
 }

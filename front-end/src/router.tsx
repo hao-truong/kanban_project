@@ -1,14 +1,15 @@
-import { createBrowserRouter } from "react-router-dom";
-import RegisterPage from "./application/auth/register/page";
-import LoginPage from "./application/auth/login/page";
-import AuthGuard from "./shared/components/guards/AuthGuard";
-import MainLayout from "./shared/components/layouts/MainLayout";
-import HomePage from "./application/home/page";
-import BoardPage from "./application/board/page";
+import { createBrowserRouter } from 'react-router-dom';
+import RegisterPage from './application/auth/register/page';
+import LoginPage from './application/auth/login/page';
+import AuthGuard from './shared/components/guards/AuthGuard';
+import MainLayout from './shared/components/layouts/MainLayout';
+import HomePage from './application/home/page';
+import BoardPage from './application/board/page';
+import PageNotFound from './application/error-page/404-not-found';
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: (
       <AuthGuard>
         <MainLayout>
@@ -18,7 +19,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "boards/:boardId",
+    path: 'boards/:boardId',
     element: (
       <MainLayout>
         <BoardPage />
@@ -26,23 +27,30 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "auth",
-    children: [{
-      path: "sign-in",
-      element: (
-        <AuthGuard>
-          <LoginPage />
-        </AuthGuard>
-      )
-    }, {
-      path: "register",
-      element: (
-        <AuthGuard>
-          <RegisterPage />
-        </AuthGuard>
-      )
-    }]
-  }
+    path: 'auth',
+    children: [
+      {
+        path: 'sign-in',
+        element: (
+          <AuthGuard>
+            <LoginPage />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'register',
+        element: (
+          <AuthGuard>
+            <RegisterPage />
+          </AuthGuard>
+        ),
+      },
+    ],
+  },
+  {
+    path: '*',
+    element: <PageNotFound />,
+  },
 ]);
 
 export default router;

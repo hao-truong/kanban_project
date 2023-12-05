@@ -1,7 +1,7 @@
 type BoardReq = {
-    title: string;
-}
+  title: string;
+};
 
 type MemberToAddReq = {
-    member: string;
-}
+  member: string;
+};

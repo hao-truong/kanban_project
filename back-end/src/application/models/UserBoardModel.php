@@ -6,6 +6,7 @@ namespace app\models;
 use app\core\Model;
 use PDO;
 use PDOException;
+use shared\enums\ErrorMessage;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
 
@@ -31,7 +32,7 @@ class UserBoardModel extends Model implements IModel
             );
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         return $this->findOne(
@@ -59,7 +60,7 @@ class UserBoardModel extends Model implements IModel
             );
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -83,7 +84,7 @@ class UserBoardModel extends Model implements IModel
     {
         if (!in_array($field, $this->ALLOW_FIELDS)) {
             error_log("Field is not allowed");
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         $query_sql = "select * from user_board where " . $field . " = :value";
@@ -97,7 +98,7 @@ class UserBoardModel extends Model implements IModel
             );
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -124,7 +125,7 @@ class UserBoardModel extends Model implements IModel
             );
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -138,7 +139,7 @@ class UserBoardModel extends Model implements IModel
     {
         if (!in_array($field, $this->ALLOW_FIELDS)) {
             error_log("Field is not allowed");
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         $query_sql = "delete from user_board where " . $field . " = :value";
@@ -152,7 +153,7 @@ class UserBoardModel extends Model implements IModel
             );
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -188,7 +189,7 @@ class UserBoardModel extends Model implements IModel
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         return $result;
@@ -204,7 +205,7 @@ class UserBoardModel extends Model implements IModel
     {
         if (!in_array($field, $this->ALLOW_FIELDS)) {
             error_log("Field is not allowed");
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         $query_sql = "select count(*) from user_board where " . $field . " = :value";
@@ -218,7 +219,7 @@ class UserBoardModel extends Model implements IModel
             );
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         return $stmt->fetchColumn();

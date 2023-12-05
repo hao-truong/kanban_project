@@ -1,5 +1,5 @@
-const isClient = typeof window !== "undefined";
-import Cookies from "js-cookie";
+const isClient = typeof window !== 'undefined';
+import Cookies from 'js-cookie';
 
 const JwtStorage = () => {
   let inMemoryToken: AuthToken | null = null;
@@ -9,14 +9,10 @@ const JwtStorage = () => {
       return;
     }
 
-    if (
-      Cookies.get("accessToken") &&
-      inMemoryToken === null &&
-      Cookies.get("refreshToken")
-    ) {
+    if (Cookies.get('accessToken') && inMemoryToken === null && Cookies.get('refreshToken')) {
       inMemoryToken = {
-        accessToken: Cookies.get("accessToken") ?? "",
-        refreshToken: Cookies.get("refreshToken") ?? "",
+        accessToken: Cookies.get('accessToken') ?? '',
+        refreshToken: Cookies.get('refreshToken') ?? '',
       };
     }
 
@@ -24,15 +20,15 @@ const JwtStorage = () => {
   };
 
   const setToken = (token: AuthToken) => {
-    isClient && Cookies.set("accessToken", token.accessToken, { expires: 1 });
-    isClient && Cookies.set("refreshToken", token.refreshToken, { expires: 7 });
+    isClient && Cookies.set('accessToken', token.accessToken, { expires: 1 });
+    isClient && Cookies.set('refreshToken', token.refreshToken, { expires: 7 });
     inMemoryToken = token;
   };
 
   const deleteToken = () => {
     inMemoryToken = null;
-    isClient && Cookies.remove("accessToken");
-    isClient && Cookies.remove("refreshToken");
+    isClient && Cookies.remove('accessToken');
+    isClient && Cookies.remove('refreshToken');
   };
 
   return {

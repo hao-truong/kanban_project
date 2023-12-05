@@ -6,20 +6,25 @@ use app\core\Request;
 use app\core\Response;
 use app\entities\UserEntity;
 use app\services\AuthService;
-use JetBrains\PhpStorm\NoReturn;
+use shared\enums\ResponseMessage;
 use shared\enums\StatusCode;
+use shared\exceptions\ResponseException;
 use shared\utils\Checker;
 
 class AuthController
 {
     public function __construct(
-        private Request     $request,
-        private Response    $response,
-        private AuthService $authService
+        private readonly Request     $request,
+        private readonly Response    $response,
+        private readonly AuthService $authService,
     ) {
     }
 
-    #[NoReturn] public function register(): mixed
+    /**
+     * @return void
+     * @throws ResponseException
+     */
+    public function register(): void
     {
         $req_data = $this->request->getBody();
         Checker::checkMissingFields(
@@ -44,10 +49,14 @@ class AuthController
         $user_entity->setAlias($req_data['alias']);
 
         $this->authService->handleRegister($user_entity);
-        return $this->response->content(StatusCode::CREATED, null, null, 'Register successfully!');
+        $this->response->content(StatusCode::CREATED, null, null, ResponseMessage::REGISTER_SUCCESSFULLY->value);
     }
 
-    #[NoReturn] public function login(): mixed
+    /**
+     * @return void
+     * @throws ResponseException
+     */
+    public function login(): void
     {
         $req_data = $this->request->getBody();
         Checker::checkMissingFields(
@@ -66,12 +75,16 @@ class AuthController
         $user_entity->setPassword($req_data['password']);
 
         $tokens = $this->authService->handleLogin($user_entity);
-        return $this->response->content(StatusCode::OK, null, null, $tokens);
+        $this->response->content(StatusCode::OK, null, null, $tokens);
     }
 
-    #[NoReturn] public function logout(): mixed
+    /**
+     * @return void
+     * @throws ResponseException
+     */
+    public function logout(): void
     {
         $this->authService->handleLogout();
-        return $this->response->content(StatusCode::OK, null, null, 'Logout successfully!');
+        $this->response->content(StatusCode::OK, null, null, ResponseMessage::LOGOUT_SUCCESSFULLY->value);
     }
 }

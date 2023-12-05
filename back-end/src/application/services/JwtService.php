@@ -8,6 +8,7 @@ use Exception;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use shared\enums\ErrorMessage;
 use shared\enums\StatusCode;
 use shared\enums\TypeJwt;
 use shared\exceptions\ResponseException;
@@ -18,6 +19,11 @@ class JwtService
     {
     }
 
+    /**
+     * @param TypeJwt $type
+     * @param int $userId
+     * @return string
+     */
     public function generateToken(TypeJwt $type, int $userId): string
     {
         $iat = new DateTime();
@@ -36,6 +42,9 @@ class JwtService
     }
 
     /**
+     * @param TypeJwt $type
+     * @param string $token
+     * @return \stdClass
      * @throws ResponseException
      */
     public function verifyToken(TypeJwt $type, string $token): \stdClass
@@ -43,9 +52,9 @@ class JwtService
         try {
             return JWT::decode($token, new Key($_ENV["JWT_{$type->name}_KEY"], 'HS256'));
         } catch (Exception $exception) {
-            throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, "Unauthorized token");
+            throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, ErrorMessage::UNAUTHORIZED_TOKEN);
         } catch (ExpiredException $expiredException) {
-            throw new ResponseException(StatusCode::UNAUTHORIZED, StatusCode::UNAUTHORIZED->name, "Token has expired");
+            throw new ResponseException(StatusCode::UNAUTHORIZED, StatusCode::UNAUTHORIZED->name, ErrorMessage::EXPIRED_TOKEN);
         }
     }
 }

@@ -5,6 +5,7 @@ namespace app\services;
 
 use app\entities\UserEntity;
 use app\models\UserModel;
+use shared\enums\ErrorMessage;
 use shared\enums\StatusCode;
 use shared\enums\TypeJwt;
 use shared\exceptions\ResponseException;
@@ -28,7 +29,7 @@ class AuthService
         $existed_username = $this->userModel->findOne('username', $user_entity->getUsername());
 
         if ($existed_username) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Username existed!");
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, ErrorMessage::EXISTED_USERNAME);
         }
 
         $user_entity->setPassword(password_hash($user_entity->getPassword(), PASSWORD_BCRYPT));
@@ -43,13 +44,13 @@ class AuthService
         $matched_user = $this->userModel->findOne('username', $user_entity->getUsername());
 
         if (!$matched_user) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Username or password is wrong!");
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, ErrorMessage::WRONG_USERNAME_OR_PASSWORD);
         }
 
         $is_correct_password = password_verify($user_entity->getPassword(), $matched_user['password']);
 
         if (!$is_correct_password) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Username or password is wrong!");
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, ErrorMessage::WRONG_USERNAME_OR_PASSWORD);
         }
 
         $matched_user['access_token'] = $this->jwtService->generateToken(TypeJwt::ACCESS_TOKEN, $matched_user['id']);
@@ -75,7 +76,7 @@ class AuthService
         $matched_user = $this->userModel->findOne('id', $user_id);
 
         if (!$matched_user) {
-            throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, "User not found!");
+            throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, ErrorMessage::USER_NOT_FOUND);
         }
 
         $matched_user['access_token'] = null;

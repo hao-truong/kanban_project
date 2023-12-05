@@ -8,9 +8,9 @@ use app\core\Response;
 use app\entities\BoardEntity;
 use app\entities\ColumnEntity;
 use app\services\BoardService;
-use JetBrains\PhpStorm\NoReturn;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
+use shared\handlers\SessionHandler;
 use shared\utils\Checker;
 
 class BoardController
@@ -23,7 +23,11 @@ class BoardController
 
     }
 
-    #[NoReturn] public function createBoard()
+    /**
+     * @return void
+     * @throws ResponseException
+     */
+    public function createBoard(): void
     {
         $req_data = $this->request->getBody();
         Checker::checkMissingFields(
@@ -37,20 +41,28 @@ class BoardController
 
         $board_entity = new BoardEntity();
         $board_entity->setTitle($req_data['title']);
-        $board_entity->setCreatorId($_SESSION['user_id']);
+        $board_entity->setCreatorId(SessionHandler::getUserId());
 
         $new_board = $this->boardService->handleCreateBoard($board_entity);
-        return $this->response->content(StatusCode::CREATED, "Create new board successfully!", null, $new_board);
+        $this->response->content(StatusCode::CREATED, null, null, $new_board);
     }
 
-    #[NoReturn] public function getMyBoards()
+    /**
+     * @return void
+     * @throws ResponseException
+     */
+    public function getMyBoards(): void
     {
-        $user_id = $_SESSION['user_id'];
+        $user_id = SessionHandler::getUserId();
         $boards = $this->boardService->handleGetMyBoards($user_id);
-        return $this->response->content(StatusCode::OK, "Get your boards successfully!", null, $boards);
+        $this->response->content(StatusCode::OK, null, null, $boards);
     }
 
-    #[NoReturn] public function updateBoard()
+    /**
+     * @return void
+     * @throws ResponseException
+     */
+    public function updateBoard(): void
     {
         $req_data = $this->request->getBody();
         Checker::checkMissingFields(
@@ -64,39 +76,43 @@ class BoardController
 
         $board_entity = new BoardEntity();
         $board_entity->setTitle($req_data['title']);
-        $board_entity->setId(intval($this->request->getParam('boardId')));
-        $user_id = $_SESSION['user_id'];
+        $board_entity->setId(intval($this->request->getIntParam('boardId')));
+        $user_id = SessionHandler::getUserId();
 
         $board = $this->boardService->handleUpdateBoard($user_id, $board_entity);
-        return $this->response->content(StatusCode::OK, "Get your boards successfully!", null, $board);
+        $this->response->content(StatusCode::OK, null, null, $board);
     }
 
-    #[NoReturn] public function deleteBoard()
+    /**
+     * @return void
+     * @throws \Exception
+     */
+    public function deleteBoard(): void
     {
-        $board_id = intval($this->request->getParam('boardId'));
-        $user_id = $_SESSION['user_id'];
+        $board_id = intval($this->request->getIntParam('boardId'));
+        $user_id = SessionHandler::getUserId();
 
         $this->boardService->handleDeleteBoard($user_id, $board_id);
-        return $this->response->content(StatusCode::OK, "Delete board id [{$board_id}] successfully!", null, "Delete board id [{$board_id}] successfully!");
+        $this->response->content(StatusCode::OK, null, null, "Delete board id [{$board_id}] successfully!");
     }
 
     /**
-     * @return null
+     * @return void
      * @throws ResponseException
      */
-    #[NoReturn] public function getBoard()
+    public function getBoard(): void
     {
-        $user_id = $_SESSION['user_id'];
-        $board_id = intval($this->request->getParam('boardId'));
+        $user_id = SessionHandler::getUserId();
+        $board_id = intval($this->request->getIntParam('boardId'));
         $board = $this->boardService->handleGetBoard($user_id, $board_id);
-        return $this->response->content(StatusCode::OK, "Get board id [{$board_id}] successfully!", null, $board);
+        $this->response->content(StatusCode::OK, null, null, $board);
     }
 
     /**
-     * @return null
+     * @return void
      * @throws ResponseException
      */
-    #[NoReturn] public function addMemberToBoard()
+    public function addMemberToBoard(): void
     {
         $req_data = $this->request->getBody();
         Checker::checkMissingFields(
@@ -108,60 +124,73 @@ class BoardController
             ]
         );
 
-        $board_id = intval($this->request->getParam('boardId'));
-        $user_id = $_SESSION['user_id'];
+        $board_id = intval($this->request->getIntParam('boardId'));
+        $user_id = SessionHandler::getUserId();
         $this->boardService->handleAddMemberToBoard($user_id, $board_id, $req_data['member']);
-        return $this->response->content(StatusCode::OK, "Add member with username [{$req_data['member']}] to this board successfully!", null, "Add member with username [{$req_data['member']}] to this board successfully!");
-    }
-
-    #[NoReturn] public function leaveBoard()
-    {
-        $board_id = intval($this->request->getParam('boardId'));
-        $user_id = $_SESSION['user_id'];
-
-        $this->boardService->handleLeaveBoard($user_id, $board_id);
-        return $this->response->content(StatusCode::OK, "Leave board with id [{$board_id}] successfully!", null, "Leave board with id [{$board_id}] successfully!");
+        $this->response->content(StatusCode::OK, null, null, "Add member with username [{$req_data['member']}] to this board successfully!");
     }
 
     /**
-     * @return null
+     * @return void
      * @throws ResponseException
      */
-    #[NoReturn] public function getMembersOfBoard()
+    public function leaveBoard(): void
     {
-        $board_id = intval($this->request->getParam('boardId'));
-        $user_id = $_SESSION['user_id'];
+        $board_id = intval($this->request->getIntParam('boardId'));
+        $user_id = SessionHandler::getUserId();
+
+        $this->boardService->handleLeaveBoard($user_id, $board_id);
+        $this->response->content(StatusCode::OK, null, null, "Leave board with id [{$board_id}] successfully!");
+    }
+
+    /**
+     * @return void
+     * @throws ResponseException
+     */
+    public function getMembersOfBoard(): void
+    {
+        $board_id = intval($this->request->getIntParam('boardId'));
+        $user_id = SessionHandler::getUserId();
 
         $members = $this->boardService->handleGetMembersOfBoard($user_id, $board_id);
-        return $this->response->content(StatusCode::OK, "Get members of board with id [{$board_id}] successfully!", null, $members);
+        $this->response->content(StatusCode::OK, null, null, $members);
     }
 
-    #[NoReturn] public function getColumnsOfBoard()
+    /**
+     * @return void
+     * @throws \Exception
+     */
+    public function getColumnsOfBoard(): void
     {
-        $board_id = intval($this->request->getParam('boardId'));
-        $user_id = $_SESSION['user_id'];
+        $board_id = intval($this->request->getIntParam('boardId'));
+        $user_id = SessionHandler::getUserId();
 
         $columns = $this->boardService->handleGetColumnsOfBoard($user_id, $board_id);
-        return $this->response->content(StatusCode::OK, "Get members of board with id [{$board_id}] successfully!", null, $columns);
+        $this->response->content(StatusCode::OK, null, null, $columns);
     }
 
-    #[NoReturn] public function createColumn() {
+    /**
+     * @return void
+     * @throws ResponseException
+     */
+    public function createColumn(): void
+    {
         $req_data = $this->request->getBody();
         Checker::checkMissingFields(
             $req_data,
             [
                 'title',
             ], [
-                'title'   => 'string',
+                'title' => 'string',
             ]
         );
 
-        $user_id = $_SESSION['user_id'];
+        $user_id = SessionHandler::getUserId();
         $column_entity = new ColumnEntity();
-        $column_entity->setBoardId(intval($this->request->getParam('boardId')));
+        $column_entity->setBoardId(intval($this->request->getIntParam('boardId')));
         $column_entity->setTitle($req_data['title']);
 
         $new_column = $this->boardService->handleCreateColumn($user_id, $column_entity);
-        return $this->response->content(StatusCode::OK, "Create a new board successfully!", null, $new_column);
+        $this->response->content(StatusCode::OK, null, null, $new_column);
     }
 }

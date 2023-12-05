@@ -8,6 +8,7 @@ use app\entities\UserEntity;
 use app\models\IModel;
 use PDO;
 use PDOException;
+use shared\enums\ErrorMessage;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
 
@@ -37,7 +38,7 @@ class UserModel extends Model implements IModel
             );
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         $last_insert_id = $this->database->getConnection()->lastInsertId();
@@ -55,7 +56,7 @@ class UserModel extends Model implements IModel
     {
         if (!in_array($field, $this->ALLOW_FIELD)) {
             error_log("Field is not allowed");
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         $query_sql = "select * from users where " . $field . " = :value";
@@ -85,7 +86,7 @@ class UserModel extends Model implements IModel
             $stmt->execute($entity);
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         return $this->findOne('id', strval($entity['id']));
@@ -101,7 +102,7 @@ class UserModel extends Model implements IModel
     {
         if (!in_array($field, $this->ALLOW_FIELD)) {
             error_log("Field is not allowed");
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         $query_sql = "select * from users where " . $field . " = :value";
@@ -135,7 +136,7 @@ class UserModel extends Model implements IModel
             );
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
     }
 }

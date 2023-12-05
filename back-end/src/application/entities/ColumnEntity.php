@@ -15,7 +15,7 @@ class ColumnEntity
     private int $creatorId;
     private DateTime $createdAt;
     private DateTime $updatedAt;
-    private int $order;
+    private int $position;
     private static int $MIN_LENGTH_TITLE = 3;
     private static int $MAX_LENGTH_TITLE = 20;
 
@@ -91,7 +91,15 @@ class ColumnEntity
         $this->updatedAt = $updatedAt;
     }
 
+    public function getPosition(): int
+    {
+        return $this->position;
+    }
 
+    public function setPosition(int $position): void
+    {
+        $this->position = $position;
+    }
 
     public function toArray(): array
     {

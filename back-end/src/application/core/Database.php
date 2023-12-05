@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\core;
 
@@ -8,9 +9,6 @@ class Database
 {
     private PDO $connection;
 
-    /**
-     * @throws \Exception
-     */
     public function __construct()
     {
         $database_type = $_ENV['DB_TYPE'] ?? "";
@@ -26,16 +24,6 @@ class Database
 
         $this->connection = new PDO("$database_type:host=$database_host;port=$port;dbname=$database_name", $username, $password);
         $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    }
-
-    /**
-     * @param string $file_name
-     * @return void
-     */
-    public function runMigration(string $file_name): void
-    {
-        $sql = file_get_contents( dirname(__DIR__)."/../shared/migrations/".$file_name);
-        $this->connection->exec($sql);
     }
 
     public function getConnection(): PDO

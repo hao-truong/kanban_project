@@ -8,6 +8,7 @@ use app\entities\BoardEntity;
 use app\entities\ColumnEntity;
 use app\models\BoardModel;
 use app\models\UserBoardModel;
+use shared\enums\ErrorMessage;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
 
@@ -17,12 +18,13 @@ class BoardService
         private readonly BoardModel     $boardModel,
         private readonly UserService    $userService,
         private readonly UserBoardModel $userBoardModel,
-        private readonly ColumnService $columnService,
+        private readonly ColumnService  $columnService,
     ) {
-
     }
 
     /**
+     * @param BoardEntity $board_entity
+     * @return array
      * @throws ResponseException
      */
     public function handleCreateBoard(BoardEntity $board_entity): array
@@ -42,6 +44,8 @@ class BoardService
     }
 
     /**
+     * @param int $user_id
+     * @return array
      * @throws ResponseException
      */
     public function handleGetMyBoards(int $user_id): array
@@ -78,6 +82,12 @@ class BoardService
         );
     }
 
+    /**
+     * @param int $user_id
+     * @param BoardEntity $board_entity
+     * @return array
+     * @throws ResponseException
+     */
     public function handleUpdateBoard(int $user_id, BoardEntity $board_entity): array
     {
         $board_to_update = $this->checkExistedBoard($board_entity->getId());
@@ -89,6 +99,12 @@ class BoardService
         return $this->boardModel->update($board_to_update);
     }
 
+    /**
+     * @param int $user_id
+     * @param int $board_id
+     * @return void
+     * @throws ResponseException
+     */
     public function handleDeleteBoard(int $user_id, int $board_id): void
     {
         $board_to_delete = $this->boardModel->findOne('id', $board_id);
@@ -105,11 +121,17 @@ class BoardService
         $this->boardModel->deleteById($board_id);
     }
 
+    /**
+     * @param int $user_id
+     * @param int $board_id
+     * @return array
+     * @throws ResponseException
+     */
     public function handleGetBoard(int $user_id, int $board_id): array
     {
         $board = $this->boardModel->findOne('id', $board_id);
         if (!$board) {
-            throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, "Board id [$board_id] not found");
+            throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, ErrorMessage::BOARD_NOT_FOUND);
         }
 
         $this->checkMemberOfBoard($user_id, $board_id);
@@ -117,6 +139,10 @@ class BoardService
     }
 
     /**
+     * @param int $user_id
+     * @param int $board_id
+     * @param string $member_username
+     * @return void
      * @throws ResponseException
      */
     public function handleAddMemberToBoard(int $user_id, int $board_id, string $member_username): void
@@ -133,7 +159,7 @@ class BoardService
         );
 
         if ($is_joined) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "User with username [$member_username] is a member of this board!");
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, ErrorMessage::JOINED_MEMBER_BOARD);
         }
 
         $this->userBoardModel->save(
@@ -145,6 +171,9 @@ class BoardService
     }
 
     /**
+     * @param int $user_id
+     * @param int $board_id
+     * @return void
      * @throws ResponseException
      */
     public function handleLeaveBoard(int $user_id, int $board_id): void
@@ -161,6 +190,9 @@ class BoardService
     }
 
     /**
+     * @param int $user_id
+     * @param int $board_id
+     * @return array
      * @throws ResponseException
      */
     public function handleGetMembersOfBoard(int $user_id, int $board_id): array
@@ -192,6 +224,12 @@ class BoardService
         );
     }
 
+    /**
+     * @param int $user_id
+     * @param int $board_id
+     * @return void
+     * @throws ResponseException
+     */
     public function checkMemberOfBoard(int $user_id, int $board_id): void
     {
         $is_member = $this->userBoardModel->findOne(
@@ -202,28 +240,46 @@ class BoardService
         );
 
         if (!$is_member) {
-            throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, "you are not the member of board with id [{$board_id}]");
+            throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, ErrorMessage::NOT_BOARD_MEMBER);
         }
     }
 
+    /**
+     * @param int $board_id
+     * @return array
+     * @throws ResponseException
+     */
     public function checkExistedBoard(int $board_id): array
     {
         $board = $this->boardModel->findOne('id', $board_id);
         if (!$board) {
-            throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, "Board id [$board_id] not found");
+            throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, ErrorMessage::BOARD_NOT_FOUND);
         }
 
         return $board;
     }
 
+    /**
+     * @param int $user_id
+     * @param array $board
+     * @return void
+     * @throws ResponseException
+     */
     public function checkOwnerOfBoard(int $user_id, array $board): void
     {
         if ($user_id !== $board['creator_id']) {
-            throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, "You are not the owner of this board!");
+            throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, ErrorMessage::NOT_BOARD_OWNER);
         }
     }
 
-    public function handleCreateColumn(int $user_id, ColumnEntity $column_entity): array {
+    /**
+     * @param int $user_id
+     * @param ColumnEntity $column_entity
+     * @return array
+     * @throws ResponseException
+     */
+    public function handleCreateColumn(int $user_id, ColumnEntity $column_entity): array
+    {
         $this->checkExistedBoard($column_entity->getBoardId());
         $this->checkMemberOfBoard($user_id, $column_entity->getBoardId());
 
@@ -231,7 +287,14 @@ class BoardService
         return $this->columnService->handleCreateColumn($column_entity);
     }
 
-    public function handleGetColumnsOfBoard(int $user_id, int $board_id): array {
+    /**
+     * @param int $user_id
+     * @param int $board_id
+     * @return array
+     * @throws ResponseException
+     */
+    public function handleGetColumnsOfBoard(int $user_id, int $board_id): array
+    {
         $this->checkExistedBoard($board_id);
         $this->checkMemberOfBoard($user_id, $board_id);
 

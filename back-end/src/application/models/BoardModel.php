@@ -6,6 +6,7 @@ namespace app\models;
 use app\core\Model;
 use PDO;
 use PDOException;
+use shared\enums\ErrorMessage;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
 
@@ -33,7 +34,7 @@ class  BoardModel extends Model implements IModel
             );
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         $last_insert_id = $this->database->getConnection()->lastInsertId();
@@ -51,7 +52,7 @@ class  BoardModel extends Model implements IModel
     {
         if (!in_array($field, $this->ALLOW_FIELD)) {
             error_log("Field is not allowed");
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         $query_sql = "select * from boards where " . $field . " = :value";
@@ -65,7 +66,7 @@ class  BoardModel extends Model implements IModel
             );
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -87,7 +88,7 @@ class  BoardModel extends Model implements IModel
             $stmt->execute($entity);
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         return $this->findOne('id', strval($entity['id']));
@@ -103,7 +104,7 @@ class  BoardModel extends Model implements IModel
     {
         if (!in_array($field, $this->ALLOW_FIELD)) {
             error_log("Field is not allowed");
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         $query_sql = "select * from boards where " . $field . " = :value";
@@ -117,7 +118,7 @@ class  BoardModel extends Model implements IModel
             );
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -143,7 +144,7 @@ class  BoardModel extends Model implements IModel
             );
         } catch (PDOException $exception) {
             error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, "Internal server error");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
     }
 }

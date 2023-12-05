@@ -8,7 +8,7 @@ use Psr\Container\ContainerInterface;
 use shared\enums\RequestMethod;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
-use shared\types\MatchedRouteResult;
+use shared\handlers\MatchedRouteHandler;
 use shared\types\RouteElement;
 
 class Router
@@ -62,6 +62,9 @@ class Router
     }
 
     /**
+     * @param Request $request
+     * @param Response $response
+     * @return void
      * @throws ResponseException
      */
     public function resolve(Request $request, Response $response): void
@@ -70,21 +73,21 @@ class Router
         $path = $this->request->getPath();
         $method = $this->request->getMethod();
 
-        $result_matched_route = $this->matchedRoute($method, $path) ?? false;
+        $result_matched_handler = $this->matchedRoute($method, $path) ?? false;
 
-        if(!$result_matched_route) {
-            throw new ResponseException(StatusCode::NOT_FOUND, "Page not found!", StatusCode::NOT_FOUND->name);
+        if(!$result_matched_handler) {
+            throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, "Page not found!");
         }
 
-        $result_matched_route->run($this->container);
+        $result_matched_handler->run($this->container);
     }
 
     /**
      * @param RequestMethod $method
      * @param string $endpoint_to_check
-     * @return ['call_back' => array, 'middlewares' => []IMiddleware]
+     * @return MatchedRouteHandler|null
      */
-    private function matchedRoute(RequestMethod $method, string $endpoint_to_check): MatchedRouteResult | null
+    private function matchedRoute(RequestMethod $method, string $endpoint_to_check): MatchedRouteHandler | null
     {
         foreach ($this->routes[$method->name] as $endpoint_key => $endpoint_pattern) {
             if (preg_match($endpoint_key, $endpoint_to_check, $param_values)) {
@@ -99,7 +102,7 @@ class Router
                 $callback = $this->routes[$method->name][$endpoint_key]['call_back'];
                 $middlewares = array_key_exists('middlewares', $this->routes[$method->name][$endpoint_key]) ? $this->routes[$method->name][$endpoint_key]['middlewares'] : [];
 
-                return new MatchedRouteResult($callback, $middlewares);
+                return new MatchedRouteHandler($callback, $middlewares);
             }
         }
 
