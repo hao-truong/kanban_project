@@ -300,4 +300,31 @@ class BoardService
 
         return $this->columnService->handleGetColumnsOfBoard($board_id);
     }
+
+    /**
+     * @param int $user_id
+     * @param ColumnEntity $column_entity
+     * @return array
+     * @throws ResponseException
+     */
+    public function handleUpdateColumn(int $user_id, ColumnEntity $column_entity): array
+    {
+        $this->checkExistedBoard($column_entity->getBoardId());
+        $this->checkMemberOfBoard($user_id, $column_entity->getBoardId());
+
+        return $this->columnService->handleUpdateColumn($column_entity);
+    }
+
+    /**
+     * @param int $user_id
+     * @param int $board_id
+     * @param int $column_id
+     * @return void
+     * @throws ResponseException
+     */
+    public function handleDeleteColumn(int $user_id,int $board_id, int $column_id): void {
+        $this->checkExistedBoard($board_id);
+        $this->checkMemberOfBoard($user_id, $board_id);
+        $this->columnService->handleDeleteColumn($column_id, $board_id);
+    }
 }

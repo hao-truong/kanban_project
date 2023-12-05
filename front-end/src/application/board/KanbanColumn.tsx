@@ -8,11 +8,11 @@ import { Check, MoreHorizontal, Plus, X } from 'lucide-react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import * as yup from 'yup';
-// import { useQueryClient } from 'react-query';
+import { useQueryClient } from 'react-query';
 import Helper from '@/shared/utils/helper';
 import { useEffect, useRef, useState } from 'react';
 import { OutlinedInput } from '@mui/material';
-import { useGlobalState } from '@/shared/storages/GlobalStorage';
+import ColumnService from '@/shared/services/ColumnService';
 
 interface itemProps {
   column: Column;
@@ -36,13 +36,11 @@ const schemaValidation = yup
   .required();
 
 const KanbanColumn = ({ column }: itemProps) => {
-  const { user } = useGlobalState();
-  // const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   const titleRef = useRef<HTMLFormElement | null>(null);
   const [isClickTilte, setIsClickTitle] = useState<boolean>(false);
   const [isShowMenu, setIsShowMenu] = useState<boolean>(false);
   const [isHoverTitle, setIsHoverTitle] = useState<boolean>(false);
-  const [isCreator, setIsCreator] = useState<boolean>(false);
   const {
     register,
     handleSubmit,
@@ -52,19 +50,21 @@ const KanbanColumn = ({ column }: itemProps) => {
     resolver: yupResolver(schemaValidation),
   });
   const onSubmit: SubmitHandler<UpdateColumnReq> = async (reqData) => {
-    try {
-      if (reqData.title === column.title) {
-        setIsClickTitle(false);
-        return;
-      }
-    } catch (error: any) {
-      toast.error(error.message);
+    if (reqData.title === column.title) {
+      setIsClickTitle(false);
+      return;
+    }
+
+    const data = await ColumnService.updateColumn(column.id, column.board_id, reqData)
+      .then((response) => response.data)
+      .catch((responseError: ResponseError) => toast.error(responseError.message));
+
+    if (data) {
+      toast.success('Update column successfully!');
+      setIsClickTitle(false);
+      queryClient.invalidateQueries('getColumnsOfBoard');
     }
   };
-
-  useEffect(() => {
-    setIsCreator(column.creator_id === user?.id);
-  }, [user]);
 
   useEffect(() => {
     if (!isClickTilte) {
@@ -74,11 +74,22 @@ const KanbanColumn = ({ column }: itemProps) => {
     if (!isHoverTitle) {
       setIsShowMenu(false);
     }
-  }, [isClickTilte, isHoverTitle]);
+  }, [isClickTilte, isHoverTitle, column]);
+
+  const handleDeleteColumn = async () => {
+    const data = await ColumnService.deleteColumn(column.id, column.board_id)
+      .then((response) => response.data)
+      .catch((responseError: ResponseError) => toast.error(responseError.message));
+
+    if (data) {
+      queryClient.invalidateQueries('getColumnsOfBoard');
+      toast.success(data);
+    }
+  };
 
   return (
     <div
-      className="bg-slate-200 p-4 text-center flex flex-col gap-5 rounded-xl min-w-[300px] min-h-[300px]"
+      className="bg-slate-200 p-4 text-center flex flex-col gap-5 rounded-xl min-w-[350px] min-h-[300px]"
       draggable
     >
       <div onMouseOver={() => setIsHoverTitle(true)} onMouseLeave={() => setIsHoverTitle(false)}>
@@ -114,33 +125,30 @@ const KanbanColumn = ({ column }: itemProps) => {
             <h2
               className="w-full uppercase text-xl font-bold py-2 hover:bg-white cursor-pointer text-left"
               onClick={() => {
-                if (isCreator) {
-                  setIsClickTitle(true);
-                }
+                setIsClickTitle(true);
               }}
             >
               {column.title}
             </h2>
-            {isHoverTitle && (
-              <div className="relative">
-                <MoreHorizontal
-                  className="cursor-pointer hover:bg-slate-100 p-2"
-                  size={40}
-                  onClick={() => setIsShowMenu(!isShowMenu)}
-                />
-                {isShowMenu && (
-                  <ul className="absolute bg-white top-full right-0 py-1 w-max">
-                    {isCreator && (
-                      <div>
-                        <li className="py-1 px-4 text-left hover:bg-slate-100 cursor-pointer">
-                          Delete
-                        </li>
-                      </div>
-                    )}
-                  </ul>
-                )}
-              </div>
-            )}
+            <div className="relative">
+              <MoreHorizontal
+                className="cursor-pointer hover:bg-slate-100 p-2"
+                size={40}
+                onClick={() => setIsShowMenu(!isShowMenu)}
+              />
+              {isShowMenu && (
+                <ul className="absolute bg-white top-full right-0 py-1 w-max">
+                  <div>
+                    <li
+                      className="py-1 px-4 text-left hover:bg-slate-100 cursor-pointer"
+                      onClick={handleDeleteColumn}
+                    >
+                      Delete
+                    </li>
+                  </div>
+                </ul>
+              )}
+            </div>
           </div>
         )}
       </div>

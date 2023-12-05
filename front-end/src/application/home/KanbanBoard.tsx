@@ -63,8 +63,8 @@ const KanbanBoard = ({ board }: itemProps) => {
       .catch((responseError: ResponseError) => toast.error(responseError.message));
 
     if (data) {
-      queryClient.invalidateQueries('getMyBoards');
       setIsClickTitle(false);
+      queryClient.invalidateQueries('getMyBoards');
     }
   };
 

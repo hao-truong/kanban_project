@@ -9,6 +9,7 @@ use app\entities\BoardEntity;
 use app\entities\ColumnEntity;
 use app\services\BoardService;
 use shared\enums\StatusCode;
+use shared\enums\SuccessMessage;
 use shared\exceptions\ResponseException;
 use shared\handlers\SessionHandler;
 use shared\utils\Checker;
@@ -76,7 +77,7 @@ class BoardController
 
         $board_entity = new BoardEntity();
         $board_entity->setTitle($req_data['title']);
-        $board_entity->setId(intval($this->request->getIntParam('boardId')));
+        $board_entity->setId($this->request->getIntParam('boardId'));
         $user_id = SessionHandler::getUserId();
 
         $board = $this->boardService->handleUpdateBoard($user_id, $board_entity);
@@ -89,7 +90,7 @@ class BoardController
      */
     public function deleteBoard(): void
     {
-        $board_id = intval($this->request->getIntParam('boardId'));
+        $board_id = $this->request->getIntParam('boardId');
         $user_id = SessionHandler::getUserId();
 
         $this->boardService->handleDeleteBoard($user_id, $board_id);
@@ -103,7 +104,7 @@ class BoardController
     public function getBoard(): void
     {
         $user_id = SessionHandler::getUserId();
-        $board_id = intval($this->request->getIntParam('boardId'));
+        $board_id = $this->request->getIntParam('boardId');
         $board = $this->boardService->handleGetBoard($user_id, $board_id);
         $this->response->content(StatusCode::OK, null, null, $board);
     }
@@ -124,7 +125,7 @@ class BoardController
             ]
         );
 
-        $board_id = intval($this->request->getIntParam('boardId'));
+        $board_id = $this->request->getIntParam('boardId');
         $user_id = SessionHandler::getUserId();
         $this->boardService->handleAddMemberToBoard($user_id, $board_id, $req_data['member']);
         $this->response->content(StatusCode::OK, null, null, "Add member with username [{$req_data['member']}] to this board successfully!");
@@ -136,7 +137,7 @@ class BoardController
      */
     public function leaveBoard(): void
     {
-        $board_id = intval($this->request->getIntParam('boardId'));
+        $board_id = $this->request->getIntParam('boardId');
         $user_id = SessionHandler::getUserId();
 
         $this->boardService->handleLeaveBoard($user_id, $board_id);
@@ -149,7 +150,7 @@ class BoardController
      */
     public function getMembersOfBoard(): void
     {
-        $board_id = intval($this->request->getIntParam('boardId'));
+        $board_id = $this->request->getIntParam('boardId');
         $user_id = SessionHandler::getUserId();
 
         $members = $this->boardService->handleGetMembersOfBoard($user_id, $board_id);
@@ -162,7 +163,7 @@ class BoardController
      */
     public function getColumnsOfBoard(): void
     {
-        $board_id = intval($this->request->getIntParam('boardId'));
+        $board_id = $this->request->getIntParam('boardId');
         $user_id = SessionHandler::getUserId();
 
         $columns = $this->boardService->handleGetColumnsOfBoard($user_id, $board_id);
@@ -187,10 +188,48 @@ class BoardController
 
         $user_id = SessionHandler::getUserId();
         $column_entity = new ColumnEntity();
-        $column_entity->setBoardId(intval($this->request->getIntParam('boardId')));
+        $column_entity->setBoardId($this->request->getIntParam('boardId'));
         $column_entity->setTitle($req_data['title']);
 
         $new_column = $this->boardService->handleCreateColumn($user_id, $column_entity);
         $this->response->content(StatusCode::OK, null, null, $new_column);
+    }
+
+    /**
+     * @return void
+     * @throws ResponseException
+     */
+    public function updateColumn(): void
+    {
+        $req_data = $this->request->getBody();
+        Checker::checkMissingFields(
+            $req_data, [
+            'title',
+        ],  [
+                'title' => 'string',
+            ]
+        );
+
+        $user_id = SessionHandler::getUserId();
+        $column_entity = new ColumnEntity();
+        $column_entity->setTitle($req_data['title']);
+        $column_entity->setBoardId($this->request->getIntParam('boardId'));
+        $column_entity->setId($this->request->getIntParam('columnId'));
+
+        $update_column = $this->boardService->handleUpdateColumn($user_id, $column_entity);
+        $this->response->content(StatusCode::OK, null, null, $update_column);
+    }
+
+    /**
+     * @return void
+     * @throws ResponseException
+     */
+    public function deleteColumn(): void{
+        $user_id = SessionHandler::getUserId();
+        $board_id = $this->request->getIntParam('boardId');
+        $column_id = $this->request->getIntParam('columnId');
+
+        $this->boardService->handleDeleteColumn($user_id, $board_id, $column_id);
+        $this->response->content(StatusCode::OK, null, null, SuccessMessage::DELETE_SUCCESSFULLY);
     }
 }

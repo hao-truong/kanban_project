@@ -14,4 +14,6 @@ enum ErrorMessage: string {
     case UNAUTHORIZED_TOKEN = 'Unauthorized token';
     case EXPIRED_TOKEN = 'Token is expired';
     case INTERNAL_SERVER_ERROR = 'Internal server error';
+    case COLUMN_NOT_FOUND = 'Column not found';
+    case COLUMN_NOT_IN_BOARD = 'Column is not in this board!';
 }

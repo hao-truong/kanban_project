@@ -68,3 +68,15 @@ $app->router->addRoute(
                            'createColumn'
                        ]
 );
+$app->router->addRoute(
+    RequestMethod::PATCH, '/boards/{boardId}/columns/{columnId}', [AuthorizeRequest::class], [
+                            BoardController::class,
+                            'updateColumn'
+                        ]
+);
+$app->router->addRoute(
+    RequestMethod::DELETE, '/boards/{boardId}/columns/{columnId}', [AuthorizeRequest::class], [
+                            BoardController::class,
+                            'deleteColumn'
+                        ]
+);

@@ -6,7 +6,7 @@ use app\core\Request;
 use app\core\Response;
 use app\entities\UserEntity;
 use app\services\AuthService;
-use shared\enums\ResponseMessage;
+use shared\enums\SuccessMessage;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
 use shared\utils\Checker;
@@ -49,7 +49,7 @@ class AuthController
         $user_entity->setAlias($req_data['alias']);
 
         $this->authService->handleRegister($user_entity);
-        $this->response->content(StatusCode::CREATED, null, null, ResponseMessage::REGISTER_SUCCESSFULLY->value);
+        $this->response->content(StatusCode::CREATED, null, null, SuccessMessage::REGISTER_SUCCESSFULLY->value);
     }
 
     /**
@@ -85,6 +85,6 @@ class AuthController
     public function logout(): void
     {
         $this->authService->handleLogout();
-        $this->response->content(StatusCode::OK, null, null, ResponseMessage::LOGOUT_SUCCESSFULLY->value);
+        $this->response->content(StatusCode::OK, null, null, SuccessMessage::LOGOUT_SUCCESSFULLY->value);
     }
 }

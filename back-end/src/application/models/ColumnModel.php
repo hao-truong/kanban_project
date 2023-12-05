@@ -64,7 +64,7 @@ class ColumnModel extends Model implements IModel {
 
     public function update(array $entity): array
     {
-        $query_sql = "UPDATE columns SET title = :title, created_at = :created_at, updated_at = :updated_at, creator_id = :creator_id, board_id = :board_id WHERE id = :id";
+        $query_sql = "UPDATE columns SET title = :title, created_at = :created_at, updated_at = :updated_at, creator_id = :creator_id, board_id = :board_id, position = :position WHERE id = :id";
         $stmt = $this->database->getConnection()->prepare($query_sql);
 
         try {
