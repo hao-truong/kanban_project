@@ -96,7 +96,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
         <SignInUser />
       </header>
       <div className="min-h-[700px]">{children}</div>
-      <footer className="text-center">Develop by Truong Van Hao</footer>
+      <footer className="text-center py-5">Develop by Truong Van Hao</footer>
     </div>
   );
 };

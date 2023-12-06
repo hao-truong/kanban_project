@@ -38,7 +38,7 @@ class BoardEntity
 
     public function setTitle(string $title): void
     {
-        if (strlen($title) <= self::$MIN_LENGTH_TITLE) {
+        if (strlen($title) < self::$MIN_LENGTH_TITLE) {
             throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Title should be at least " . self::$MIN_LENGTH_TITLE . " characters long");
         }
 

@@ -6,6 +6,7 @@ namespace app\controllers;
 use app\core\Request;
 use app\core\Response;
 use app\entities\BoardEntity;
+use app\entities\CardEntity;
 use app\entities\ColumnEntity;
 use app\services\BoardService;
 use shared\enums\StatusCode;
@@ -224,12 +225,105 @@ class BoardController
      * @return void
      * @throws ResponseException
      */
-    public function deleteColumn(): void{
+    public function deleteColumn(): void
+    {
         $user_id = SessionHandler::getUserId();
         $board_id = $this->request->getIntParam('boardId');
         $column_id = $this->request->getIntParam('columnId');
 
         $this->boardService->handleDeleteColumn($user_id, $board_id, $column_id);
         $this->response->content(StatusCode::OK, null, null, SuccessMessage::DELETE_SUCCESSFULLY);
+    }
+
+    /**
+     * @return void
+     * @throws ResponseException
+     */
+    public function swapPositionOfCoupleColumn(): void
+    {
+        $req_data = $this->request->getBody();
+        Checker::checkMissingFields(
+            $req_data, [
+            'originalColumnId',
+            'targetColumnId',
+            'boardId'
+        ],  [
+                'originalColumnId' => 'integer',
+                'targetColumnId'   => 'integer',
+                'boardId'          => 'integer'
+            ]
+        );
+
+        $user_id = SessionHandler::getUserId();
+        $board_id = $this->request->getIntParam('boardId');
+
+        $this->boardService->handleSwapPositionOfCoupleColumn($user_id, $board_id, $req_data['originalColumnId'], $req_data['targetColumnId']);
+        $this->response->content(StatusCode::OK, null, null, SuccessMessage::SWAP_POSITION_SUCCESSFULLY);
+    }
+
+    /**
+     * @return void
+     * @throws ResponseException
+     */
+    public function createCardForColumn(): void
+    {
+        $req_data = $this->request->getBody();
+        Checker::checkMissingFields(
+            $req_data, [
+            'title',
+        ],  [
+                'title' => 'string',
+            ]
+        );
+
+        $user_id = SessionHandler::getUserId();
+        $board_id = $this->request->getIntParam('boardId');
+        $column_id = $this->request->getIntParam('columnId');
+        $card_entity = new CardEntity();
+        $card_entity->setTitle($req_data['title']);
+        $card_entity->setColumnId($column_id);
+
+        $new_card = $this->boardService->handleCreateCardForColumn($user_id, $board_id, $card_entity);
+        $this->response->content(StatusCode::OK, null, null, $new_card);
+    }
+
+    /**
+     * @return void
+     * @throws ResponseException
+     */
+    public function getCardsOfColumn(): void {
+        $user_id = SessionHandler::getUserId();
+        $board_id = $this->request->getIntParam('boardId');
+        $column_id = $this->request->getIntParam('columnId');
+
+        $cards = $this->boardService->handleGetCardsOfColumn($user_id, $board_id, $column_id);
+        $this->response->content(StatusCode::OK, null, null, $cards);
+    }
+
+    /**
+     * @return void
+     * @throws ResponseException
+     */
+    public function updateTitleCard(): void {
+        $req_data = $this->request->getBody();
+        Checker::checkMissingFields(
+            $req_data, [
+            'title',
+        ],  [
+                'title' => 'string',
+            ]
+        );
+
+        $user_id = SessionHandler::getUserId();
+        $board_id = $this->request->getIntParam('boardId');
+        $column_id = $this->request->getIntParam('columnId');
+        $card_id = $this->request->getIntParam('cardId');
+        $card_entity = new CardEntity();
+        $card_entity->setId($card_id);
+        $card_entity->setTitle($req_data['title']);
+        $card_entity->setColumnId($column_id);
+
+        $card = $this->boardService->handleUpdateTitleCard($user_id, $board_id, $card_entity);
+        $this->response->content(StatusCode::OK, null, null, $card);
     }
 }

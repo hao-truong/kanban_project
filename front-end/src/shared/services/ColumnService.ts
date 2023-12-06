@@ -8,6 +8,8 @@ const ColumnService = {
     axiosClient.patch<Column>(`/boards/${boardId}/columns/${columnId}`, data),
   deleteColumn: (columnId: number, boardId: number) =>
     axiosClient.delete<string>(`/boards/${boardId}/columns/${columnId}`),
+  swapPositionOfCoupleColumn: (boardId: number, data: DragDropReq) =>
+    axiosClient.patch<string>(`/boards/${boardId}/columns/position`, data),
 };
 
 export default ColumnService;

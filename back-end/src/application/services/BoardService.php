@@ -5,6 +5,7 @@ namespace app\services;
 
 use app\controllers\UserBoardService;
 use app\entities\BoardEntity;
+use app\entities\CardEntity;
 use app\entities\ColumnEntity;
 use app\models\BoardModel;
 use app\models\UserBoardModel;
@@ -19,6 +20,7 @@ class BoardService
         private readonly UserService    $userService,
         private readonly UserBoardModel $userBoardModel,
         private readonly ColumnService  $columnService,
+        private readonly CardService    $cardService,
     ) {
     }
 
@@ -282,7 +284,6 @@ class BoardService
     {
         $this->checkExistedBoard($column_entity->getBoardId());
         $this->checkMemberOfBoard($user_id, $column_entity->getBoardId());
-
         $column_entity->setCreatorId($user_id);
         return $this->columnService->handleCreateColumn($column_entity);
     }
@@ -322,9 +323,67 @@ class BoardService
      * @return void
      * @throws ResponseException
      */
-    public function handleDeleteColumn(int $user_id,int $board_id, int $column_id): void {
+    public function handleDeleteColumn(int $user_id, int $board_id, int $column_id): void
+    {
         $this->checkExistedBoard($board_id);
         $this->checkMemberOfBoard($user_id, $board_id);
         $this->columnService->handleDeleteColumn($column_id, $board_id);
+    }
+
+    /**
+     * @param int $user_id
+     * @param int $column_id_first
+     * @param int $column_id_second
+     * @return void
+     * @throws ResponseException
+     */
+    public function handleSwapPositionOfCoupleColumn(int $user_id, int $board_id, int $column_id_first, int $column_id_second): void
+    {
+        $this->checkMemberOfBoard($user_id, $board_id);
+
+        $column_first = $this->columnService->checkColumnInBoard($column_id_first, $board_id);
+        $column_second = $this->columnService->checkColumnInBoard($column_id_second, $board_id);
+
+        $this->checkMemberOfBoard($user_id, $column_first['board_id']);
+        $this->columnService->handleSwapPositionOfCoupleColumn(ColumnEntity::fromArray($column_first), ColumnEntity::fromArray($column_second));
+    }
+
+    /**
+     * @param int $user_id
+     * @param int $board_id
+     * @param CardEntity $card_entity
+     * @return array
+     * @throws ResponseException
+     */
+    public function handleCreateCardForColumn(int $user_id, int $board_id, CardEntity $card_entity): array
+    {
+        $this->checkExistedBoard($board_id);
+        $this->checkMemberOfBoard($user_id, $board_id);
+        $this->columnService->checkColumnInBoard($card_entity->getColumnId(), $board_id);
+
+        return $this->cardService->handleCreateCard($card_entity);
+    }
+
+    /**
+     * @param int $user_id
+     * @param int $board_id
+     * @param int $column_id
+     * @return array
+     * @throws ResponseException
+     */
+    public function handleGetCardsOfColumn(int $user_id, int $board_id, int $column_id): array {
+        $this->checkExistedBoard($board_id);
+        $this->checkMemberOfBoard($user_id, $board_id);
+        $this->columnService->checkColumnInBoard($column_id, $board_id);
+
+        return $this->cardService->handleGetCardsByColumn($column_id);
+    }
+
+    public function handleUpdateTitleCard(int $user_id, int $board_id, CardEntity $card_entity): array {
+        $this->checkExistedBoard($board_id);
+        $this->checkMemberOfBoard($user_id, $board_id);
+        $this->columnService->checkColumnInBoard($card_entity->getColumnId(), $board_id);
+
+        return $this->cardService->handleUpdateTitleCard($card_entity);
     }
 }

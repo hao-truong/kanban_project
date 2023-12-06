@@ -107,6 +107,7 @@ const RegisterForm = () => {
           className="w-[400px]"
           error={errors.username ? true : false}
           helperText={errors.username?.message}
+          inputProps={{ maxLength: MAX_LENGTH_INPUT_STRING }}
         />
         <TextField
           label="Email"
@@ -123,6 +124,7 @@ const RegisterForm = () => {
           className="w-[400px]"
           error={errors.alias ? true : false}
           helperText={errors.alias?.message}
+          inputProps={{ maxLength: MAX_LENGTH_INPUT_STRING }}
         />
         <TextField
           label="Password"

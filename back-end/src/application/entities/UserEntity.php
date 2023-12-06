@@ -24,6 +24,7 @@ class UserEntity
     private static int $MIN_LENGTH_PASSWORD = 8;
     private static int $MIN_LENGTH_STRING = 3;
     private static int $MAX_LENGTH_STRING = 256;
+    private static int $MAX_LENGTH_ALIAS_NAME = 30;
 
     public function __construct()
     {
@@ -97,8 +98,8 @@ class UserEntity
             throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, 'Alias name must have ' . self::$MIN_LENGTH_STRING . ' characters at least');
         }
 
-        if (strlen($alias) > self::$MAX_LENGTH_STRING) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, 'Alias must less than ' . self::$MAX_LENGTH_STRING . ' characters at least');
+        if (strlen($alias) > self::$MAX_LENGTH_ALIAS_NAME) {
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, 'Alias must less than ' . self::$MAX_LENGTH_ALIAS_NAME . ' characters at least');
         }
 
         $this->alias = $alias;

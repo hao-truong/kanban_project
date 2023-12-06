@@ -16,4 +16,8 @@ enum ErrorMessage: string {
     case INTERNAL_SERVER_ERROR = 'Internal server error';
     case COLUMN_NOT_FOUND = 'Column not found';
     case COLUMN_NOT_IN_BOARD = 'Column is not in this board!';
+    case COUPLE_COLUMN_NOT_IN_THE_SAME_BOARD = 'This couple column is not in the same board';
+    case STATUS_CARD_NOT_ALLOW = 'Status card is not allowed in range[1,4]';
+    case CARD_NOT_IN_COLUMN = 'Card is not in this column!';
+    case CARD_NOT_FOUND = 'Card not found!';
 }

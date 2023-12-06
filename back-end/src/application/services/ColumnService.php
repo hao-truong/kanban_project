@@ -13,6 +13,7 @@ class  ColumnService
 {
     public function __construct(
         private readonly ColumnModel  $columnModel,
+        private readonly CardService $cardService,
     ) {
     }
 
@@ -23,6 +24,9 @@ class  ColumnService
      */
     public function handleCreateColumn(ColumnEntity $column_entity): array
     {
+        $position = $this->columnModel->count('board_id', $column_entity->getBoardId());
+        $column_entity->setPosition($position + 1);
+
         return $this->columnModel->save(
             $column_entity->toArray(),
         );
@@ -99,5 +103,22 @@ class  ColumnService
     public function handleDeleteColumn(int $column_id, int $board_id): void {
         $this->checkColumnInBoard($column_id, $board_id);
         $this->columnModel->deleteById($column_id);
+    }
+
+    /**
+     * @param ColumnEntity $column_first
+     * @param ColumnEntity $column_second
+     * @return void
+     * @throws ResponseException
+     */
+    public function handleSwapPositionOfCoupleColumn(ColumnEntity $column_first, ColumnEntity $column_second): void {
+        $temp_position = $column_first->getPosition();
+        $column_first->setPosition($column_second->getPosition());
+        $column_second->setPosition($temp_position);
+        $column_first->setUpdatedAt(new \DateTime());
+        $column_second->setUpdatedAt(new \DateTime());
+
+        $this->columnModel->update($column_first->toFullArray());
+        $this->columnModel->update($column_second->toFullArray());
     }
 }

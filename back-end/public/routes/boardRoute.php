@@ -69,6 +69,12 @@ $app->router->addRoute(
                        ]
 );
 $app->router->addRoute(
+    RequestMethod::PATCH, '/boards/{boardId}/columns/position', [AuthorizeRequest::class], [
+                            BoardController::class,
+                            'swapPositionOfCoupleColumn'
+                        ]
+);
+$app->router->addRoute(
     RequestMethod::PATCH, '/boards/{boardId}/columns/{columnId}', [AuthorizeRequest::class], [
                             BoardController::class,
                             'updateColumn'
@@ -76,7 +82,25 @@ $app->router->addRoute(
 );
 $app->router->addRoute(
     RequestMethod::DELETE, '/boards/{boardId}/columns/{columnId}', [AuthorizeRequest::class], [
-                            BoardController::class,
-                            'deleteColumn'
-                        ]
+                             BoardController::class,
+                             'deleteColumn'
+                         ]
+);
+$app->router->addRoute(
+    RequestMethod::POST, '/boards/{boardId}/columns/{columnId}/cards', [AuthorizeRequest::class], [
+                           BoardController::class,
+                           'createCardForColumn'
+                       ]
+);
+$app->router->addRoute(
+    RequestMethod::GET, '/boards/{boardId}/columns/{columnId}/cards', [AuthorizeRequest::class], [
+                          BoardController::class,
+                          'getCardsOfColumn'
+                      ]
+);
+$app->router->addRoute(
+    RequestMethod::PATCH, '/boards/{boardId}/columns/{columnId}/cards/{cardId}', [AuthorizeRequest::class], [
+                          BoardController::class,
+                          'updateTitleCard'
+                      ]
 );
