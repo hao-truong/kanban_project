@@ -3,21 +3,10 @@ import KanbanColumn from './KanbanColumn';
 import { useEffect, useState } from 'react';
 import useCheckLogin from '@/shared/hooks/useCheckLogin';
 import { useNavigate, useParams } from 'react-router-dom';
-import BoardService from '@/shared/services/BoardService';
 import { useQuery, useQueryClient } from 'react-query';
-import ColumnService from '@/shared/services/ColumnService';
 import DialogCreateColumn from './DialogCreateColumn';
 import FlipMove from 'react-flip-move';
-
-const getColumnsOfBoard = async (boardId: number): Promise<Column[]> => {
-  const data = await ColumnService.getColumnsOfBoard(boardId).then((response) => response.data);
-  return data;
-};
-
-const getBoard = async (boardId: number): Promise<Board> => {
-  const data = await BoardService.getBoard(boardId).then((response) => response.data);
-  return data;
-};
+import { getBoard, getColumnsOfBoard } from '@/shared/services/QueryService';
 
 const BoardPage = () => {
   useQueryClient();

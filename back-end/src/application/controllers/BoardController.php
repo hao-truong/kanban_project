@@ -292,7 +292,8 @@ class BoardController
      * @throws ResponseException
      * @throws \Exception
      */
-    public function getCardsOfColumn(): void {
+    public function getCardsOfColumn(): void
+    {
         $user_id = SessionHandler::getUserId();
         $board_id = $this->request->getIntParam('boardId');
         $column_id = $this->request->getIntParam('columnId');
@@ -305,7 +306,8 @@ class BoardController
      * @return void
      * @throws ResponseException
      */
-    public function updateTitleCard(): void {
+    public function updateTitleCard(): void
+    {
         $req_data = $this->request->getBody();
         Checker::checkMissingFields(
             $req_data, [
@@ -328,7 +330,13 @@ class BoardController
         $this->response->content(StatusCode::OK, null, null, $card);
     }
 
-    public function deleteCardOfColumn(): void {
+    /**
+     * @return void
+     * @throws ResponseException
+     * @throws \Exception
+     */
+    public function deleteCardOfColumn(): void
+    {
         $user_id = SessionHandler::getUserId();
         $board_id = $this->request->getIntParam('boardId');
         $column_id = $this->request->getIntParam('columnId');
@@ -336,5 +344,59 @@ class BoardController
 
         $this->boardService->handleDeleteCardOfColumn($user_id, $board_id, $column_id, $card_id);
         $this->response->content(StatusCode::OK, null, null, SuccessMessage::DELETE_SUCCESSFULLY);
+    }
+
+    /**
+     * @return void
+     * @throws ResponseException
+     * @throws \Exception
+     */
+    public function assignMeToCard(): void
+    {
+        $user_id = SessionHandler::getUserId();
+        $board_id = $this->request->getIntParam('boardId');
+        $column_id = $this->request->getIntParam('columnId');
+        $card_id = $this->request->getIntParam('cardId');
+        $this->boardService->handleAssignMeToCard($user_id, $board_id, $column_id, $card_id);
+        $this->response->content(StatusCode::OK, null, null, SuccessMessage::ASSIGN_USER_TO_CARD_SUCCESSFULLY);
+    }
+
+    /**
+     * @return void
+     * @throws ResponseException
+     * @throws \Exception
+     */
+    public function assignMemberToCard(): void {
+        $req_data = $this->request->getBody();
+        Checker::checkMissingFields(
+            $req_data, [
+            'assignToMemberId',
+        ],  [
+                'assignToMemberId' => 'integer',
+            ]
+        );
+
+        $user_id = SessionHandler::getUserId();
+        $board_id = $this->request->getIntParam('boardId');
+        $column_id = $this->request->getIntParam('columnId');
+        $card_id = $this->request->getIntParam('cardId');
+        $this->boardService->handleAssignMemberToCard($user_id, $board_id, $column_id, $card_id, $req_data['assignToMemberId']);
+
+        $this->response->content(StatusCode::OK, null, null, SuccessMessage::ASSIGN_USER_TO_CARD_SUCCESSFULLY);
+    }
+
+    /**
+     * @return void
+     * @throws ResponseException
+     * @throws \Exception
+     */
+    public function getDetailCard(): void {
+        $user_id = SessionHandler::getUserId();
+        $board_id = $this->request->getIntParam('boardId');
+        $column_id = $this->request->getIntParam('columnId');
+        $card_id = $this->request->getIntParam('cardId');
+        $detail_card = $this->boardService->handleGetDetailCard($user_id, $board_id, $column_id, $card_id);
+
+        $this->response->content(StatusCode::OK, null, null, $detail_card);
     }
 }

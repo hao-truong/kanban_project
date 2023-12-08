@@ -9,6 +9,8 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
 import { toast } from 'react-toastify';
 import * as yup from 'yup';
+import MenuAssignUser from './MenuAssignUser';
+import DialogDetailCard from './DialogDetailCard';
 
 interface itemProps {
   card: Card;
@@ -38,6 +40,8 @@ const KanbanCard = ({ card, boardId }: itemProps) => {
   const [isEditTitle, setIsEditTitle] = useState<boolean>(false);
   const titleRef = useRef<HTMLFormElement | null>(null);
   const menuRef = useRef<HTMLUListElement | null>(null);
+  const [isOpenMenuAssignUser, setIsOpenMenuAssignUser] = useState<boolean>(false);
+  const [isOpenDetailCard, setIsOpenDetailCard] = useState<boolean>(false);
   const {
     register,
     handleSubmit,
@@ -47,12 +51,18 @@ const KanbanCard = ({ card, boardId }: itemProps) => {
     resolver: yupResolver(schemaValidation),
   });
   const onSubmit: SubmitHandler<UpdateColumnReq> = async (reqData) => {
-    const data = await CardService.updateTitleCard({
-      columnId: card.column_id,
-      cardId: card.id,
+    if (reqData.title === card.title) {
+      return;
+    }
+
+    const data = await CardService.updateTitleCard(
+      {
+        cardId: card.id,
+        columnId: card.column_id,
+        boardId,
+      },
       reqData,
-      boardId: boardId,
-    })
+    )
       .then((response) => response.data)
       .catch((responseError: ResponseError) => {
         toast.error(responseError.error);
@@ -101,10 +111,11 @@ const KanbanCard = ({ card, boardId }: itemProps) => {
 
   return (
     <div
-      className="w-full grid grid-cols-12 bg-white rounded-md p-4 gap-2 cursor-pointer"
+      className="w-full grid grid-cols-12 bg-white rounded-md p-4 gap-2 cursor-pointer hover:bg-slate-400"
       draggable
       onDragStart={(e) => handleDragStartCard(e)}
       onDragOver={(e) => handleDragOverCard(e)}
+      onClick={() => setIsOpenDetailCard(true)}
     >
       <div className="col-span-10">
         <div className="">
@@ -114,7 +125,10 @@ const KanbanCard = ({ card, boardId }: itemProps) => {
               <Pencil
                 className="absolute bottom-0 right-0 hover:bg-slate-200 p-1"
                 size={25}
-                onClick={() => setIsEditTitle(true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsEditTitle(true);
+                }}
               />
             </h2>
           )}
@@ -124,6 +138,7 @@ const KanbanCard = ({ card, boardId }: itemProps) => {
                 autoFocus
                 className="w-full bg-white"
                 onFocus={() => Helper.handleOutSideClick(titleRef, setIsEditTitle)}
+                onClick={(e) => e.stopPropagation()}
                 id="outlined-adornment-weight"
                 aria-describedby="outlined-weight-helper-text"
                 {...register('title')}
@@ -133,6 +148,7 @@ const KanbanCard = ({ card, boardId }: itemProps) => {
               <div className="flex flex-row justify-end gap-2 mt-2 absolute right-0">
                 <button type="submit">
                   <Check
+                    onClick={(e) => e.stopPropagation()}
                     size={40}
                     className="p-2 bg-white hover:bg-slate-100 rounded-sm shadow-lg cursor-pointer"
                   />
@@ -140,7 +156,10 @@ const KanbanCard = ({ card, boardId }: itemProps) => {
                 <X
                   size={40}
                   className="p-2 bg-white hover:bg-slate-100 rounded-sm shadow-lg cursor-pointer"
-                  onClick={() => setIsEditTitle(false)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsEditTitle(false);
+                  }}
                 />
               </div>
             </form>
@@ -152,33 +171,50 @@ const KanbanCard = ({ card, boardId }: itemProps) => {
           <MoreHorizontal
             className="cursor-pointer hover:bg-slate-100 p-2"
             size={40}
-            onClick={() => setIsShowMenu(!isShowMenu)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsShowMenu(!isShowMenu);
+            }}
           />
           {isShowMenu && (
-            <ul ref={menuRef} className="absolute bg-white top-full right-0 py-1 w-max shadow-lg">
+            <ul
+              ref={menuRef}
+              className="absolute bg-white top-full right-0 py-1 w-max shadow-lg border border-black z-10"
+            >
               <div>
                 <li
                   className="py-1 px-4 text-left hover:bg-slate-100 cursor-pointer"
-                  onClick={handleDelete}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete();
+                  }}
                 >
                   Delete
-                </li>
-              </div>
-              <div>
-                <li className="py-1 px-4 text-left hover:bg-slate-100 cursor-pointer">
-                  Assign to member
                 </li>
               </div>
             </ul>
           )}
         </div>
-        <div className="w-full">
+        <div className="w-full relative">
           <h2
-            className="p-2 bg-yellow-400 w-full"
+            className="p-2 bg-yellow-400"
             title={card.assigned_user ? card.assigned_user.username.slice(0, 2) : 'unassigned'}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsOpenMenuAssignUser(!isOpenMenuAssignUser);
+            }}
           >
             {card.assigned_user ? card.assigned_user.username.slice(0, 2) : '#'}
           </h2>
+          {isOpenMenuAssignUser && (
+            <MenuAssignUser
+              card={card}
+              boardId={boardId}
+              isOpen={isOpenMenuAssignUser}
+              setIsOpen={setIsOpenMenuAssignUser}
+            />
+          )}
+          <DialogDetailCard card={card} isOpen={isOpenDetailCard} setIsOpen={setIsOpenDetailCard} />
         </div>
       </div>
     </div>

@@ -100,13 +100,43 @@ $app->router->addRoute(
 );
 $app->router->addRoute(
     RequestMethod::PATCH, '/boards/{boardId}/columns/{columnId}/cards/{cardId}', [AuthorizeRequest::class], [
-                          BoardController::class,
-                          'updateTitleCard'
-                      ]
+                            BoardController::class,
+                            'updateTitleCard'
+                        ]
 );
 $app->router->addRoute(
     RequestMethod::DELETE, '/boards/{boardId}/columns/{columnId}/cards/{cardId}', [AuthorizeRequest::class], [
+                             BoardController::class,
+                             'deleteCardOfColumn'
+                         ]
+);
+$app->router->addRoute(
+    RequestMethod::DELETE, '/boards/{boardId}/columns/{columnId}/cards/{cardId}', [AuthorizeRequest::class], [
+                             BoardController::class,
+                             'deleteCardOfColumn'
+                         ]
+);
+$app->router->addRoute(
+    RequestMethod::DELETE, '/boards/{boardId}/columns/{columnId}/cards/{cardId}', [AuthorizeRequest::class], [
+                             BoardController::class,
+                             'deleteCardOfColumn'
+                         ]
+);
+$app->router->addRoute(
+    RequestMethod::GET, '/boards/{boardId}/columns/{columnId}/cards/{cardId}', [AuthorizeRequest::class], [
+                             BoardController::class,
+                             'getDetailCard'
+                         ]
+);
+$app->router->addRoute(
+    RequestMethod::PATCH, '/boards/{boardId}/columns/{columnId}/cards/{cardId}/assign-to-me', [AuthorizeRequest::class], [
                             BoardController::class,
-                            'deleteCardOfColumn'
+                            'assignMeToCard'
+                        ]
+);
+$app->router->addRoute(
+    RequestMethod::PATCH, '/boards/{boardId}/columns/{columnId}/cards/{cardId}/assign-to-member', [AuthorizeRequest::class], [
+                            BoardController::class,
+                            'assignMemberToCard'
                         ]
 );

@@ -8,15 +8,18 @@ type CreateCardReq = {
   reqData: TitleCardReq;
 };
 
-type UpdateTitleCardReq = {
-  columnId: number;
-  boardId: number;
-  cardId: number;
-  reqData: TitleCardReq;
-};
-
 type DeleteCardReq = {
   columnId: number;
   boardId: number;
   cardId: number;
+};
+
+type ParamsApiCard = {
+  columnId: number;
+  boardId: number;
+  cardId: number;
+};
+
+type AssignToMemberReq = {
+  assignToMemberId: number;
 };

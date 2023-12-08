@@ -93,7 +93,7 @@ const DialogCreateCard = ({ isOpen, setIsOpen, columnId, boardId }: itemProps) =
   }, [isOpen, dialogRef, bodyDialogRef]);
 
   return (
-    <dialog ref={dialogRef} className=" rounded-lg p-10">
+    <dialog ref={dialogRef} className="rounded-lg p-10">
       <div ref={bodyDialogRef} className="flex flex-col items-center justify-center gap-4">
         {error && <h2 className="text-red-600 text-center">{error}</h2>}
         <form

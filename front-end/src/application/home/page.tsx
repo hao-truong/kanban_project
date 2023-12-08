@@ -1,16 +1,11 @@
 import { useState } from 'react';
 import KanbanBoard from './KanbanBoard';
-import BoardService from '@/shared/services/BoardService';
 import { InputBase } from '@mui/material';
 import { Plus, Search } from 'lucide-react';
 import DialogCreateBoard from './DialogCreateBoard';
 import { useQuery, useQueryClient } from 'react-query';
 import useCheckLogin from '@/shared/hooks/useCheckLogin';
-
-const getMyBoards = async (): Promise<Board[]> => {
-  const data = await BoardService.getMyBoards().then((response) => response.data);
-  return data;
-};
+import { getMyBoards } from '@/shared/services/QueryService';
 
 const HomePage = () => {
   useQueryClient();

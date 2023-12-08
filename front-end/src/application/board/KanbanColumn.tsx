@@ -16,16 +16,11 @@ import ColumnService from '@/shared/services/ColumnService';
 import { useGlobalState } from '@/shared/storages/GlobalStorage';
 import KanbanCard from './KanbanCard';
 import DialogCreateCard from './DialogCreateCard';
-import CardService from '@/shared/services/CardService';
+import { getCards } from '@/shared/services/QueryService';
 
 interface itemProps {
   column: Column;
 }
-
-const getCards = async (boardId: number, columnId: number): Promise<Card[]> => {
-  const data = await CardService.getCards(boardId, columnId).then((response) => response.data);
-  return data;
-};
 
 const schemaValidation = yup
   .object({
@@ -206,7 +201,7 @@ const KanbanColumn = ({ column }: itemProps) => {
               </h2>
               <div className="relative">
                 <MoreHorizontal
-                  className="cursor-pointer hover:bg-slate-100 p-2"
+                  className="cursor-pointer hover:bg-slate-100 p-2 relative"
                   size={40}
                   onClick={() => setIsShowMenu(!isShowMenu)}
                   onMouseOver={() => setIsEnableDraggable(false)}
@@ -234,20 +229,24 @@ const KanbanColumn = ({ column }: itemProps) => {
           columnId={column.id}
           boardId={column.board_id}
         />
-        <div className="flex flex-col gap-4 max-h-[500px] overflow-y-scroll">
-          {cards &&
-            cards.length !== 0 &&
-            cards.map((card) => <KanbanCard card={card} key={card.id} boardId={column.board_id} />)}
+        <div className="h-full max-h-[500px] overflow-y-scroll">
+          <div className="flex flex-col gap-4">
+            {cards &&
+              cards.length !== 0 &&
+              cards.map((card) => (
+                <KanbanCard card={card} key={card.id} boardId={column.board_id} />
+              ))}
+          </div>
+          <button
+            className="w-full mt-4 flex flex-row items-center gap-2 px-4 py-2 hover:bg-slate-400"
+            onClick={() => setIsOpenDialogCreateCard(true)}
+            onMouseOver={() => setIsEnableDraggable(false)}
+            onMouseLeave={() => setIsEnableDraggable(true)}
+          >
+            <Plus />
+            <span>Create card</span>
+          </button>
         </div>
-        <button
-          className="w-full flex flex-row items-center gap-2 px-4 py-2 hover:bg-slate-400"
-          onClick={() => setIsOpenDialogCreateCard(true)}
-          onMouseOver={() => setIsEnableDraggable(false)}
-          onMouseLeave={() => setIsEnableDraggable(true)}
-        >
-          <Plus />
-          <span>Create card</span>
-        </button>
       </div>
     </div>
   );

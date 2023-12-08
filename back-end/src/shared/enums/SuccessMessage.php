@@ -8,4 +8,5 @@ enum SuccessMessage: string {
     case LOGOUT_SUCCESSFULLY = 'Logout successfully!';
     case DELETE_SUCCESSFULLY = 'Delete successfully!';
     case SWAP_POSITION_SUCCESSFULLY = 'Swap position of two column successfully!';
+    case ASSIGN_USER_TO_CARD_SUCCESSFULLY = 'Assign this user to card successfully!';
 }

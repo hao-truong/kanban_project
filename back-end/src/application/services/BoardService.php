@@ -409,4 +409,54 @@ class BoardService
         $this->cardService->checkCardInColumn($column_id, $card_id);
         $this->cardService->handleDeleteCard($card_id);
     }
+
+    /**
+     * @param int $user_id
+     * @param int $board_id
+     * @param int $column_id
+     * @param int $card_id
+     * @return void
+     * @throws ResponseException
+     */
+    public function handleAssignMeToCard(int $user_id, int $board_id,int $column_id, int $card_id): void {
+        $this->checkExistedBoard($board_id);
+        $this->checkMemberOfBoard($user_id, $board_id);
+        $this->columnService->checkColumnInBoard($column_id, $board_id);
+        $this->cardService->checkCardInColumn($column_id, $card_id);
+        $this->cardService->handleAssignMemberToBoard($user_id, $card_id);
+    }
+
+    /**
+     * @param int $user_id
+     * @param int $board_id
+     * @param int $column_id
+     * @param int $card_id
+     * @param int $user_need_assign
+     * @return void
+     * @throws ResponseException
+     */
+    public function handleAssignMemberToCard(int $user_id,  int $board_id,int $column_id, int $card_id, int $user_need_assign ): void {
+        $this->checkExistedBoard($board_id);
+        $this->checkMemberOfBoard($user_id, $board_id);
+        $this->checkMemberOfBoard($user_need_assign, $board_id);
+        $this->columnService->checkColumnInBoard($column_id, $board_id);
+        $this->cardService->checkCardInColumn($column_id, $card_id);
+        $this->cardService->handleAssignMemberToBoard($user_need_assign, $card_id);
+    }
+
+    /**
+     * @param int $user_id
+     * @param int $board_id
+     * @param int $column_id
+     * @param int $card_id
+     * @return array
+     * @throws ResponseException
+     */
+    public function handleGetDetailCard(int $user_id,  int $board_id,int $column_id, int $card_id): array {
+        $this->checkExistedBoard($board_id);
+        $this->checkMemberOfBoard($user_id, $board_id);
+        $this->columnService->checkColumnInBoard($column_id, $board_id);
+        $this->cardService->checkCardInColumn($column_id, $card_id);
+        return $this->cardService->handleGetDetailCard($card_id);
+    }
 }

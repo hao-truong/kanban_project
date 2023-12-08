@@ -20,4 +20,5 @@ enum ErrorMessage: string {
     case STATUS_CARD_NOT_ALLOW = 'Status card is not allowed in range[1,4]';
     case CARD_NOT_IN_COLUMN = 'Card is not in this column!';
     case CARD_NOT_FOUND = 'Card not found!';
+    case USER_WAS_ASSIGNED_USER_OF_THIS_CARD = 'This user was the assigned user of this card!';
 }
