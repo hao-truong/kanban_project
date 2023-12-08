@@ -3,6 +3,7 @@ import { ToastContainer } from 'react-toastify';
 import router from './router';
 import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
+import 'react-quill/dist/quill.snow.css';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
 export const queryClient = new QueryClient({

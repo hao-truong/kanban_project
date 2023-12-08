@@ -399,4 +399,28 @@ class BoardController
 
         $this->response->content(StatusCode::OK, null, null, $detail_card);
     }
+
+    /**
+     * @return void
+     * @throws ResponseException
+     * @throws \Exception
+     */
+    public function changeColumnForCard(): void {
+        $req_data = $this->request->getBody();
+        Checker::checkMissingFields(
+            $req_data, [
+            'destinationColumnId',
+        ],  [
+                'destinationColumnId' => 'integer',
+            ]
+        );
+
+        $user_id = SessionHandler::getUserId();
+        $board_id = $this->request->getIntParam('boardId');
+        $column_id = $this->request->getIntParam('columnId');
+        $card_id = $this->request->getIntParam('cardId');
+
+        $card = $this->boardService->handleChangeColumnForCard($user_id, $board_id, $column_id, $card_id, $req_data['destinationColumnId']);
+        $this->response->content(StatusCode::OK, null, null, $card);
+    }
 }

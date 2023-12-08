@@ -23,3 +23,7 @@ type ParamsApiCard = {
 type AssignToMemberReq = {
   assignToMemberId: number;
 };
+
+type ChangeColumnReq = {
+  destinationColumnId: number;
+};

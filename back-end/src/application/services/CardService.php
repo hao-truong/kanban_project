@@ -194,4 +194,16 @@ class CardService
 
         return Converter::toCardResponse($card[0]);
     }
+
+    /**
+     * @param int $card_id
+     * @param int $destination_column_id
+     * @return array
+     * @throws ResponseException
+     */
+    public function handleChangeColumn(int $card_id,int $destination_column_id): array {
+        $card_to_update = $this->checkExistedCard($card_id);
+        $card_to_update['column_id'] = $destination_column_id;
+        return $this->cardModel->update($card_to_update);
+    }
 }

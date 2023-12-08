@@ -214,7 +214,12 @@ const KanbanCard = ({ card, boardId }: itemProps) => {
               setIsOpen={setIsOpenMenuAssignUser}
             />
           )}
-          <DialogDetailCard card={card} isOpen={isOpenDetailCard} setIsOpen={setIsOpenDetailCard} />
+          <DialogDetailCard
+            card={card}
+            isOpen={isOpenDetailCard}
+            setIsOpen={setIsOpenDetailCard}
+            boardId={boardId}
+          />
         </div>
       </div>
     </div>

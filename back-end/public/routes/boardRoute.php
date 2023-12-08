@@ -111,18 +111,6 @@ $app->router->addRoute(
                          ]
 );
 $app->router->addRoute(
-    RequestMethod::DELETE, '/boards/{boardId}/columns/{columnId}/cards/{cardId}', [AuthorizeRequest::class], [
-                             BoardController::class,
-                             'deleteCardOfColumn'
-                         ]
-);
-$app->router->addRoute(
-    RequestMethod::DELETE, '/boards/{boardId}/columns/{columnId}/cards/{cardId}', [AuthorizeRequest::class], [
-                             BoardController::class,
-                             'deleteCardOfColumn'
-                         ]
-);
-$app->router->addRoute(
     RequestMethod::GET, '/boards/{boardId}/columns/{columnId}/cards/{cardId}', [AuthorizeRequest::class], [
                              BoardController::class,
                              'getDetailCard'
@@ -138,5 +126,11 @@ $app->router->addRoute(
     RequestMethod::PATCH, '/boards/{boardId}/columns/{columnId}/cards/{cardId}/assign-to-member', [AuthorizeRequest::class], [
                             BoardController::class,
                             'assignMemberToCard'
+                        ]
+);
+$app->router->addRoute(
+    RequestMethod::PATCH, '/boards/{boardId}/columns/{columnId}/cards/{cardId}/change-column', [AuthorizeRequest::class], [
+                            BoardController::class,
+                            'changeColumnForCard'
                         ]
 );

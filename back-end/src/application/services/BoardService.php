@@ -371,7 +371,8 @@ class BoardService
      * @return array
      * @throws ResponseException
      */
-    public function handleGetCardsOfColumn(int $user_id, int $board_id, int $column_id): array {
+    public function handleGetCardsOfColumn(int $user_id, int $board_id, int $column_id): array
+    {
         $this->checkExistedBoard($board_id);
         $this->checkMemberOfBoard($user_id, $board_id);
         $this->columnService->checkColumnInBoard($column_id, $board_id);
@@ -386,7 +387,8 @@ class BoardService
      * @return array
      * @throws ResponseException
      */
-    public function handleUpdateTitleCard(int $user_id, int $board_id, CardEntity $card_entity): array {
+    public function handleUpdateTitleCard(int $user_id, int $board_id, CardEntity $card_entity): array
+    {
         $this->checkExistedBoard($board_id);
         $this->checkMemberOfBoard($user_id, $board_id);
         $this->columnService->checkColumnInBoard($card_entity->getColumnId(), $board_id);
@@ -402,7 +404,8 @@ class BoardService
      * @return void
      * @throws ResponseException
      */
-    public function handleDeleteCardOfColumn(int $user_id, int $board_id, int $column_id, int $card_id): void {
+    public function handleDeleteCardOfColumn(int $user_id, int $board_id, int $column_id, int $card_id): void
+    {
         $this->checkExistedBoard($board_id);
         $this->checkMemberOfBoard($user_id, $board_id);
         $this->columnService->checkColumnInBoard($column_id, $board_id);
@@ -418,7 +421,8 @@ class BoardService
      * @return void
      * @throws ResponseException
      */
-    public function handleAssignMeToCard(int $user_id, int $board_id,int $column_id, int $card_id): void {
+    public function handleAssignMeToCard(int $user_id, int $board_id, int $column_id, int $card_id): void
+    {
         $this->checkExistedBoard($board_id);
         $this->checkMemberOfBoard($user_id, $board_id);
         $this->columnService->checkColumnInBoard($column_id, $board_id);
@@ -435,7 +439,8 @@ class BoardService
      * @return void
      * @throws ResponseException
      */
-    public function handleAssignMemberToCard(int $user_id,  int $board_id,int $column_id, int $card_id, int $user_need_assign ): void {
+    public function handleAssignMemberToCard(int $user_id, int $board_id, int $column_id, int $card_id, int $user_need_assign): void
+    {
         $this->checkExistedBoard($board_id);
         $this->checkMemberOfBoard($user_id, $board_id);
         $this->checkMemberOfBoard($user_need_assign, $board_id);
@@ -452,11 +457,31 @@ class BoardService
      * @return array
      * @throws ResponseException
      */
-    public function handleGetDetailCard(int $user_id,  int $board_id,int $column_id, int $card_id): array {
+    public function handleGetDetailCard(int $user_id, int $board_id, int $column_id, int $card_id): array
+    {
         $this->checkExistedBoard($board_id);
         $this->checkMemberOfBoard($user_id, $board_id);
         $this->columnService->checkColumnInBoard($column_id, $board_id);
         $this->cardService->checkCardInColumn($column_id, $card_id);
         return $this->cardService->handleGetDetailCard($card_id);
+    }
+
+    /**
+     * @param int $user_id
+     * @param int $board_id
+     * @param int $column_id
+     * @param int $card_id
+     * @return array
+     * @throws ResponseException
+     */
+    public function handleChangeColumnForCard(int $user_id, int $board_id, int $column_id, int $card_id, int $destination_column_id): array
+    {
+        $this->checkExistedBoard($board_id);
+        $this->checkMemberOfBoard($user_id, $board_id);
+        $this->columnService->checkColumnInBoard($column_id, $board_id);
+        $this->columnService->checkColumnInBoard($destination_column_id, $board_id);
+        $this->cardService->checkCardInColumn($column_id, $card_id);
+
+        return $this->cardService->handleChangeColumn($card_id, $destination_column_id);
     }
 }

@@ -27,6 +27,11 @@ const CardService = {
       `/boards/${params.boardId}/columns/${params.columnId}/cards/${params.cardId}/assign-to-member`,
       data,
     ),
+  changeColumnForCard: (params: ParamsApiCard, data: ChangeColumnReq) =>
+    axiosClient.patch<string>(
+      `/boards/${params.boardId}/columns/${params.columnId}/cards/${params.cardId}/change-column`,
+      data,
+    ),
 };
 
 export default CardService;

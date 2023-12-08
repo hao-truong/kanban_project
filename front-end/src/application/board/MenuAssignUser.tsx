@@ -45,9 +45,10 @@ const MemberComponent = ({ member, paramsApi, setIsOpen, assignedUser }: memberP
         .then((response) => response.data)
         .catch((responseError: ResponseError) => toast.error(responseError.message));
 
-      queryClient.invalidateQueries(`getCards${paramsApi.columnId}`);
-      setIsOpen(false);
-      toast.success(data);
+      if (data) {
+        queryClient.invalidateQueries(`getCards${paramsApi.columnId}`);
+        setIsOpen(false);
+      }
       return;
     }
 
@@ -57,15 +58,16 @@ const MemberComponent = ({ member, paramsApi, setIsOpen, assignedUser }: memberP
       .then((response) => response.data)
       .catch((responseError: ResponseError) => toast.error(responseError.message));
 
-    queryClient.invalidateQueries(`getCards${paramsApi.columnId}`);
-    setIsOpen(false);
-    toast.success(data);
+    if (data) {
+      queryClient.invalidateQueries(`getCards${paramsApi.columnId}`);
+      setIsOpen(false);
+    }
   };
 
   return (
     <div
       className={`p-2 hover:bg-slate-400 hover:text-white flex flex-row items-center gap-4 ${
-        isAssignedUser ? 'bg-red-500 text-white' : ''
+        isAssignedUser ? 'bg-yellow-500 text-white' : ''
       }`}
       onClick={(e) => {
         e.stopPropagation();
@@ -89,7 +91,10 @@ const MenuAssignUser = ({ boardId, isOpen, setIsOpen, card }: itemProps) => {
   }, [isOpen, menuRef]);
 
   return (
-    <ul ref={menuRef} className="absolute bg-white top-full right-0 py-1 border border-black z-50">
+    <ul
+      ref={menuRef}
+      className="absolute bg-white top-full right-0 py-1 border border-black z-50 max-h-[240px] overflow-y-scroll"
+    >
       {members &&
         members.map((member) => (
           <MemberComponent
