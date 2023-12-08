@@ -6,5 +6,4 @@ type DragDropElement = {
 type DragDropReq = {
   originalColumnId: number;
   targetColumnId: number;
-  boardId: number;
 };

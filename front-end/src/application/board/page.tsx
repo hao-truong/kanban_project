@@ -25,16 +25,19 @@ const BoardPage = () => {
   const navigate = useNavigate();
   const params = useParams<{ boardId: string }>();
   const [isShowDialogCreateColumn, setIsShowDialogCreateColumn] = useState<boolean>(false);
-  const { data: columns } = useQuery<Column[]>(
-    'getColumnsOfBoard',
-    () => getColumnsOfBoard(Number(params.boardId)),
-    {
-      enabled: !!params.boardId,
-    },
-  );
   const { data: board } = useQuery<Board | null>(
     'getBoard',
     () => getBoard(Number(params.boardId)),
+    {
+      enabled: !!params.boardId,
+      onError: () => {
+        navigate('/not-found');
+      },
+    },
+  );
+  const { data: columns } = useQuery<Column[]>(
+    'getColumnsOfBoard',
+    () => getColumnsOfBoard(Number(params.boardId)),
     {
       enabled: !!params.boardId,
     },

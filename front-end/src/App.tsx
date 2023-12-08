@@ -5,7 +5,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
-export const queryClient = new QueryClient();
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retryDelay: 0,
+    },
+  },
+});
 
 function App() {
   return (

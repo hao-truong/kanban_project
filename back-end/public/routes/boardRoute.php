@@ -104,3 +104,9 @@ $app->router->addRoute(
                           'updateTitleCard'
                       ]
 );
+$app->router->addRoute(
+    RequestMethod::DELETE, '/boards/{boardId}/columns/{columnId}/cards/{cardId}', [AuthorizeRequest::class], [
+                            BoardController::class,
+                            'deleteCardOfColumn'
+                        ]
+);

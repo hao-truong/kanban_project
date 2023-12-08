@@ -9,6 +9,7 @@ use app\entities\BoardEntity;
 use app\entities\CardEntity;
 use app\entities\ColumnEntity;
 use app\services\BoardService;
+use shared\enums\ErrorMessage;
 use shared\enums\StatusCode;
 use shared\enums\SuccessMessage;
 use shared\exceptions\ResponseException;
@@ -238,6 +239,7 @@ class BoardController
     /**
      * @return void
      * @throws ResponseException
+     * @throws \Exception
      */
     public function swapPositionOfCoupleColumn(): void
     {
@@ -246,11 +248,9 @@ class BoardController
             $req_data, [
             'originalColumnId',
             'targetColumnId',
-            'boardId'
         ],  [
                 'originalColumnId' => 'integer',
                 'targetColumnId'   => 'integer',
-                'boardId'          => 'integer'
             ]
         );
 
@@ -290,6 +290,7 @@ class BoardController
     /**
      * @return void
      * @throws ResponseException
+     * @throws \Exception
      */
     public function getCardsOfColumn(): void {
         $user_id = SessionHandler::getUserId();
@@ -325,5 +326,15 @@ class BoardController
 
         $card = $this->boardService->handleUpdateTitleCard($user_id, $board_id, $card_entity);
         $this->response->content(StatusCode::OK, null, null, $card);
+    }
+
+    public function deleteCardOfColumn(): void {
+        $user_id = SessionHandler::getUserId();
+        $board_id = $this->request->getIntParam('boardId');
+        $column_id = $this->request->getIntParam('columnId');
+        $card_id = $this->request->getIntParam('cardId');
+
+        $this->boardService->handleDeleteCardOfColumn($user_id, $board_id, $column_id, $card_id);
+        $this->response->content(StatusCode::OK, null, null, SuccessMessage::DELETE_SUCCESSFULLY);
     }
 }

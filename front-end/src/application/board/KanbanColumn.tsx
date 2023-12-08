@@ -47,6 +47,7 @@ const schemaValidation = yup
 const KanbanColumn = ({ column }: itemProps) => {
   const queryClient = useQueryClient();
   const titleRef = useRef<HTMLFormElement | null>(null);
+  const [isEnableDraggable, setIsEnableDraggable] = useState<boolean>(true);
   const [isClickTilte, setIsClickTitle] = useState<boolean>(false);
   const [isShowMenu, setIsShowMenu] = useState<boolean>(false);
   const [isHoverTitle, setIsHoverTitle] = useState<boolean>(false);
@@ -114,7 +115,7 @@ const KanbanColumn = ({ column }: itemProps) => {
   const handleDragOver = (e: any, column: Column) => {
     e.preventDefault();
 
-    if (columnNeedDrop && column.id === columnNeedDrop.id) {
+    if (!columnNeedDrop || (columnNeedDrop && column.id === columnNeedDrop.id)) {
       setIsOver(false);
       return;
     }
@@ -141,7 +142,6 @@ const KanbanColumn = ({ column }: itemProps) => {
     const data = await ColumnService.swapPositionOfCoupleColumn(column.board_id, {
       originalColumnId: columnNeedDrop.id,
       targetColumnId: targetColumn.id,
-      boardId: column.id,
     })
       .then((response) => response.data)
       .catch((responseError: ResponseError) => toast.error(responseError.message));
@@ -153,13 +153,13 @@ const KanbanColumn = ({ column }: itemProps) => {
   };
 
   return (
-    <div className="flex flex-row relative">
+    <div className={`flex flex-row relative ${isEnableDraggable ? 'cursor-grabbing' : ''}`}>
       {isOver && (
         <div className="w-[5px] h-full absolute bg-red-700 left-0 top-0 -translate-x-2.5 rounded-lg"></div>
       )}
       <div
         className="bg-slate-200 p-4 text-center flex flex-col gap-5 rounded-xl min-w-[350px] w-[350px] min-h-[300px]"
-        draggable
+        draggable={isEnableDraggable}
         onDragStart={() => handleDragStart(column)}
         onDragOver={(e) => handleDragOver(e, column)}
         onDragLeave={() => setIsOver(false)}
@@ -209,9 +209,11 @@ const KanbanColumn = ({ column }: itemProps) => {
                   className="cursor-pointer hover:bg-slate-100 p-2"
                   size={40}
                   onClick={() => setIsShowMenu(!isShowMenu)}
+                  onMouseOver={() => setIsEnableDraggable(false)}
+                  onMouseLeave={() => setIsEnableDraggable(true)}
                 />
                 {isShowMenu && (
-                  <ul className="absolute bg-white top-full right-0 py-1 w-max">
+                  <ul className="absolute bg-white top-full right-0 py-1 w-max border border-black z-10">
                     <div>
                       <li
                         className="py-1 px-4 text-left hover:bg-slate-100 cursor-pointer"
@@ -235,11 +237,13 @@ const KanbanColumn = ({ column }: itemProps) => {
         <div className="flex flex-col gap-4 max-h-[500px] overflow-y-scroll">
           {cards &&
             cards.length !== 0 &&
-            cards.map((card) => <KanbanCard card={card} key={card.id} />)}
+            cards.map((card) => <KanbanCard card={card} key={card.id} boardId={column.board_id} />)}
         </div>
         <button
           className="w-full flex flex-row items-center gap-2 px-4 py-2 hover:bg-slate-400"
           onClick={() => setIsOpenDialogCreateCard(true)}
+          onMouseOver={() => setIsEnableDraggable(false)}
+          onMouseLeave={() => setIsEnableDraggable(true)}
         >
           <Plus />
           <span>Create card</span>

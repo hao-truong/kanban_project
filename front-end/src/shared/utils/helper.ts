@@ -18,6 +18,13 @@ const Helper = {
       document.removeEventListener('mousedown', handleOutsideClick);
     };
   },
+  handleDisableDragStart: (e: React.DragEvent<HTMLElement>) => {
+    e.stopPropagation();
+  },
+  handleDisableDragOver: (e: React.DragEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  },
 };
 
 export default Helper;

@@ -8,6 +8,7 @@ use app\models\CardModel;
 use shared\enums\ErrorMessage;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
+use shared\utils\Converter;
 
 class CardService
 {
@@ -45,11 +46,38 @@ class CardService
     /**
      * @param int $column_id
      * @return array
-     * @throws \shared\exceptions\ResponseException
+     * @throws ResponseException
      */
     public function handleGetCardsByColumn(int $column_id): array
     {
-        return $this->cardModel->find('column_id', $column_id);
+        $cards = $this->cardModel->join(
+            [
+                'table'     => 'users',
+                'as'        => 'u',
+                'condition' => [
+                    'assigned_user',
+                    'id'
+                ],
+                'select'    => [
+                    'id as assigned_user_id',
+                    'username as assigned_user_username',
+                    'alias as assigned_user_alias',
+                    'email as assigned_user_email',
+                ],
+            ],
+            [
+                'where' => [
+                    'column_id',
+                    $column_id
+                ]
+            ]
+        );
+
+        return array_map(
+            function ($card) {
+                return Converter::toCardResponse($card);
+            }, $cards
+        );
     }
 
     /**
@@ -63,5 +91,20 @@ class CardService
 
         $matched_card['title'] = $card_entity->getTitle();
         return $this->cardModel->update($matched_card);
+    }
+
+    /**
+     * @param int $card_id
+     * @return void
+     * @throws ResponseException
+     */
+    public function handleDeleteCard(int $card_id): void
+    {
+        $this->cardModel->deleteById($card_id);
+    }
+
+    public function handleDeleteCardsFollowingColumn(int $column_id): void
+    {
+        $this->cardModel->delete('column_id', $column_id);
     }
 }

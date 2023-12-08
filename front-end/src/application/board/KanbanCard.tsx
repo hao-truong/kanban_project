@@ -1,14 +1,18 @@
-import { MAX_TITLE_LENGTH, MIN_LENGTH_INPUT_STRING } from '@/shared/utils/constant';
+import CardService from '@/shared/services/CardService';
+import { MAX_LENGTH_INPUT_TITLE_CARD, MIN_LENGTH_INPUT_STRING } from '@/shared/utils/constant';
 import Helper from '@/shared/utils/helper';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { OutlinedInput } from '@mui/material';
 import { Check, MoreHorizontal, Pencil, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { useQueryClient } from 'react-query';
+import { toast } from 'react-toastify';
 import * as yup from 'yup';
 
 interface itemProps {
   card: Card;
+  boardId: number;
 }
 
 const schemaValidation = yup
@@ -17,15 +21,23 @@ const schemaValidation = yup
       .string()
       .trim()
       .required('Title is required!')
-      .min(MIN_LENGTH_INPUT_STRING, `Title must be at least ${MAX_TITLE_LENGTH} characters long`)
-      .max(MAX_TITLE_LENGTH, `Title must be at least ${MAX_TITLE_LENGTH} characters long`),
+      .min(
+        MIN_LENGTH_INPUT_STRING,
+        `Title must be at least ${MIN_LENGTH_INPUT_STRING} characters long`,
+      )
+      .max(
+        MAX_LENGTH_INPUT_TITLE_CARD,
+        `Title must be at least ${MAX_LENGTH_INPUT_TITLE_CARD} characters long`,
+      ),
   })
   .required();
 
-const KanbanCard = ({ card }: itemProps) => {
+const KanbanCard = ({ card, boardId }: itemProps) => {
+  const queryClient = useQueryClient();
   const [isShowMenu, setIsShowMenu] = useState<boolean>(false);
   const [isEditTitle, setIsEditTitle] = useState<boolean>(false);
   const titleRef = useRef<HTMLFormElement | null>(null);
+  const menuRef = useRef<HTMLUListElement | null>(null);
   const {
     register,
     handleSubmit,
@@ -35,7 +47,22 @@ const KanbanCard = ({ card }: itemProps) => {
     resolver: yupResolver(schemaValidation),
   });
   const onSubmit: SubmitHandler<UpdateColumnReq> = async (reqData) => {
-    console.log(reqData);
+    const data = await CardService.updateTitleCard({
+      columnId: card.column_id,
+      cardId: card.id,
+      reqData,
+      boardId: boardId,
+    })
+      .then((response) => response.data)
+      .catch((responseError: ResponseError) => {
+        toast.error(responseError.error);
+      });
+
+    if (data) {
+      queryClient.invalidateQueries(`getCards${card.column_id}`);
+      toast.success('Update card successfully!');
+      setIsEditTitle(false);
+    }
   };
 
   useEffect(() => {
@@ -44,10 +71,40 @@ const KanbanCard = ({ card }: itemProps) => {
     }
   }, [isEditTitle, card]);
 
+  useEffect(() => {
+    Helper.handleOutSideClick(menuRef, setIsShowMenu);
+  }, [isShowMenu]);
+
+  const handleDelete = async () => {
+    const data = await CardService.deleteCard({
+      columnId: card.column_id,
+      boardId,
+      cardId: card.id,
+    })
+      .then((response) => response.data)
+      .catch((responseError: ResponseError) => toast.error(responseError.message));
+
+    if (data) {
+      queryClient.invalidateQueries(`getCards${card.column_id}`);
+      toast.success(data);
+    }
+  };
+
+  const handleDragStartCard = (e: React.DragEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+  };
+
+  const handleDragOverCard = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
   return (
     <div
       className="w-full grid grid-cols-12 bg-white rounded-md p-4 gap-2 cursor-pointer"
       draggable
+      onDragStart={(e) => handleDragStartCard(e)}
+      onDragOver={(e) => handleDragOverCard(e)}
     >
       <div className="col-span-10">
         <div className="">
@@ -71,7 +128,7 @@ const KanbanCard = ({ card }: itemProps) => {
                 aria-describedby="outlined-weight-helper-text"
                 {...register('title')}
                 error={errors.title ? true : false}
-                inputProps={{ maxLength: MAX_TITLE_LENGTH }}
+                inputProps={{ maxLength: MAX_LENGTH_INPUT_TITLE_CARD }}
               />
               <div className="flex flex-row justify-end gap-2 mt-2 absolute right-0">
                 <button type="submit">
@@ -98,9 +155,14 @@ const KanbanCard = ({ card }: itemProps) => {
             onClick={() => setIsShowMenu(!isShowMenu)}
           />
           {isShowMenu && (
-            <ul className="absolute bg-white top-full right-0 py-1 w-max shadow-lg">
+            <ul ref={menuRef} className="absolute bg-white top-full right-0 py-1 w-max shadow-lg">
               <div>
-                <li className="py-1 px-4 text-left hover:bg-slate-100 cursor-pointer">Delete</li>
+                <li
+                  className="py-1 px-4 text-left hover:bg-slate-100 cursor-pointer"
+                  onClick={handleDelete}
+                >
+                  Delete
+                </li>
               </div>
               <div>
                 <li className="py-1 px-4 text-left hover:bg-slate-100 cursor-pointer">
@@ -111,7 +173,12 @@ const KanbanCard = ({ card }: itemProps) => {
           )}
         </div>
         <div className="w-full">
-          <h2 className="p-2 bg-yellow-400 w-full">#</h2>
+          <h2
+            className="p-2 bg-yellow-400 w-full"
+            title={card.assigned_user ? card.assigned_user.username.slice(0, 2) : 'unassigned'}
+          >
+            {card.assigned_user ? card.assigned_user.username.slice(0, 2) : '#'}
+          </h2>
         </div>
       </div>
     </div>

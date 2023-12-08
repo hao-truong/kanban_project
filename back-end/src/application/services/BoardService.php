@@ -379,11 +379,34 @@ class BoardService
         return $this->cardService->handleGetCardsByColumn($column_id);
     }
 
+    /**
+     * @param int $user_id
+     * @param int $board_id
+     * @param CardEntity $card_entity
+     * @return array
+     * @throws ResponseException
+     */
     public function handleUpdateTitleCard(int $user_id, int $board_id, CardEntity $card_entity): array {
         $this->checkExistedBoard($board_id);
         $this->checkMemberOfBoard($user_id, $board_id);
         $this->columnService->checkColumnInBoard($card_entity->getColumnId(), $board_id);
 
         return $this->cardService->handleUpdateTitleCard($card_entity);
+    }
+
+    /**
+     * @param int $user_id
+     * @param int $board_id
+     * @param int $column_id
+     * @param int $card_id
+     * @return void
+     * @throws ResponseException
+     */
+    public function handleDeleteCardOfColumn(int $user_id, int $board_id, int $column_id, int $card_id): void {
+        $this->checkExistedBoard($board_id);
+        $this->checkMemberOfBoard($user_id, $board_id);
+        $this->columnService->checkColumnInBoard($column_id, $board_id);
+        $this->cardService->checkCardInColumn($column_id, $card_id);
+        $this->cardService->handleDeleteCard($card_id);
     }
 }
