@@ -480,4 +480,25 @@ class BoardController
         $this->boardService->handleMoveCard($user_id, $board_id, $req_data);
         $this->response->content(StatusCode::OK, null, null, SuccessMessage::SWAP_TWO_CARDS_SUCCESSFULLY);
     }
+
+    /**
+     * @return void
+     * @throws ResponseException
+     */
+    public function searchBoard(): void
+    {
+        $req_queries = $this->request->getQueries();
+        Checker::checkMissingFields(
+            $req_queries, [
+            'title',
+        ],  [
+                'title' => 'string',
+            ]
+        );
+
+        $user_id = SessionHandler::getUserId();
+        $title_search = urldecode($req_queries['title']);
+        $boards = $this->boardService->handleSearchByTitle($user_id, $title_search);
+        $this->response->content(StatusCode::OK, null, null, $boards);
+    }
 }

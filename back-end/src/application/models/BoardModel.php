@@ -147,4 +147,30 @@ class  BoardModel extends Model implements IModel
             throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function search(string $field, string $search_value, int $user_id): array
+    {
+        if (!in_array($field, $this->ALLOW_FIELD)) {
+            error_log("Field is not allowed");
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
+        }
+
+        $query_sql = "select * from boards as b  left join user_board as ub on b.id = ub.board_id";
+        $query_sql .= " where " . $field . " like :search_value and ub.user_id = :user_id";
+        $stmt = $this->database->getConnection()->prepare($query_sql);
+
+        try {
+            $stmt->execute(
+                [
+                    "search_value" => "%" . $search_value . "%",
+                    "user_id" => $user_id,
+                ]
+            );
+        } catch (PDOException $exception) {
+            error_log($exception->getMessage());
+            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
+        }
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

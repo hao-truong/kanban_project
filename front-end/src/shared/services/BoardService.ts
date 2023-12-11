@@ -13,6 +13,12 @@ const BoardService = {
   getMembers: (boardId: number) => axiosClient.get<User[]>(`/boards/${boardId}/members`),
   moveCards: (boardId: number, data: MoveCardsReq) =>
     axiosClient.patch<string>(`/boards/${boardId}/move-cards`, data),
+  searchBoard: (queries: SearchBoardReq) =>
+    axiosClient.get<Board[]>(`/boards/search`, {
+      params: {
+        ...queries,
+      },
+    }),
 };
 
 export default BoardService;

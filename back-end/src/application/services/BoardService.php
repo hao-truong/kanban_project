@@ -524,4 +524,22 @@ class BoardService
             $req_data['targetColumnId']
         );
     }
+
+    /**
+     * @param int $user_id
+     * @param string $title
+     * @return array
+     * @throws ResponseException
+     */
+    public function handleSearchByTitle(int $user_id, string $title): array
+    {
+        $boards = $this->boardModel->search('title', $title, $user_id);
+
+        return array_map(
+            function ($board) {
+                $board["number_of_members"] = $this->userBoardModel->count('board_id', $board['id']);
+                return $board;
+            }, $boards
+        );
+    }
 }

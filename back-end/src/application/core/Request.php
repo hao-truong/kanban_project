@@ -45,7 +45,7 @@ class Request
         $query_component_list = explode('&', $path_component);
         foreach ($query_component_list as $query_component) {
             $pair_query = explode('=', $query_component);
-            $this->queries[] = $pair_query;
+            $this->queries["$pair_query[0]"] = $pair_query[1];
         }
     }
 
