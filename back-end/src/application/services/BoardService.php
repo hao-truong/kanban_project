@@ -76,12 +76,7 @@ class BoardService
             ]
         );
 
-        return array_map(
-            function ($board) {
-                $board["number_of_members"] = $this->userBoardModel->count('board_id', $board['id']);
-                return $board;
-            }, $boards
-        );
+        return $this->boardsWithNumberOfMembers($boards);
     }
 
     /**
@@ -534,7 +529,15 @@ class BoardService
     public function handleSearchByTitle(int $user_id, string $title): array
     {
         $boards = $this->boardModel->search('title', $title, $user_id);
+        return $this->boardsWithNumberOfMembers($boards);
+    }
 
+    /**
+     * @param array $boards
+     * @return array
+     * @throws ResponseException
+     */
+    public function boardsWithNumberOfMembers(array $boards): array {
         return array_map(
             function ($board) {
                 $board["number_of_members"] = $this->userBoardModel->count('board_id', $board['id']);
