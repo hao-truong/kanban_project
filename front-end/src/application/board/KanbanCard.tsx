@@ -127,10 +127,12 @@ const KanbanCard = ({ card, boardId, setIsDraggingCard }: itemProps) => {
   const handleDragEnd = () => {
     setCardNeedDrop(null);
     setIsOver(false);
+    setIsDraggingCard(false);
   };
 
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>, card: Card) => {
     e.preventDefault();
+    setIsOver(false);
 
     if (!cardNeedDrop) {
       return;
@@ -156,9 +158,6 @@ const KanbanCard = ({ card, boardId, setIsDraggingCard }: itemProps) => {
         queryClient.invalidateQueries(`getCards${cardNeedDrop.column_id}`);
       })
       .catch((responseError: ResponseError) => toast.error(responseError.error));
-
-    setIsOver(false);
-    setIsDraggingCard(false);
   };
 
   return (

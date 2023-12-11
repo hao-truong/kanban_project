@@ -129,6 +129,8 @@ const KanbanColumn = ({ column }: itemProps) => {
 
   const handleDrop = async (e: any, targetColumn: Column) => {
     e.preventDefault();
+    setIsOver(false);
+    setIsDraggingCard(false);
 
     if (!columnNeedDrop) {
       return;
@@ -146,8 +148,6 @@ const KanbanColumn = ({ column }: itemProps) => {
         queryClient.invalidateQueries(`getColumnsOfBoard${column.board_id}`);
       })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    setIsOver(false);
   };
 
   return (

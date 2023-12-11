@@ -138,7 +138,7 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
   return (
     <dialog
       ref={dialogRef}
-      className="rounded-lg p-10 min-w-[90%] overflow-y-visible min-h-[400px] z-20"
+      className="rounded-lg p-10 min-w-[90%] overflow-y-visible min-h-[400px] z-20 cursor-default"
     >
       <div className="flex flex-row justify-between my-2 items-center">
         {column && (
