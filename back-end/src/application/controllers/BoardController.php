@@ -366,7 +366,8 @@ class BoardController
      * @throws ResponseException
      * @throws \Exception
      */
-    public function assignMemberToCard(): void {
+    public function assignMemberToCard(): void
+    {
         $req_data = $this->request->getBody();
         Checker::checkMissingFields(
             $req_data, [
@@ -390,7 +391,8 @@ class BoardController
      * @throws ResponseException
      * @throws \Exception
      */
-    public function getDetailCard(): void {
+    public function getDetailCard(): void
+    {
         $user_id = SessionHandler::getUserId();
         $board_id = $this->request->getIntParam('boardId');
         $column_id = $this->request->getIntParam('columnId');
@@ -405,7 +407,8 @@ class BoardController
      * @throws ResponseException
      * @throws \Exception
      */
-    public function changeColumnForCard(): void {
+    public function changeColumnForCard(): void
+    {
         $req_data = $this->request->getBody();
         Checker::checkMissingFields(
             $req_data, [
@@ -421,6 +424,60 @@ class BoardController
         $card_id = $this->request->getIntParam('cardId');
 
         $card = $this->boardService->handleChangeColumnForCard($user_id, $board_id, $column_id, $card_id, $req_data['destinationColumnId']);
+        $this->response->content(StatusCode::OK, null, null, SuccessMessage::CHANGE_COLUMN_SUCCESSFULLY);
+    }
+
+    /**
+     * @return void
+     * @throws ResponseException
+     * @throws \Exception
+     */
+    public function updateDescriptionOfCard(): void
+    {
+        $req_data = $this->request->getBody();
+        Checker::checkMissingFields(
+            $req_data, [
+            'description',
+        ],  [
+                'description' => 'string',
+            ]
+        );
+
+        $user_id = SessionHandler::getUserId();
+        $board_id = $this->request->getIntParam('boardId');
+        $column_id = $this->request->getIntParam('columnId');
+        $card_id = $this->request->getIntParam('cardId');
+
+        $card = $this->boardService->handleUpdateDescriptionOfCard($user_id, $board_id, $column_id, $card_id, $req_data['description']);
         $this->response->content(StatusCode::OK, null, null, $card);
+    }
+
+    /**
+     * @return void
+     * @throws ResponseException
+     * @throws \Exception
+     */
+    public function moveCard(): void
+    {
+        $req_data = $this->request->getBody();
+        Checker::checkMissingFields(
+            $req_data, [
+            'originalCardId',
+            'originalColumnId',
+            'targetCardId',
+            'targetColumnId',
+        ],  [
+                'originalCardId'   => 'integer',
+                'originalColumnId' => 'integer',
+                'targetCardId'     => 'integer',
+                'targetColumnId'   => 'integer',
+            ]
+        );
+
+        $user_id = SessionHandler::getUserId();
+        $board_id = $this->request->getIntParam('boardId');
+
+        $this->boardService->handleMoveCard($user_id, $board_id, $req_data);
+        $this->response->content(StatusCode::OK, null, null, SuccessMessage::SWAP_TWO_CARDS_SUCCESSFULLY);
     }
 }

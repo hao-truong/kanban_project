@@ -32,6 +32,11 @@ const CardService = {
       `/boards/${params.boardId}/columns/${params.columnId}/cards/${params.cardId}/change-column`,
       data,
     ),
+  updateDescriptionOfCard: (params: ParamsApiCard, data: DescriptionCardReq) =>
+    axiosClient.patch<Card>(
+      `/boards/${params.boardId}/columns/${params.columnId}/cards/${params.cardId}/update-description`,
+      data,
+    ),
 };
 
 export default CardService;

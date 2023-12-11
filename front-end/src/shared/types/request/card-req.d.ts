@@ -27,3 +27,12 @@ type AssignToMemberReq = {
 type ChangeColumnReq = {
   destinationColumnId: number;
 };
+
+type StatusCard = {
+  code: number;
+  title: string;
+};
+
+type DescriptionCardReq = {
+  description: string;
+};

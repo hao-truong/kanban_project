@@ -5,6 +5,8 @@ interface GlobalState {
   setUser: (data: User) => void;
   columnNeedDrop: Column | null;
   setColumnNeedDrop: (data: Column | null) => void;
+  cardNeedDrop: Card | null;
+  setCardNeedDrop: (data: Card | null) => void;
 }
 
 export const useGlobalState = create<GlobalState>((set) => ({
@@ -12,4 +14,6 @@ export const useGlobalState = create<GlobalState>((set) => ({
   setUser: (data) => set((state) => ({ ...state, user: data })),
   columnNeedDrop: null,
   setColumnNeedDrop: (data) => set((state) => ({ ...state, columnNeedDrop: data })),
+  cardNeedDrop: null,
+  setCardNeedDrop: (data) => set((state) => ({ ...state, cardNeedDrop: data })),
 }));

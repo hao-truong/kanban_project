@@ -118,7 +118,7 @@ const KanbanColumn = ({ column }: itemProps) => {
     setIsOver(true);
   };
 
-  const handleDragEnd = async () => {
+  const handleDragEnd = () => {
     setColumnNeedDrop(null);
     setIsOver(false);
   };
@@ -230,22 +230,26 @@ const KanbanColumn = ({ column }: itemProps) => {
           boardId={column.board_id}
         />
         <div className="h-full max-h-[500px] overflow-y-scroll">
-          <div className="flex flex-col gap-4">
-            {cards &&
-              cards.length !== 0 &&
-              cards.map((card) => (
-                <KanbanCard card={card} key={card.id} boardId={column.board_id} />
-              ))}
+          <div>
+            <div className="flex flex-col gap-4 py-4">
+              {cards &&
+                cards.length !== 0 &&
+                cards
+                  .sort((a, b) => a.position - b.position)
+                  .map((card) => (
+                    <KanbanCard card={card} key={card.id} boardId={column.board_id} />
+                  ))}
+            </div>
+            <button
+              className="w-full mt-4 flex flex-row items-center gap-2 px-4 py-2 hover:bg-slate-400"
+              onClick={() => setIsOpenDialogCreateCard(true)}
+              onMouseOver={() => setIsEnableDraggable(false)}
+              onMouseLeave={() => setIsEnableDraggable(true)}
+            >
+              <Plus />
+              <span>Create card</span>
+            </button>
           </div>
-          <button
-            className="w-full mt-4 flex flex-row items-center gap-2 px-4 py-2 hover:bg-slate-400"
-            onClick={() => setIsOpenDialogCreateCard(true)}
-            onMouseOver={() => setIsEnableDraggable(false)}
-            onMouseLeave={() => setIsEnableDraggable(true)}
-          >
-            <Plus />
-            <span>Create card</span>
-          </button>
         </div>
       </div>
     </div>

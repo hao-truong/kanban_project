@@ -484,4 +484,44 @@ class BoardService
 
         return $this->cardService->handleChangeColumn($card_id, $destination_column_id);
     }
+
+    /**
+     * @param int $user_id
+     * @param int $board_id
+     * @param int $column_id
+     * @param int $card_id
+     * @param string $new_description
+     * @return array
+     * @throws ResponseException
+     */
+    public function handleUpdateDescriptionOfCard(int $user_id, int $board_id, int $column_id, int $card_id, string $new_description): array
+    {
+        $this->checkExistedBoard($board_id);
+        $this->checkMemberOfBoard($user_id, $board_id);
+        $this->columnService->checkColumnInBoard($column_id, $board_id);
+        $this->cardService->checkCardInColumn($column_id, $card_id);
+
+        return $this->cardService->handleUpdateDescription($card_id, $new_description);
+    }
+
+    /**
+     * @param int $user_id
+     * @param int $board_id
+     * @param array $req_data
+     * @return void
+     * @throws ResponseException
+     */
+    public function handleMoveCard(int $user_id, int $board_id, array $req_data): void
+    {
+        $this->checkExistedBoard($board_id);
+        $this->checkMemberOfBoard($user_id, $board_id);
+        $this->columnService->checkColumnInBoard($req_data['originalColumnId'], $board_id);
+        $this->columnService->checkColumnInBoard($req_data['targetColumnId'], $board_id);
+        $this->cardService->handleMoveCardInBoard(
+            $req_data['originalCardId'],
+            $req_data['originalColumnId'],
+            $req_data['targetCardId'],
+            $req_data['targetColumnId']
+        );
+    }
 }

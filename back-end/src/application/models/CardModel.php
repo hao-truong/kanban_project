@@ -107,7 +107,7 @@ class CardModel extends Model implements IModel
             throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
-        $query_sql = "select * from cards where " . $field . " = :value";
+        $query_sql = "select * from cards where " . $field . " = :value order by position ASC";
         $stmt = $this->database->getConnection()->prepare($query_sql);
 
         try {

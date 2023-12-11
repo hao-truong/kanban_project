@@ -56,8 +56,15 @@ class CardService
      */
     public function handleCreateCard(CardEntity $card_entity): array
     {
-        $position = $this->cardModel->count('column_id', $card_entity->getColumnId());
-        $card_entity->setPosition($position + 1);
+        $cards_in_column = $this->cardModel->find('column_id', $card_entity->getColumnId());
+        if(count($cards_in_column) == 0) {
+            $position = 1;
+        } else {
+            $positions = array_column($cards_in_column, 'position');
+            $position = max($positions) + 1;
+        }
+
+        $card_entity->setPosition($position);
         return $this->cardModel->save($card_entity->toCreateArray());
     }
 
@@ -204,6 +211,61 @@ class CardService
     public function handleChangeColumn(int $card_id,int $destination_column_id): array {
         $card_to_update = $this->checkExistedCard($card_id);
         $card_to_update['column_id'] = $destination_column_id;
+
+        $cards_in_column = $this->cardModel->find('column_id', $destination_column_id);
+        if(count($cards_in_column) == 0) {
+            $new_position = 1;
+        } else {
+            $positions = array_column($cards_in_column, 'position');
+            $new_position = max($positions) + 1;
+        }
+
+        $card_to_update['position'] = $new_position;
         return $this->cardModel->update($card_to_update);
+    }
+
+    /**
+     * @param int $card_id
+     * @param string $new_description
+     * @return array
+     * @throws ResponseException
+     */
+    public function handleUpdateDescription(int $card_id, string $new_description): array {
+        $card_to_update = $this->checkExistedCard($card_id);
+        $card_to_update['description'] = $new_description;
+        return $this->cardModel->update($card_to_update);
+    }
+
+    /**
+     * @param int $original_car_id
+     * @param int $original_column_id
+     * @param int $target_card_id
+     * @param int $target_column_id
+     * @return void
+     * @throws ResponseException
+     */
+    public function handleMoveCardInBoard(int $original_car_id, int $original_column_id, int $target_card_id, int $target_column_id): void {
+        $original_card = $this->checkCardInColumn($original_column_id, $original_car_id);
+        $target_card = $this->checkCardInColumn($target_column_id, $target_card_id);
+
+        if($target_column_id === $original_column_id) {
+            $temp_position = $original_card['position'];
+            $original_card['position'] = $target_card['position'];
+            $target_card['position'] = $temp_position;
+            $this->cardModel->update($original_card);
+            $this->cardModel->update($target_card);
+            return;
+        }
+
+        $original_card['column_id'] = $target_card['column_id'];
+        $original_card['position'] = $target_card['position'];
+        $cards_in_target_column = $this->cardModel->find('column_id', $target_column_id);
+        array_map(function ($card) use ($target_card) {
+            if($card['position'] >= $target_card['position']) {
+                $card['position']++;
+                $this->cardModel->update($card);
+            }
+        }, $cards_in_target_column);
+        $this->cardModel->update($original_card);
     }
 }

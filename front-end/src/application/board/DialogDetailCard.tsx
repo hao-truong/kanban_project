@@ -6,6 +6,10 @@ import ReactQuill from 'react-quill';
 import { toast } from 'react-toastify';
 import MenuAssignUser from './MenuAssignUser';
 import { getColumnsOfBoard } from '@/shared/services/QueryService';
+import * as yup from 'yup';
+import { MAX_LENGTH_INPUT_TITLE_CARD, MIN_LENGTH_INPUT_STRING } from '@/shared/utils/constant';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 interface itemProps {
   card: Card;
@@ -13,6 +17,23 @@ interface itemProps {
   setIsOpen: Function;
   boardId: number;
 }
+
+const schemaValidation = yup
+  .object({
+    description: yup
+      .string()
+      .trim()
+      .required('Title is required')
+      .min(
+        MIN_LENGTH_INPUT_STRING,
+        `Title must be at least ${MIN_LENGTH_INPUT_STRING} characters long`,
+      )
+      .max(
+        MAX_LENGTH_INPUT_TITLE_CARD,
+        `Title must be at least ${MAX_LENGTH_INPUT_TITLE_CARD} characters long`,
+      ),
+  })
+  .required();
 
 const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
   const queryClient = useQueryClient();
@@ -28,6 +49,34 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
       enabled: !!boardId,
     },
   );
+  const column = columns?.find((column) => column.id === card.column_id);
+
+  const {
+    getValues,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<DescriptionCardReq>({
+    resolver: yupResolver(schemaValidation),
+  });
+  const onSubmit: SubmitHandler<DescriptionCardReq> = async (dataReq) => {
+    const data = await CardService.updateDescriptionOfCard(
+      {
+        cardId: card.id,
+        columnId: card.column_id,
+        boardId,
+      },
+      dataReq,
+    )
+      .then((response) => response.data)
+      .catch((responseError: ResponseError) => toast.error(responseError.message));
+
+    if (data) {
+      queryClient.invalidateQueries(`getCards${card.column_id}`);
+      setIsShowRichTextEditor(false);
+      toast.success('Update card sucessfully!');
+    }
+  };
 
   useEffect(() => {
     if (isOpen && dialogRef) {
@@ -51,6 +100,10 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
       document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, [isOpen, dialogRef, bodyDialogRef]);
+
+  useEffect(() => {
+    setValue('description', card.description);
+  }, [card]);
 
   const handleAssignToMe = async () => {
     const data = await CardService.assignMe({
@@ -88,8 +141,18 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
   return (
     <dialog
       ref={dialogRef}
-      className="rounded-lg p-10 min-w-[80%] overflow-y-visible min-h-[400px]"
+      className="rounded-lg p-10 min-w-[90%] overflow-y-visible min-h-[400px] z-20"
     >
+      <div className="flex flex-row justify-between my-2 items-center">
+        {column && (
+          <h2>
+            {column.title.toUpperCase()} / {card.title}
+          </h2>
+        )}
+        <div className="p-1 hover:bg-slate-400 cursor-pointer" onClick={() => setIsOpen(false)}>
+          <X size={40} />
+        </div>
+      </div>
       <div ref={bodyDialogRef} className="grid grid-cols-12 gap-4">
         <div className="col-span-8 flex flex-col items-start text-left gap-4">
           <div className="text-3xl">{card.title}</div>
@@ -99,21 +162,26 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
               <div
                 className="text-slate-500 py-2 hover:bg-slate-500 hover:text-white cursor-text"
                 onClick={() => setIsShowRichTextEditor(true)}
-              >
-                {card.description === '' ? 'Add a description...' : card.description}
-              </div>
+                dangerouslySetInnerHTML={{
+                  __html: card.description ? card.description : 'Add a description...',
+                }}
+              ></div>
             )}
             {isShowRichTextEditor && (
-              <div className="flex flex-col gap-4">
+              <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+                {errors.description && <h2>{errors.description.message}</h2>}
                 <div>
                   <ReactQuill
                     theme="snow"
-                    value={card.description}
                     placeholder="Describe your card..."
+                    value={getValues('description')}
+                    onChange={(value) => setValue('description', value)}
                   />
                 </div>
                 <div className="flex flex-row gap-4">
-                  <button className="px-3 py-1 bg-blue-600 text-white rounded-lg">Save</button>
+                  <button className="px-3 py-1 bg-blue-600 text-white rounded-lg" type="submit">
+                    Save
+                  </button>
                   <button
                     className="px-3 py-1 hover:bg-slate-200 text-black rounded-lg"
                     onClick={() => setIsShowRichTextEditor(false)}
@@ -121,17 +189,12 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
                     Cancel
                   </button>
                 </div>
-              </div>
+              </form>
             )}
           </div>
         </div>
         <div className="col-span-4">
-          <div className="flex flex-row justify-end my-2">
-            <div className="p-1 hover:bg-slate-400" onClick={() => setIsOpen(false)}>
-              <X size={40} />
-            </div>
-          </div>
-          <div className="flex flex-row my-2">
+          <div className="flex flex-row my-2 gap-4">
             <select
               value={columnId}
               className="bg-green-500 p-2 text-white"

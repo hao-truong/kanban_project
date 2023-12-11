@@ -1,12 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use app\controllers\AuthController;
-use app\controllers\BoardController;
-use app\controllers\UserController;
 use app\core\Application;
-use app\middlewares\AuthorizeRequest;
-use shared\enums\RequestMethod;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -38,5 +33,7 @@ $app = $container->get(Application::class);
 require_once __DIR__ . '/routes/authRoute.php';
 require_once __DIR__ . '/routes/boardRoute.php';
 require_once __DIR__ . '/routes/userRoute.php';
+require_once __DIR__ . '/routes/columnRoute.php';
+require_once __DIR__ . '/routes/cardRoute.php';
 
 $app->run();
