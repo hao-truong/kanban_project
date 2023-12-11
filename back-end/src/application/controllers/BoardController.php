@@ -423,7 +423,7 @@ class BoardController
         $column_id = $this->request->getIntParam('columnId');
         $card_id = $this->request->getIntParam('cardId');
 
-        $card = $this->boardService->handleChangeColumnForCard($user_id, $board_id, $column_id, $card_id, $req_data['destinationColumnId']);
+        $this->boardService->handleChangeColumnForCard($user_id, $board_id, $column_id, $card_id, $req_data['destinationColumnId']);
         $this->response->content(StatusCode::OK, null, null, SuccessMessage::CHANGE_COLUMN_SUCCESSFULLY);
     }
 

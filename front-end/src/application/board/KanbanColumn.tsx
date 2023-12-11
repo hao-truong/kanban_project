@@ -17,6 +17,7 @@ import { useGlobalState } from '@/shared/storages/GlobalStorage';
 import KanbanCard from './KanbanCard';
 import DialogCreateCard from './DialogCreateCard';
 import { getCards } from '@/shared/services/QueryService';
+import EmptyDrop from './EmptyDrop';
 
 interface itemProps {
   column: Column;
@@ -41,6 +42,8 @@ const schemaValidation = yup
 
 const KanbanColumn = ({ column }: itemProps) => {
   const queryClient = useQueryClient();
+  const { cardNeedDrop } = useGlobalState();
+  const [isDraggingCard, setIsDraggingCard] = useState<boolean>(false);
   const titleRef = useRef<HTMLFormElement | null>(null);
   const [isEnableDraggable, setIsEnableDraggable] = useState<boolean>(true);
   const [isClickTilte, setIsClickTitle] = useState<boolean>(false);
@@ -110,6 +113,10 @@ const KanbanColumn = ({ column }: itemProps) => {
   const handleDragOver = (e: any, column: Column) => {
     e.preventDefault();
 
+    if (cardNeedDrop && cardNeedDrop.column_id !== column.id) {
+      setIsDraggingCard(true);
+    }
+
     if (!columnNeedDrop || (columnNeedDrop && column.id === columnNeedDrop.id)) {
       setIsOver(false);
       return;
@@ -125,6 +132,9 @@ const KanbanColumn = ({ column }: itemProps) => {
 
   const handleDrop = async (e: any, targetColumn: Column) => {
     e.preventDefault();
+
+    if (cardNeedDrop && cardNeedDrop.column_id !== targetColumn.id) {
+    }
 
     if (!columnNeedDrop) {
       return;
@@ -157,7 +167,10 @@ const KanbanColumn = ({ column }: itemProps) => {
         draggable={isEnableDraggable}
         onDragStart={() => handleDragStart(column)}
         onDragOver={(e) => handleDragOver(e, column)}
-        onDragLeave={() => setIsOver(false)}
+        onDragLeave={() => {
+          setIsOver(false);
+          setIsDraggingCard(false);
+        }}
         onDragEnd={handleDragEnd}
         onDrop={(e) => handleDrop(e, column)}
       >
@@ -231,6 +244,9 @@ const KanbanColumn = ({ column }: itemProps) => {
         />
         <div className="h-full max-h-[500px] overflow-y-scroll">
           <div>
+            {isDraggingCard && cards?.length === 0 && (
+              <EmptyDrop column={column} setIsShow={setIsDraggingCard} />
+            )}
             <div className="flex flex-col gap-4 py-4">
               {cards &&
                 cards.length !== 0 &&
