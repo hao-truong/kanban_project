@@ -40,7 +40,7 @@ const HomePage = () => {
           />
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
         {boards &&
           boards?.length !== 0 &&
           boards.map((board) => <KanbanBoard board={board} key={board.id} />)}

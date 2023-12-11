@@ -145,8 +145,10 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
     >
       <div className="flex flex-row justify-between my-2 items-center">
         {column && (
-          <h2>
-            {column.title.toUpperCase()} / {card.title}
+          <h2 className="flex flex-row gap-2 items-center ju">
+            <span>{column.title.toUpperCase()}</span>
+            <span>/</span>
+            <span className="line line-clamp-1">{card.title}</span>
           </h2>
         )}
         <div className="p-1 hover:bg-slate-400 cursor-pointer" onClick={() => setIsOpen(false)}>
@@ -154,8 +156,8 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
         </div>
       </div>
       <div ref={bodyDialogRef} className="grid grid-cols-12 gap-4">
-        <div className="col-span-8 flex flex-col items-start text-left gap-4">
-          <div className="text-3xl">{card.title}</div>
+        <div className="col-span-12 lg:col-span-8 flex flex-col items-start text-left gap-4">
+          <div className="text-3xl w-[90%] break-words">{card.title}</div>
           <div className="w-full flex flex-col gap-2">
             <strong>Description</strong>
             {!isShowRichTextEditor && (
@@ -193,7 +195,7 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
             )}
           </div>
         </div>
-        <div className="col-span-4">
+        <div className="col-span-12 lg:col-span-4">
           <div className="flex flex-row my-2 gap-4">
             <select
               value={columnId}
@@ -238,10 +240,11 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
               </div>
               {!card.assigned_user && (
                 <div
-                  className="col-span-12 text-right mx-4 py-2 text-blue-600"
+                  className="col-span-12 grid grid-cols-12 text-left mx-4 py-2 text-blue-600"
                   onClick={handleAssignToMe}
                 >
-                  Assign to me
+                  <span className="col-span-5"></span>
+                  <span className="col-span-7">Assign to me</span>
                 </div>
               )}
             </div>

@@ -18,7 +18,7 @@ class CardEntity
     private int $position;
     private int $createdAt;
     private int $updatedAt;
-    private static int $MAX_LENGTH_STRING = 256;
+    private static int $MAX_LENGTH_STRING = 120;
     private static int $MIN_LENGTH_STRING = 3;
     private static array $ALLOW_STATUS = [
         1,
