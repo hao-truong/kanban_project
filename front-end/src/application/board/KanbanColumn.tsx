@@ -133,9 +133,6 @@ const KanbanColumn = ({ column }: itemProps) => {
   const handleDrop = async (e: any, targetColumn: Column) => {
     e.preventDefault();
 
-    if (cardNeedDrop && cardNeedDrop.column_id !== targetColumn.id) {
-    }
-
     if (!columnNeedDrop) {
       return;
     }
@@ -247,17 +244,20 @@ const KanbanColumn = ({ column }: itemProps) => {
             {isDraggingCard && cards?.length === 0 && (
               <EmptyDrop column={column} setIsShow={setIsDraggingCard} />
             )}
-            <div className="flex flex-col gap-4 py-4">
-              {cards &&
-                cards.length !== 0 &&
-                cards
+            {cards && cards.length !== 0 && (
+              <div className="flex flex-col gap-4 py-4">
+                {cards
                   .sort((a, b) => a.position - b.position)
                   .map((card) => (
                     <KanbanCard card={card} key={card.id} boardId={column.board_id} />
                   ))}
-            </div>
+              </div>
+            )}
+            {isDraggingCard && cards?.length !== 0 && (
+              <EmptyDrop column={column} setIsShow={setIsDraggingCard} />
+            )}
             <button
-              className="w-full mt-4 flex flex-row items-center gap-2 px-4 py-2 hover:bg-slate-400"
+              className="w-full mt-4 flex flex-row items-center gap-2 py-2 hover:bg-slate-400"
               onClick={() => setIsOpenDialogCreateCard(true)}
               onMouseOver={() => setIsEnableDraggable(false)}
               onMouseLeave={() => setIsEnableDraggable(true)}
