@@ -16,7 +16,7 @@ const EmptyDrop = ({ column, setIsShow }: itemProps) => {
       return;
     }
 
-    const data = await CardService.changeColumnForCard(
+    await CardService.changeColumnForCard(
       {
         cardId: cardNeedDrop.id,
         columnId: cardNeedDrop.column_id,
@@ -26,14 +26,12 @@ const EmptyDrop = ({ column, setIsShow }: itemProps) => {
         destinationColumnId: column.id,
       },
     )
-      .then((response) => response.data)
+      .then(() => {
+        queryClient.invalidateQueries(`getCards${column.id}`);
+        queryClient.invalidateQueries(`getCards${cardNeedDrop.column_id}`);
+        setCardNeedDrop(null);
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    if (data) {
-      queryClient.invalidateQueries(`getCards${column.id}`);
-      queryClient.invalidateQueries(`getCards${cardNeedDrop.column_id}`);
-      setCardNeedDrop(null);
-    }
 
     setIsShow(false);
   };

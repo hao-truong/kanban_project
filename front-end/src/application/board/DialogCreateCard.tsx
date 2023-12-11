@@ -50,22 +50,21 @@ const DialogCreateCard = ({ isOpen, setIsOpen, columnId, boardId }: itemProps) =
     resolver: yupResolver(schemaValidation),
   });
   const onSubmit: SubmitHandler<TitleCardReq> = async (dataReq) => {
-    const data = await CardService.createCard({
+    await CardService.createCard({
       columnId,
       boardId,
       reqData: dataReq,
     })
-      .then((response) => response.data)
+      .then(() => {
+        setValue('title', '');
+        setError(null);
+        toast.success('Create new card successfully!');
+        queryClient.invalidateQueries(`getCards${columnId}`);
+        if (dialogRef.current) {
+          dialogRef.current.close();
+        }
+      })
       .catch((responseError: ResponseError) => setError(responseError.message));
-    if (data) {
-      setValue('title', '');
-      setError(null);
-      toast.success('Create new card successfully!');
-      queryClient.invalidateQueries(`getCards${columnId}`);
-      if (dialogRef.current) {
-        dialogRef.current.close();
-      }
-    }
   };
 
   useEffect(() => {

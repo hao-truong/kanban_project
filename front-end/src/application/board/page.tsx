@@ -15,7 +15,7 @@ const BoardPage = () => {
   const params = useParams<{ boardId: string }>();
   const [isShowDialogCreateColumn, setIsShowDialogCreateColumn] = useState<boolean>(false);
   const { data: board } = useQuery<Board | null>(
-    'getBoard',
+    `getBoard${params.boardId}`,
     () => getBoard(Number(params.boardId)),
     {
       enabled: !!params.boardId,
@@ -24,8 +24,9 @@ const BoardPage = () => {
       },
     },
   );
+
   const { data: columns } = useQuery<Column[]>(
-    'getColumnsOfBoard',
+    `getColumnsOfBoard${params.boardId}`,
     () => getColumnsOfBoard(Number(params.boardId)),
     {
       enabled: !!params.boardId,

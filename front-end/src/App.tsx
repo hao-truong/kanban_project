@@ -7,11 +7,7 @@ import 'react-quill/dist/quill.snow.css';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
 export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retryDelay: 0,
-    },
-  },
+  defaultOptions: {},
 });
 
 function App() {

@@ -58,14 +58,12 @@ const KanbanBoard = ({ board }: itemProps) => {
     resolver: yupResolver(schemaValidation),
   });
   const onSubmit: SubmitHandler<BoardReq> = async (reqData) => {
-    const data = await BoardService.updateBoard(board.id, reqData)
-      .then((response) => response.data)
+    await BoardService.updateBoard(board.id, reqData)
+      .then(() => {
+        setIsClickTitle(false);
+        queryClient.invalidateQueries('getMyBoards');
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    if (data) {
-      setIsClickTitle(false);
-      queryClient.invalidateQueries('getMyBoards');
-    }
   };
 
   useEffect(() => {
@@ -89,25 +87,23 @@ const KanbanBoard = ({ board }: itemProps) => {
   }, [isClickTilte, isHoverTitle]);
 
   const handleDeleteBoard = async () => {
-    const data = await BoardService.deleteBoard(board.id)
-      .then((response) => response.data)
+    await BoardService.deleteBoard(board.id)
+      .then((response) => {
+        const { data } = response;
+        queryClient.invalidateQueries('getMyBoards');
+        toast.success(data);
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    if (data) {
-      queryClient.invalidateQueries('getMyBoards');
-      toast.success(data);
-    }
   };
 
   const handleLeaveBoard = async () => {
-    const data = await BoardService.leaveBoard(board.id)
-      .then((response) => response.data)
+    await BoardService.leaveBoard(board.id)
+      .then((response) => {
+        const { data } = response;
+        queryClient.invalidateQueries('getMyBoards');
+        toast.success(data);
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    if (data) {
-      queryClient.invalidateQueries('getMyBoards');
-      toast.success(data);
-    }
   };
 
   return (

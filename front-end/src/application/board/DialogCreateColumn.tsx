@@ -49,19 +49,17 @@ const DialogCreateColumn = ({ isOpen, setIsOpen, boardId }: itemProps) => {
     resolver: yupResolver(schemaValidation),
   });
   const onSubmit: SubmitHandler<ColumnReq> = async (columnReqData) => {
-    const data = await ColumnService.createColumn(boardId, columnReqData)
-      .then((response) => response.data)
+    await ColumnService.createColumn(boardId, columnReqData)
+      .then(() => {
+        setValue('title', '');
+        setError(null);
+        toast.success('Create new columnn successfully!');
+        queryClient.invalidateQueries(`getColumnsOfBoard${boardId}`);
+        if (dialogRef.current) {
+          dialogRef.current.close();
+        }
+      })
       .catch((responseError: ResponseError) => setError(responseError.message));
-
-    if (data) {
-      setValue('title', '');
-      setError(null);
-      toast.success('Create new columnn successfully!');
-      queryClient.invalidateQueries('getColumnsOfBoard');
-      if (dialogRef.current) {
-        dialogRef.current.close();
-      }
-    }
   };
 
   useEffect(() => {

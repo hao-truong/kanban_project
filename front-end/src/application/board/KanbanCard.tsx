@@ -17,6 +17,7 @@ import BoardService from '@/shared/services/BoardService';
 interface itemProps {
   card: Card;
   boardId: number;
+  setIsDraggingCard: Function;
 }
 
 const schemaValidation = yup
@@ -36,7 +37,7 @@ const schemaValidation = yup
   })
   .required();
 
-const KanbanCard = ({ card, boardId }: itemProps) => {
+const KanbanCard = ({ card, boardId, setIsDraggingCard }: itemProps) => {
   const [isOver, setIsOver] = useState<boolean>(false);
   const { cardNeedDrop, setCardNeedDrop } = useGlobalState();
   const queryClient = useQueryClient();
@@ -59,7 +60,7 @@ const KanbanCard = ({ card, boardId }: itemProps) => {
       return;
     }
 
-    const data = await CardService.updateTitleCard(
+    await CardService.updateTitleCard(
       {
         cardId: card.id,
         columnId: card.column_id,
@@ -67,16 +68,14 @@ const KanbanCard = ({ card, boardId }: itemProps) => {
       },
       reqData,
     )
-      .then((response) => response.data)
+      .then(() => {
+        queryClient.invalidateQueries(`getCards${card.column_id}`);
+        toast.success('Update card successfully!');
+        setIsEditTitle(false);
+      })
       .catch((responseError: ResponseError) => {
         toast.error(responseError.error);
       });
-
-    if (data) {
-      queryClient.invalidateQueries(`getCards${card.column_id}`);
-      toast.success('Update card successfully!');
-      setIsEditTitle(false);
-    }
   };
 
   useEffect(() => {
@@ -90,18 +89,17 @@ const KanbanCard = ({ card, boardId }: itemProps) => {
   }, [isShowMenu]);
 
   const handleDelete = async () => {
-    const data = await CardService.deleteCard({
+    await CardService.deleteCard({
       columnId: card.column_id,
       boardId,
       cardId: card.id,
     })
-      .then((response) => response.data)
+      .then((response) => {
+        const { data } = response;
+        queryClient.invalidateQueries(`getCards${card.column_id}`);
+        toast.success(data);
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    if (data) {
-      queryClient.invalidateQueries(`getCards${card.column_id}`);
-      toast.success(data);
-    }
   };
 
   useEffect(() => {
@@ -142,25 +140,25 @@ const KanbanCard = ({ card, boardId }: itemProps) => {
       return;
     }
 
-    const data = await BoardService.moveCards(boardId, {
+    await BoardService.moveCards(boardId, {
       originalCardId: cardNeedDrop.id,
       originalColumnId: cardNeedDrop.column_id,
       targetCardId: card.id,
       targetColumnId: card.column_id,
     })
-      .then((response) => response.data)
+      .then(() => {
+        if (card.column_id === cardNeedDrop.column_id) {
+          queryClient.invalidateQueries(`getCards${card.column_id}`);
+          return;
+        }
+
+        queryClient.invalidateQueries(`getCards${card.column_id}`);
+        queryClient.invalidateQueries(`getCards${cardNeedDrop.column_id}`);
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.error));
 
-    if (data) {
-      if (card.column_id === cardNeedDrop.column_id) {
-        queryClient.invalidateQueries(`getCards${card.column_id}`);
-        return;
-      }
-
-      queryClient.invalidateQueries(`getCards${card.column_id}`);
-      queryClient.invalidateQueries(`getCards${cardNeedDrop.column_id}`);
-    }
     setIsOver(false);
+    setIsDraggingCard(false);
   };
 
   return (

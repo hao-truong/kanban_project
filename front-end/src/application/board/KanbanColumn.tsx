@@ -72,15 +72,13 @@ const KanbanColumn = ({ column }: itemProps) => {
       return;
     }
 
-    const data = await ColumnService.updateColumn(column.id, column.board_id, reqData)
-      .then((response) => response.data)
+    await ColumnService.updateColumn(column.id, column.board_id, reqData)
+      .then(() => {
+        toast.success('Update column successfully!');
+        setIsClickTitle(false);
+        queryClient.invalidateQueries(`getColumnsOfBoard${column.board_id}`);
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    if (data) {
-      toast.success('Update column successfully!');
-      setIsClickTitle(false);
-      queryClient.invalidateQueries('getColumnsOfBoard');
-    }
   };
 
   useEffect(() => {
@@ -94,14 +92,13 @@ const KanbanColumn = ({ column }: itemProps) => {
   }, [isClickTilte, isHoverTitle, column]);
 
   const handleDeleteColumn = async () => {
-    const data = await ColumnService.deleteColumn(column.id, column.board_id)
-      .then((response) => response.data)
+    await ColumnService.deleteColumn(column.id, column.board_id)
+      .then((response) => {
+        const { data } = response;
+        queryClient.invalidateQueries(`getColumnsOfBoard${column.board_id}`);
+        toast.success(data);
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    if (data) {
-      queryClient.invalidateQueries('getColumnsOfBoard');
-      toast.success(data);
-    }
   };
 
   const { columnNeedDrop, setColumnNeedDrop } = useGlobalState();
@@ -141,16 +138,15 @@ const KanbanColumn = ({ column }: itemProps) => {
       return;
     }
 
-    const data = await ColumnService.swapPositionOfCoupleColumn(column.board_id, {
+    await ColumnService.swapPositionOfCoupleColumn(column.board_id, {
       originalColumnId: columnNeedDrop.id,
       targetColumnId: targetColumn.id,
     })
-      .then((response) => response.data)
+      .then(() => {
+        queryClient.invalidateQueries(`getColumnsOfBoard${column.board_id}`);
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
 
-    if (data) {
-      queryClient.invalidateQueries('getColumnsOfBoard');
-    }
     setIsOver(false);
   };
 
@@ -249,7 +245,12 @@ const KanbanColumn = ({ column }: itemProps) => {
                 {cards
                   .sort((a, b) => a.position - b.position)
                   .map((card) => (
-                    <KanbanCard card={card} key={card.id} boardId={column.board_id} />
+                    <KanbanCard
+                      setIsDraggingCard={setIsDraggingCard}
+                      card={card}
+                      key={card.id}
+                      boardId={column.board_id}
+                    />
                   ))}
               </div>
             )}

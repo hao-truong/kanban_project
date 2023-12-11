@@ -50,13 +50,14 @@ const HomePage = () => {
     resolver: yupResolver(schemaValidation),
   });
   const onSubmit: SubmitHandler<UpdateColumnReq> = async (reqData) => {
-    const data = await BoardService.searchBoard(reqData)
-      .then((response) => response.data)
+    await BoardService.searchBoard(reqData)
+      .then((response) => {
+        const { data } = response;
+        if (Array.isArray(data)) {
+          setBoards(data);
+        }
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    if (Array.isArray(data)) {
-      setBoards(data);
-    }
   };
 
   return (

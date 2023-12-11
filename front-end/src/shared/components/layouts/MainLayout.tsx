@@ -50,14 +50,12 @@ const SignInUser = () => {
   }, [userRef]);
 
   const handleLogout = async () => {
-    const data = await AuthService.logout()
-      .then((response) => response.data)
+    await AuthService.logout()
+      .then(() => {
+        JwtStorage.deleteToken();
+        navigate('/auth/sign-in');
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    if (data) {
-      JwtStorage.deleteToken();
-      navigate('/auth/sign-in');
-    }
   };
 
   return (

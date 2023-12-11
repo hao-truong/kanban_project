@@ -43,7 +43,7 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
   const [isOpenMenuAssignUser, setIsOpenMenuAssignUser] = useState<boolean>(false);
   const [columnId, setColumnId] = useState<number>(card.column_id);
   const { data: columns } = useQuery<Column[]>(
-    'getColumnsOfBoard',
+    `getColumnsOfBoard${boardId}`,
     () => getColumnsOfBoard(boardId),
     {
       enabled: !!boardId,
@@ -60,7 +60,7 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
     resolver: yupResolver(schemaValidation),
   });
   const onSubmit: SubmitHandler<DescriptionCardReq> = async (dataReq) => {
-    const data = await CardService.updateDescriptionOfCard(
+    await CardService.updateDescriptionOfCard(
       {
         cardId: card.id,
         columnId: card.column_id,
@@ -68,14 +68,12 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
       },
       dataReq,
     )
-      .then((response) => response.data)
+      .then(() => {
+        queryClient.invalidateQueries(`getCards${card.column_id}`);
+        setIsShowRichTextEditor(false);
+        toast.success('Update card sucessfully!');
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    if (data) {
-      queryClient.invalidateQueries(`getCards${card.column_id}`);
-      setIsShowRichTextEditor(false);
-      toast.success('Update card sucessfully!');
-    }
   };
 
   useEffect(() => {
@@ -106,22 +104,23 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
   }, [card]);
 
   const handleAssignToMe = async () => {
-    const data = await CardService.assignMe({
+    await CardService.assignMe({
       cardId: card.id,
       columnId: card.column_id,
       boardId,
     })
-      .then((response) => response.data)
+      .then((response) => {
+        const { data } = response;
+        queryClient.invalidateQueries(`getCards${card.column_id}`);
+        setIsOpen(false);
+        toast.success(data);
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    queryClient.invalidateQueries(`getCards${card.column_id}`);
-    setIsOpen(false);
-    toast.success(data);
   };
 
   const handleMoveCardToAnotherColumn = async (selectedColumnId: number) => {
     setColumnId(selectedColumnId);
-    const data = await CardService.changeColumnForCard(
+    await CardService.changeColumnForCard(
       {
         columnId: card.column_id,
         cardId: card.id,
@@ -129,13 +128,11 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
       },
       { destinationColumnId: selectedColumnId },
     )
-      .then((response) => response.data)
+      .then(() => {
+        queryClient.invalidateQueries(`getCards${card.column_id}`);
+        queryClient.invalidateQueries(`getCards${selectedColumnId}`);
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    if (data) {
-      queryClient.invalidateQueries(`getCards${card.column_id}`);
-      queryClient.invalidateQueries(`getCards${selectedColumnId}`);
-    }
   };
 
   return (

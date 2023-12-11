@@ -47,18 +47,16 @@ const DialogCreateBoard = ({ isOpen, setIsOpen }: itemProps) => {
     resolver: yupResolver(schemaValidation),
   });
   const onSubmit: SubmitHandler<BoardReq> = async (boardReqData) => {
-    const data = await BoardService.createBoard(boardReqData)
-      .then((response) => response.data)
+    await BoardService.createBoard(boardReqData)
+      .then(() => {
+        toast.success('Create new board successfully!');
+        queryClient.invalidateQueries('getMyBoards');
+        reset();
+        if (dialogRef.current) {
+          dialogRef.current.close();
+        }
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    if (data) {
-      toast.success('Create new board successfully!');
-      queryClient.invalidateQueries('getMyBoards');
-      reset();
-      if (dialogRef.current) {
-        dialogRef.current.close();
-      }
-    }
   };
 
   useEffect(() => {

@@ -41,27 +41,24 @@ const MemberComponent = ({ member, paramsApi, setIsOpen, assignedUser }: memberP
 
   const handleAssignUser = async () => {
     if (isMe) {
-      const data = await CardService.assignMe(paramsApi)
-        .then((response) => response.data)
+      await CardService.assignMe(paramsApi)
+        .then(() => {
+          queryClient.invalidateQueries(`getCards${paramsApi.columnId}`);
+          setIsOpen(false);
+        })
         .catch((responseError: ResponseError) => toast.error(responseError.message));
 
-      if (data) {
-        queryClient.invalidateQueries(`getCards${paramsApi.columnId}`);
-        setIsOpen(false);
-      }
       return;
     }
 
-    const data = await CardService.assignToMember(paramsApi, {
+    await CardService.assignToMember(paramsApi, {
       assignToMemberId: member.id,
     })
-      .then((response) => response.data)
+      .then(() => {
+        queryClient.invalidateQueries(`getCards${paramsApi.columnId}`);
+        setIsOpen(false);
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    if (data) {
-      queryClient.invalidateQueries(`getCards${paramsApi.columnId}`);
-      setIsOpen(false);
-    }
   };
 
   return (

@@ -48,18 +48,17 @@ const LoginForm = () => {
     resolver: yupResolver(schemaValidation),
   });
   const onSubmit: SubmitHandler<SigninReq> = async (loginReqData) => {
-    const data = await AuthService.sigin(loginReqData)
-      .then((response) => response.data)
+    await AuthService.sigin(loginReqData)
+      .then((response) => {
+        const { data } = response;
+        setError(null);
+        JwtStorage.setToken(data);
+        toast.success('Login successfully!');
+        navigate('/');
+      })
       .catch((responseError: ResponseError) => {
         setError(responseError.message);
       });
-
-    if (data) {
-      setError(null);
-      JwtStorage.setToken(data);
-      toast.success('Login successfully!');
-      navigate('/');
-    }
   };
 
   return (
