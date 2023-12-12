@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace shared\enums;
 
-enum ErrorMessage: string {
+enum ErrorMessage: string
+{
     case EXISTED_USERNAME = 'Username existed!';
     case WRONG_USERNAME_OR_PASSWORD = "Username or password is wrong!";
     case USER_NOT_FOUND = 'User not found';

@@ -34,14 +34,14 @@ class AuthorizeRequest implements IMiddleware
 
         $matched_user = $this->userModel->findOne('access_token', $token);
 
-        if(!$matched_user) {
+        if (!$matched_user) {
             throw new ResponseException(StatusCode::FORBIDDEN, "Invalid token", StatusCode::FORBIDDEN->name);
         }
 
         $payload = $this->jwtService->verifyToken(TypeJwt::ACCESS_TOKEN, $token);
         $user_id = $payload->userId;
 
-        if($matched_user['id'] != $user_id) {
+        if ($matched_user['id'] != $user_id) {
             throw new ResponseException(StatusCode::FORBIDDEN, "Invalid token", StatusCode::FORBIDDEN->name);
         }
 

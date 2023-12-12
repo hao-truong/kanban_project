@@ -23,7 +23,7 @@ class UserController
      * @return void
      * @throws ResponseException
      */
-   public function getProfile(): void
+    public function getProfile(): void
     {
         $user_id = SessionHandler::getUserId();
         $profile = $this->userService->handleGetProfile($user_id);

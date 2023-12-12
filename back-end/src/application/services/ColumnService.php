@@ -12,7 +12,7 @@ use shared\exceptions\ResponseException;
 class  ColumnService
 {
     public function __construct(
-        private readonly ColumnModel  $columnModel,
+        private readonly ColumnModel $columnModel,
         private readonly CardService $cardService,
     ) {
     }
@@ -47,7 +47,8 @@ class  ColumnService
      * @return void
      * @throws ResponseException
      */
-    public function handleDeleteColumnByBoardId(int $board_id): void {
+    public function handleDeleteColumnByBoardId(int $board_id): void
+    {
         $this->columnModel->delete('board_id', $board_id);
     }
 
@@ -56,10 +57,11 @@ class  ColumnService
      * @return array
      * @throws ResponseException
      */
-    public function checkExistedColumn(int $column_id): array {
+    public function checkExistedColumn(int $column_id): array
+    {
         $column = $this->columnModel->findOne('id', $column_id);
 
-        if(!$column) {
+        if (!$column) {
             throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, ErrorMessage::COLUMN_NOT_FOUND);
         }
 
@@ -72,10 +74,11 @@ class  ColumnService
      * @return array
      * @throws ResponseException
      */
-    public function checkColumnInBoard(int $column_id, int $board_id): array {
+    public function checkColumnInBoard(int $column_id, int $board_id): array
+    {
         $matched_column = $this->checkExistedColumn($column_id);
 
-        if($matched_column['board_id'] !== $board_id) {
+        if ($matched_column['board_id'] !== $board_id) {
             throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, ErrorMessage::COLUMN_NOT_IN_BOARD);
         }
 
@@ -87,7 +90,8 @@ class  ColumnService
      * @return array
      * @throws ResponseException
      */
-    public function handleUpdateColumn(ColumnEntity $entity): array {
+    public function handleUpdateColumn(ColumnEntity $entity): array
+    {
         $column_to_update = $this->checkColumnInBoard($entity->getId(), $entity->getBoardId());
         $column_to_update['title'] = $entity->getTitle();
         $column_to_update['updated_at'] = (new \DateTime())->format('Y-m-d H:i:s');
@@ -100,7 +104,8 @@ class  ColumnService
      * @return void
      * @throws ResponseException
      */
-    public function handleDeleteColumn(int $column_id, int $board_id): void {
+    public function handleDeleteColumn(int $column_id, int $board_id): void
+    {
         $this->checkColumnInBoard($column_id, $board_id);
         $this->columnModel->deleteById($column_id);
     }
@@ -111,7 +116,8 @@ class  ColumnService
      * @return void
      * @throws ResponseException
      */
-    public function handleSwapPositionOfCoupleColumn(ColumnEntity $column_first, ColumnEntity $column_second): void {
+    public function handleSwapPositionOfCoupleColumn(ColumnEntity $column_first, ColumnEntity $column_second): void
+    {
         $temp_position = $column_first->getPosition();
         $column_first->setPosition($column_second->getPosition());
         $column_second->setPosition($temp_position);

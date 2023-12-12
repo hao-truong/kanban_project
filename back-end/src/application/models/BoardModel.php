@@ -163,7 +163,7 @@ class  BoardModel extends Model implements IModel
             $stmt->execute(
                 [
                     "search_value" => "%" . $search_value . "%",
-                    "user_id" => $user_id,
+                    "user_id"      => $user_id,
                 ]
             );
         } catch (PDOException $exception) {

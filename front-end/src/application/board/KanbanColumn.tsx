@@ -2,6 +2,8 @@ import {
   MAX_LENGTH_INPUT_STRING,
   MAX_TITLE_LENGTH,
   MIN_LENGTH_INPUT_STRING,
+  WIDTH_GAP_BETWEEN_COLUMN,
+  WIDTH_KANBAN_COLUMN,
 } from '@/shared/utils/constant';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Check, MoreHorizontal, Plus, X } from 'lucide-react';
@@ -18,6 +20,7 @@ import KanbanCard from './KanbanCard';
 import DialogCreateCard from './DialogCreateCard';
 import { getCards } from '@/shared/services/QueryService';
 import EmptyDrop from './EmptyDrop';
+import { animated, useSpring, useSpringRef } from '@react-spring/web';
 
 interface itemProps {
   column: Column;
@@ -40,9 +43,10 @@ const schemaValidation = yup
   })
   .required();
 
+const TOTAL_WIDTH_COLUMN = WIDTH_KANBAN_COLUMN + WIDTH_GAP_BETWEEN_COLUMN;
+
 const KanbanColumn = ({ column }: itemProps) => {
   const queryClient = useQueryClient();
-  const { cardNeedDrop } = useGlobalState();
   const [isDraggingCard, setIsDraggingCard] = useState<boolean>(false);
   const titleRef = useRef<HTMLFormElement | null>(null);
   const [isEnableDraggable, setIsEnableDraggable] = useState<boolean>(true);
@@ -51,6 +55,15 @@ const KanbanColumn = ({ column }: itemProps) => {
   const [isHoverTitle, setIsHoverTitle] = useState<boolean>(false);
   const [isOver, setIsOver] = useState<boolean>(false);
   const [isOpenDialogCreateCard, setIsOpenDialogCreateCard] = useState<boolean>(false);
+  const { columnNeedDrop, setColumnNeedDrop, cardNeedDrop, targetColumnDrop, setTargetColumnDrop } =
+    useGlobalState();
+  const api = useSpringRef();
+  const props = useSpring({
+    ref: api,
+    x: 0,
+    y: 0,
+  });
+
   const { data: cards } = useQuery<Card[]>(
     `getCards${column.id}`,
     () => getCards(column.board_id, column.id),
@@ -101,8 +114,6 @@ const KanbanColumn = ({ column }: itemProps) => {
       .catch((responseError: ResponseError) => toast.error(responseError.message));
   };
 
-  const { columnNeedDrop, setColumnNeedDrop } = useGlobalState();
-
   const handleDragStart = (column: Column) => {
     setColumnNeedDrop(column);
   };
@@ -123,6 +134,37 @@ const KanbanColumn = ({ column }: itemProps) => {
   };
 
   const handleDragEnd = () => {
+    if (columnNeedDrop && targetColumnDrop) {
+      if (targetColumnDrop.position < columnNeedDrop.position) {
+        api({
+          x: -Math.abs(targetColumnDrop.position - columnNeedDrop.position) * TOTAL_WIDTH_COLUMN,
+          y: 0,
+          onRest: async () => {
+            api({
+              x: 0,
+              y: 0,
+              immediate: true,
+            });
+            await queryClient.invalidateQueries(`getColumnsOfBoard${column.board_id}`);
+          },
+        });
+      } else {
+        api({
+          x: Math.abs(targetColumnDrop.position - columnNeedDrop.position) * TOTAL_WIDTH_COLUMN,
+          y: 0,
+          onRest: async () => {
+            api({
+              x: 0,
+              y: 0,
+              immediate: true,
+            });
+            await queryClient.invalidateQueries(`getColumnsOfBoard${column.board_id}`);
+          },
+        });
+      }
+    }
+
+    setTargetColumnDrop(null);
     setColumnNeedDrop(null);
     setIsOver(false);
   };
@@ -140,23 +182,55 @@ const KanbanColumn = ({ column }: itemProps) => {
       return;
     }
 
+    setTargetColumnDrop(targetColumn);
+
     await ColumnService.swapPositionOfCoupleColumn(column.board_id, {
       originalColumnId: columnNeedDrop.id,
       targetColumnId: targetColumn.id,
     })
       .then(() => {
-        queryClient.invalidateQueries(`getColumnsOfBoard${column.board_id}`);
+        if (targetColumn.position > columnNeedDrop.position) {
+          api({
+            x: -(targetColumn.position - columnNeedDrop.position) * TOTAL_WIDTH_COLUMN,
+            y: 0,
+            onRest: () => {
+              api({
+                x: 0,
+                y: 0,
+                immediate: true,
+              });
+            },
+          });
+        } else {
+          api({
+            x: Math.abs(targetColumn.position - columnNeedDrop.position) * TOTAL_WIDTH_COLUMN,
+            y: 0,
+            onRest: () => {
+              api({
+                x: 0,
+                y: 0,
+                immediate: true,
+              });
+            },
+          });
+        }
       })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
+
+    setIsOver(false);
   };
 
   return (
-    <div className={`flex flex-row relative ${isEnableDraggable ? 'cursor-grabbing' : ''}`}>
+    <animated.div
+      id={`kanban-column-${column.id}`}
+      style={props}
+      className={`flex flex-row relative ${isEnableDraggable ? 'cursor-grabbing' : ''}`}
+    >
       {isOver && (
         <div className="w-[5px] h-full absolute bg-red-700 left-0 top-0 -translate-x-2.5 rounded-lg"></div>
       )}
       <div
-        className="bg-slate-200 p-4 text-center flex flex-col gap-5 rounded-xl min-w-[350px] w-[350px] min-h-[300px]"
+        className={`bg-slate-200 p-4 text-center flex flex-col gap-5 rounded-xl min-w-[${WIDTH_KANBAN_COLUMN}px] w-[350px] min-h-[600px] overflow-y-scroll`}
         draggable={isEnableDraggable}
         onDragStart={() => handleDragStart(column)}
         onDragOver={(e) => handleDragOver(e, column)}
@@ -269,7 +343,7 @@ const KanbanColumn = ({ column }: itemProps) => {
           </div>
         </div>
       </div>
-    </div>
+    </animated.div>
   );
 };
 

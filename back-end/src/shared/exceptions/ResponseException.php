@@ -12,7 +12,7 @@ class ResponseException extends \Exception implements Throwable
     private StatusCode $statusCode;
     private mixed $errors;
 
-    public function __construct(StatusCode $status_code, mixed $errors, ErrorMessage | string $message)
+    public function __construct(StatusCode $status_code, mixed $errors, ErrorMessage|string $message)
     {
         $this->statusCode = $status_code;
 
@@ -32,7 +32,7 @@ class ResponseException extends \Exception implements Throwable
         return $this->statusCode;
     }
 
-    public function getErrors(): array | string
+    public function getErrors(): array|string
     {
         return $this->errors;
     }

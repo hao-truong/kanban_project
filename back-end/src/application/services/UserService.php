@@ -40,10 +40,11 @@ class UserService
      * @return array
      * @throws ResponseException
      */
-    public function getUserByUsername(string $username): array {
+    public function getUserByUsername(string $username): array
+    {
         $matched_user = $this->userModel->findOne("username", $username);
 
-        if(!$matched_user) {
+        if (!$matched_user) {
             throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, ErrorMessage::USER_NOT_FOUND);
         }
 

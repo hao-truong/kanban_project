@@ -11,7 +11,8 @@ use shared\enums\ErrorMessage;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
 
-class ColumnModel extends Model implements IModel {
+class ColumnModel extends Model implements IModel
+{
     private array $ALLOW_FIELDS = [
         'id',
         'creator_id',
@@ -121,13 +122,14 @@ class ColumnModel extends Model implements IModel {
         }
     }
 
-    public function delete(string $field, mixed $value): void {
+    public function delete(string $field, mixed $value): void
+    {
         if (!in_array($field, $this->ALLOW_FIELDS)) {
             error_log("Field is not allowed");
             throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
         }
 
-        $query_sql = "delete from columns where ".$field." = :value";
+        $query_sql = "delete from columns where " . $field . " = :value";
         $stmt = $this->database->getConnection()->prepare($query_sql);
 
         try {

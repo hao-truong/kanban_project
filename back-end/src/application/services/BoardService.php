@@ -537,7 +537,8 @@ class BoardService
      * @return array
      * @throws ResponseException
      */
-    public function boardsWithNumberOfMembers(array $boards): array {
+    public function boardsWithNumberOfMembers(array $boards): array
+    {
         return array_map(
             function ($board) {
                 $board["number_of_members"] = $this->userBoardModel->count('board_id', $board['id']);

@@ -25,7 +25,6 @@ class Database
         $this->connection = new PDO("$database_type:host=$database_host;port=$port;dbname=$database_name", $username, $password);
         $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
-
     public function getConnection(): PDO
     {
         return $this->connection;

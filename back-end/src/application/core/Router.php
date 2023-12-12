@@ -17,7 +17,7 @@ class Router
     private array $routes = [];
     private string $prefixEndpoint = "/api/v1";
     const PARAM_PATTERN = "~^\{(\w+)\}$~";
-    const SUBSTITUTION_PARAM_PATTERN =  "([\w-]+)";
+    const SUBSTITUTION_PARAM_PATTERN = "([\w-]+)";
 
     public function __construct(private readonly ContainerInterface $container)
     {
@@ -37,7 +37,7 @@ class Router
      */
     public function addRoute(RequestMethod $method, string $endpoint, ?array $middlewares, array $call_backs): void
     {
-        $route_element = $this->handleRoute($this->prefixEndpoint.$endpoint);
+        $route_element = $this->handleRoute($this->prefixEndpoint . $endpoint);
         $this->routes[$method->name][$route_element->getEndpoint()]['call_back'] = $call_backs;
 
         if ($middlewares) {
@@ -75,7 +75,7 @@ class Router
 
         $result_matched_handler = $this->matchedRoute($method, $path) ?? false;
 
-        if(!$result_matched_handler) {
+        if (!$result_matched_handler) {
             throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, "Page not found!");
         }
 
@@ -87,7 +87,7 @@ class Router
      * @param string $endpoint_to_check
      * @return MatchedRouteHandler|null
      */
-    private function matchedRoute(RequestMethod $method, string $endpoint_to_check): MatchedRouteHandler | null
+    private function matchedRoute(RequestMethod $method, string $endpoint_to_check): MatchedRouteHandler|null
     {
         foreach ($this->routes[$method->name] as $endpoint_key => $endpoint_pattern) {
             if (preg_match($endpoint_key, $endpoint_to_check, $param_values)) {
@@ -125,7 +125,7 @@ class Router
             }
         }
 
-        if(count($param_key_list) ===  0) {
+        if (count($param_key_list) === 0) {
             $refactor_endpoint = '~^' . $endpoint . '$~';
             return new RouteElement($refactor_endpoint, $param_key_list);
         }

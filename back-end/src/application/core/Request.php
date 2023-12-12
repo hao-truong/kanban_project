@@ -100,7 +100,8 @@ class Request
      * @return int
      * @throws \Exception
      */
-    public function getIntParam(string $param_name): int {
+    public function getIntParam(string $param_name): int
+    {
         if (!array_key_exists($param_name, $this->params)) {
             error_log("Param {$param_name} does not exist.");
             throw new \Exception("Param {$param_name} does not exist.");
