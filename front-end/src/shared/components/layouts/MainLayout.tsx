@@ -49,8 +49,8 @@ const SignInUser = () => {
     };
   }, [userRef]);
 
-  const handleLogout = async () => {
-    await AuthService.logout()
+  const handleLogout = () => {
+    AuthService.logout()
       .then(() => {
         JwtStorage.deleteToken();
         navigate('/auth/sign-in');

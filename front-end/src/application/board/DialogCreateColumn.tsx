@@ -48,8 +48,8 @@ const DialogCreateColumn = ({ isOpen, setIsOpen, boardId }: itemProps) => {
   } = useForm<ColumnReq>({
     resolver: yupResolver(schemaValidation),
   });
-  const onSubmit: SubmitHandler<ColumnReq> = async (columnReqData) => {
-    await ColumnService.createColumn(boardId, columnReqData)
+  const onSubmit: SubmitHandler<ColumnReq> = (columnReqData) => {
+    ColumnService.createColumn(boardId, columnReqData)
       .then(() => {
         setValue('title', '');
         setError(null);

@@ -47,8 +47,8 @@ const DialogAddMember = ({ isOpen, setIsOpen, boardId }: itemProps) => {
   } = useForm<MemberToAddReq>({
     resolver: yupResolver(schemaValidation),
   });
-  const onSubmit: SubmitHandler<MemberToAddReq> = async (reqData) => {
-    await BoardService.addMemberToBoard(boardId, reqData)
+  const onSubmit: SubmitHandler<MemberToAddReq> = (reqData) => {
+    BoardService.addMemberToBoard(boardId, reqData)
       .then((response) => {
         toast.success(response.data);
         queryClient.invalidateQueries('getMyBoards');

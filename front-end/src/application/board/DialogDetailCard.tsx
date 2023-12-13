@@ -46,7 +46,7 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
     `getColumnsOfBoard${boardId}`,
     () => getColumnsOfBoard(boardId),
     {
-      enabled: !!boardId,
+      enabled: !!boardId && isOpen,
     },
   );
   const column = columns?.find((column) => column.id === card.column_id);
@@ -59,8 +59,8 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
   } = useForm<DescriptionCardReq>({
     resolver: yupResolver(schemaValidation),
   });
-  const onSubmit: SubmitHandler<DescriptionCardReq> = async (dataReq) => {
-    await CardService.updateDescriptionOfCard(
+  const onSubmit: SubmitHandler<DescriptionCardReq> = (dataReq) => {
+    CardService.updateDescriptionOfCard(
       {
         cardId: card.id,
         columnId: card.column_id,
@@ -103,8 +103,8 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
     setValue('description', card.description);
   }, [card]);
 
-  const handleAssignToMe = async () => {
-    await CardService.assignMe({
+  const handleAssignToMe = () => {
+    CardService.assignMe({
       cardId: card.id,
       columnId: card.column_id,
       boardId,
@@ -118,9 +118,9 @@ const DialogDetailCard = ({ card, isOpen, setIsOpen, boardId }: itemProps) => {
       .catch((responseError: ResponseError) => toast.error(responseError.message));
   };
 
-  const handleMoveCardToAnotherColumn = async (selectedColumnId: number) => {
+  const handleMoveCardToAnotherColumn = (selectedColumnId: number) => {
     setColumnId(selectedColumnId);
-    await CardService.changeColumnForCard(
+    CardService.changeColumnForCard(
       {
         columnId: card.column_id,
         cardId: card.id,

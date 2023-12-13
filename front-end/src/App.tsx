@@ -7,7 +7,11 @@ import 'react-quill/dist/quill.snow.css';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
 export const queryClient = new QueryClient({
-  defaultOptions: {},
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
 });
 
 function App() {

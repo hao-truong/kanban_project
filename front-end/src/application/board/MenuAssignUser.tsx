@@ -39,9 +39,9 @@ const MemberComponent = ({ member, paramsApi, setIsOpen, assignedUser }: memberP
     }
   }, [assignedUser]);
 
-  const handleAssignUser = async () => {
+  const handleAssignUser = () => {
     if (isMe) {
-      await CardService.assignMe(paramsApi)
+      CardService.assignMe(paramsApi)
         .then(() => {
           queryClient.invalidateQueries(`getCards${paramsApi.columnId}`);
           setIsOpen(false);
@@ -51,7 +51,7 @@ const MemberComponent = ({ member, paramsApi, setIsOpen, assignedUser }: memberP
       return;
     }
 
-    await CardService.assignToMember(paramsApi, {
+    CardService.assignToMember(paramsApi, {
       assignToMemberId: member.id,
     })
       .then(() => {

@@ -25,7 +25,7 @@ class UserController
      */
     public function getProfile(): void
     {
-        $user_id = SessionHandler::getUserId();
+        $user_id = $this->request->getUserId();
         $profile = $this->userService->handleGetProfile($user_id);
         $this->response->content(StatusCode::OK, null, null, $profile);
     }

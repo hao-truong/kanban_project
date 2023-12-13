@@ -48,7 +48,7 @@ const DialogViewMembers = ({ board, isOpen, setIsOpen }: itemProps) => {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const bodyDialogRef = useRef<HTMLDivElement | null>(null);
   const { data: members } = useQuery<User[]>('getMembersOfBoard', () => getMembers(board!.id), {
-    enabled: !!board,
+    enabled: !!board && isOpen,
   });
 
   useEffect(() => {

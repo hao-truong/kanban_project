@@ -11,12 +11,12 @@ interface itemProps {
 const EmptyDrop = ({ column, setIsShow }: itemProps) => {
   const queryClient = useQueryClient();
   const { cardNeedDrop, setCardNeedDrop } = useGlobalState();
-  const handleDrop = async () => {
+  const handleDrop = () => {
     if (!cardNeedDrop) {
       return;
     }
 
-    await CardService.changeColumnForCard(
+    CardService.changeColumnForCard(
       {
         cardId: cardNeedDrop.id,
         columnId: cardNeedDrop.column_id,

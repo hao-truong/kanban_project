@@ -47,8 +47,8 @@ const LoginForm = () => {
   } = useForm<SigninReq>({
     resolver: yupResolver(schemaValidation),
   });
-  const onSubmit: SubmitHandler<SigninReq> = async (loginReqData) => {
-    await AuthService.sigin(loginReqData)
+  const onSubmit: SubmitHandler<SigninReq> = (loginReqData) => {
+    AuthService.sigin(loginReqData)
       .then((response) => {
         const { data } = response;
         setError(null);

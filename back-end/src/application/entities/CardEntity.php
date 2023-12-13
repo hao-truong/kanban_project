@@ -13,19 +13,12 @@ class CardEntity
     private string $title;
     private int $columnId;
     private string $description;
-    private int $status;
     private int|null $assignedUser;
     private int $position;
     private int $createdAt;
     private int $updatedAt;
     private static int $MAX_LENGTH_STRING = 120;
     private static int $MIN_LENGTH_STRING = 3;
-    private static array $ALLOW_STATUS = [
-        1,
-        2,
-        3,
-        4
-    ];
 
     public function __construct()
     {
@@ -40,11 +33,11 @@ class CardEntity
     public function setTitle(string $title): void
     {
         if (strlen($title) < self::$MIN_LENGTH_STRING) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Title should be at least " . self::$MIN_LENGTH_STRING . " characters long");
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, sprintf(ErrorMessage::STRING_SO_SHORT->value, 'title', self::$MIN_LENGTH_STRING));
         }
 
         if (strlen($title) > self::$MAX_LENGTH_STRING) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Title should be less than " . self::$MAX_LENGTH_STRING . " characters long");
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, sprintf(ErrorMessage::STRING_SO_LONG->value, 'title', self::$MAX_LENGTH_STRING));
         }
 
         $this->title = $title;
@@ -68,28 +61,14 @@ class CardEntity
     public function setDescription(string $description): void
     {
         if (strlen($description) < self::$MIN_LENGTH_STRING) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Title should be at least " . self::$MIN_LENGTH_STRING . " characters long");
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, sprintf(ErrorMessage::STRING_SO_SHORT->value, 'Description', self::$MIN_LENGTH_STRING));
         }
 
         if (strlen($description) > self::$MAX_LENGTH_STRING) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Title should be less than " . self::$MAX_LENGTH_STRING . " characters long");
+            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, sprintf(ErrorMessage::STRING_SO_LONG->value, 'Description', self::$MAX_LENGTH_STRING));
         }
 
         $this->description = $description;
-    }
-
-    public function getStatus(): int
-    {
-        return $this->status;
-    }
-
-    public function setStatus(int $status): void
-    {
-        if (!in_array(self::$ALLOW_STATUS)) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, ErrorMessage::STATUS_CARD_NOT_ALLOW);
-        }
-
-        $this->status = $status;
     }
 
     public function getAssignedUser(): ?int

@@ -14,7 +14,7 @@ class Checker
      * @return void
      * @throws ResponseException
      */
-    public static function checkMissingFields(array $data, array $fields, array $field_types): void
+    public static function checkMissingFields(array $data, array $fields, array $field_types): array
     {
         $missing_fields = array_diff(
             $fields, array_keys($data)
@@ -26,6 +26,8 @@ class Checker
 
         $data = Checker::removeRedundantFields($data, $fields);
         Checker::checkTypeFields($data, $field_types);
+        return Checker::sanitizeData($data, $field_types);
+
     }
 
     /**
@@ -42,6 +44,7 @@ class Checker
             }
 
             $expected_type = $field_types[$field];
+
             if (!is_null($value) && gettype($value) !== $expected_type) {
                 throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Invalid type for field '$field'. Expected '$expected_type', got '" . gettype($value) . "'.");
             }
@@ -57,5 +60,26 @@ class Checker
         }
 
         return $data;
+    }
+
+    public static function sanitizeField(mixed $input, string $type): mixed
+    {
+        return match ($type) {
+            'integer' => intval(filter_var($input, FILTER_SANITIZE_NUMBER_INT)),
+            'string' => $input,
+        };
+    }
+
+    public static function sanitizeData(array $data, array $types): array
+    {
+        return array_combine(
+            array_keys($data),
+            array_map(
+                function ($field, $value) use ($types) {
+                    $type = $types[$field];
+                    return Checker::sanitizeField($value, $type);
+                }, array_keys($data), $data
+            )
+        );
     }
 }

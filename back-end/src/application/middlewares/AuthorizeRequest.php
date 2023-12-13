@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace app\middlewares;
 
+use app\core\Request;
 use app\models\UserModel;
 use app\services\JwtService;
 use app\services\UserService;
@@ -14,6 +15,7 @@ class AuthorizeRequest implements IMiddleware
 {
 
     public function __construct(
+        private Request $request,
         private readonly JwtService $jwtService,
         private readonly UserModel  $userModel
     ) {
@@ -45,7 +47,7 @@ class AuthorizeRequest implements IMiddleware
             throw new ResponseException(StatusCode::FORBIDDEN, "Invalid token", StatusCode::FORBIDDEN->name);
         }
 
-        $_SESSION["user_id"] = $user_id;
+        $this->request->setUserId($user_id);
 
         return true;
     }

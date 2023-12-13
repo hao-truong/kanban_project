@@ -67,12 +67,8 @@ class AuthService
     /**
      * @throws ResponseException
      */
-    public function handleLogout(): void
+    public function handleLogout(int $user_id): void
     {
-        $user_id = $_SESSION['user_id'];
-        $_SESSION = array();
-        session_destroy();
-
         $matched_user = $this->userModel->findOne('id', $user_id);
 
         if (!$matched_user) {

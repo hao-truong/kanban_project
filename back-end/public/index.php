@@ -25,8 +25,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 $dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
 $dotenv->load();
 
-session_start();
-
 $container = require __DIR__ . '/../src/shared/configs/php-di/config.php';
 $app = $container->get(Application::class);
 

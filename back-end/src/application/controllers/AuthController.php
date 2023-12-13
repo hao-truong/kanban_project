@@ -27,7 +27,7 @@ class AuthController
     public function register(): void
     {
         $req_data = $this->request->getBody();
-        Checker::checkMissingFields(
+        $req_data = Checker::checkMissingFields(
             $req_data,
             [
                 'username',
@@ -59,7 +59,7 @@ class AuthController
     public function login(): void
     {
         $req_data = $this->request->getBody();
-        Checker::checkMissingFields(
+        $req_data = Checker::checkMissingFields(
             $req_data,
             [
                 'username',
@@ -74,6 +74,7 @@ class AuthController
         $user_entity->setUsername($req_data['username']);
         $user_entity->setPassword($req_data['password']);
 
+
         $tokens = $this->authService->handleLogin($user_entity);
         $this->response->content(StatusCode::OK, null, null, $tokens);
     }
@@ -84,7 +85,9 @@ class AuthController
      */
     public function logout(): void
     {
-        $this->authService->handleLogout();
+        $user_id = $this->request->getUserId();
+        $this->authService->handleLogout($user_id);
+        $this->request->setUserId(null);
         $this->response->content(StatusCode::OK, null, null, SuccessMessage::LOGOUT_SUCCESSFULLY->value);
     }
 }

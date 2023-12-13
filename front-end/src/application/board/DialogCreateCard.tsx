@@ -49,8 +49,8 @@ const DialogCreateCard = ({ isOpen, setIsOpen, columnId, boardId }: itemProps) =
   } = useForm<TitleCardReq>({
     resolver: yupResolver(schemaValidation),
   });
-  const onSubmit: SubmitHandler<TitleCardReq> = async (dataReq) => {
-    await CardService.createCard({
+  const onSubmit: SubmitHandler<TitleCardReq> = (dataReq) => {
+    CardService.createCard({
       columnId,
       boardId,
       reqData: dataReq,

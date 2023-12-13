@@ -79,13 +79,13 @@ const KanbanColumn = ({ column }: itemProps) => {
   } = useForm<UpdateColumnReq>({
     resolver: yupResolver(schemaValidation),
   });
-  const onSubmit: SubmitHandler<UpdateColumnReq> = async (reqData) => {
+  const onSubmit: SubmitHandler<UpdateColumnReq> = (reqData) => {
     if (reqData.title === column.title) {
       setIsClickTitle(false);
       return;
     }
 
-    await ColumnService.updateColumn(column.id, column.board_id, reqData)
+    ColumnService.updateColumn(column.id, column.board_id, reqData)
       .then(() => {
         toast.success('Update column successfully!');
         setIsClickTitle(false);
@@ -104,8 +104,8 @@ const KanbanColumn = ({ column }: itemProps) => {
     }
   }, [isClickTilte, isHoverTitle, column]);
 
-  const handleDeleteColumn = async () => {
-    await ColumnService.deleteColumn(column.id, column.board_id)
+  const handleDeleteColumn = () => {
+    ColumnService.deleteColumn(column.id, column.board_id)
       .then((response) => {
         const { data } = response;
         queryClient.invalidateQueries(`getColumnsOfBoard${column.board_id}`);
@@ -140,11 +140,7 @@ const KanbanColumn = ({ column }: itemProps) => {
           x: -Math.abs(targetColumnDrop.position - columnNeedDrop.position) * TOTAL_WIDTH_COLUMN,
           y: 0,
           onRest: async () => {
-            api({
-              x: 0,
-              y: 0,
-              immediate: true,
-            });
+            resetPos();
             await queryClient.invalidateQueries(`getColumnsOfBoard${column.board_id}`);
           },
         });
@@ -153,11 +149,7 @@ const KanbanColumn = ({ column }: itemProps) => {
           x: Math.abs(targetColumnDrop.position - columnNeedDrop.position) * TOTAL_WIDTH_COLUMN,
           y: 0,
           onRest: async () => {
-            api({
-              x: 0,
-              y: 0,
-              immediate: true,
-            });
+            resetPos();
             await queryClient.invalidateQueries(`getColumnsOfBoard${column.board_id}`);
           },
         });
@@ -169,7 +161,7 @@ const KanbanColumn = ({ column }: itemProps) => {
     setIsOver(false);
   };
 
-  const handleDrop = async (e: any, targetColumn: Column) => {
+  const handleDrop = (e: any, targetColumn: Column) => {
     e.preventDefault();
     setIsOver(false);
     setIsDraggingCard(false);
@@ -184,7 +176,7 @@ const KanbanColumn = ({ column }: itemProps) => {
 
     setTargetColumnDrop(targetColumn);
 
-    await ColumnService.swapPositionOfCoupleColumn(column.board_id, {
+    ColumnService.swapPositionOfCoupleColumn(column.board_id, {
       originalColumnId: columnNeedDrop.id,
       targetColumnId: targetColumn.id,
     })
@@ -194,11 +186,7 @@ const KanbanColumn = ({ column }: itemProps) => {
             x: -(targetColumn.position - columnNeedDrop.position) * TOTAL_WIDTH_COLUMN,
             y: 0,
             onRest: () => {
-              api({
-                x: 0,
-                y: 0,
-                immediate: true,
-              });
+              resetPos();
             },
           });
         } else {
@@ -206,11 +194,7 @@ const KanbanColumn = ({ column }: itemProps) => {
             x: Math.abs(targetColumn.position - columnNeedDrop.position) * TOTAL_WIDTH_COLUMN,
             y: 0,
             onRest: () => {
-              api({
-                x: 0,
-                y: 0,
-                immediate: true,
-              });
+              resetPos();
             },
           });
         }
@@ -218,6 +202,14 @@ const KanbanColumn = ({ column }: itemProps) => {
       .catch((responseError: ResponseError) => toast.error(responseError.message));
 
     setIsOver(false);
+  };
+
+  const resetPos = () => {
+    api({
+      x: 0,
+      y: 0,
+      immediate: true,
+    });
   };
 
   return (

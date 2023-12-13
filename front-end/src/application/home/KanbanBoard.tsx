@@ -57,8 +57,8 @@ const KanbanBoard = ({ board }: itemProps) => {
   } = useForm<BoardReq>({
     resolver: yupResolver(schemaValidation),
   });
-  const onSubmit: SubmitHandler<BoardReq> = async (reqData) => {
-    await BoardService.updateBoard(board.id, reqData)
+  const onSubmit: SubmitHandler<BoardReq> = (reqData) => {
+    BoardService.updateBoard(board.id, reqData)
       .then(() => {
         setIsClickTitle(false);
         queryClient.invalidateQueries('getMyBoards');
@@ -86,8 +86,8 @@ const KanbanBoard = ({ board }: itemProps) => {
     }
   }, [isClickTilte, isHoverTitle]);
 
-  const handleDeleteBoard = async () => {
-    await BoardService.deleteBoard(board.id)
+  const handleDeleteBoard = () => {
+    BoardService.deleteBoard(board.id)
       .then((response) => {
         const { data } = response;
         queryClient.invalidateQueries('getMyBoards');
@@ -96,8 +96,8 @@ const KanbanBoard = ({ board }: itemProps) => {
       .catch((responseError: ResponseError) => toast.error(responseError.message));
   };
 
-  const handleLeaveBoard = async () => {
-    await BoardService.leaveBoard(board.id)
+  const handleLeaveBoard = () => {
+    BoardService.leaveBoard(board.id)
       .then((response) => {
         const { data } = response;
         queryClient.invalidateQueries('getMyBoards');

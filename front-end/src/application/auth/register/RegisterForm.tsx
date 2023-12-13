@@ -84,8 +84,8 @@ const RegisterForm = () => {
   } = useForm<IFormInput>({
     resolver: yupResolver(schemaValidation),
   });
-  const onSubmit: SubmitHandler<IFormInput> = async (registerReqData) => {
-    await AuthService.register({ ...registerReqData })
+  const onSubmit: SubmitHandler<IFormInput> = (registerReqData) => {
+    AuthService.register({ ...registerReqData })
       .then((response) => {
         const { data } = response;
         toast.success(data);

@@ -55,12 +55,12 @@ const KanbanCard = ({ card, boardId, setIsDraggingCard }: itemProps) => {
   } = useForm<UpdateColumnReq>({
     resolver: yupResolver(schemaValidation),
   });
-  const onSubmit: SubmitHandler<UpdateColumnReq> = async (reqData) => {
+  const onSubmit: SubmitHandler<UpdateColumnReq> = (reqData) => {
     if (reqData.title === card.title) {
       return;
     }
 
-    await CardService.updateTitleCard(
+    CardService.updateTitleCard(
       {
         cardId: card.id,
         columnId: card.column_id,
@@ -88,8 +88,8 @@ const KanbanCard = ({ card, boardId, setIsDraggingCard }: itemProps) => {
     Helper.handleOutSideClick(menuRef, setIsShowMenu);
   }, [isShowMenu]);
 
-  const handleDelete = async () => {
-    await CardService.deleteCard({
+  const handleDelete = () => {
+    CardService.deleteCard({
       columnId: card.column_id,
       boardId,
       cardId: card.id,
@@ -130,7 +130,7 @@ const KanbanCard = ({ card, boardId, setIsDraggingCard }: itemProps) => {
     setIsDraggingCard(false);
   };
 
-  const handleDrop = async (e: React.DragEvent<HTMLDivElement>, card: Card) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, card: Card) => {
     e.preventDefault();
     setIsOver(false);
 
@@ -142,7 +142,7 @@ const KanbanCard = ({ card, boardId, setIsDraggingCard }: itemProps) => {
       return;
     }
 
-    await BoardService.moveCards(boardId, {
+    BoardService.moveCards(boardId, {
       originalCardId: cardNeedDrop.id,
       originalColumnId: cardNeedDrop.column_id,
       targetCardId: card.id,

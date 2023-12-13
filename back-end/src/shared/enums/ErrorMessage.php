@@ -22,4 +22,7 @@ enum ErrorMessage: string
     case CARD_NOT_IN_COLUMN = 'Card is not in this column!';
     case CARD_NOT_FOUND = 'Card not found!';
     case USER_WAS_ASSIGNED_USER_OF_THIS_CARD = 'This user was the assigned user of this card!';
+    case STRING_SO_SHORT = "%s should be at least %s characters long";
+    case STRING_SO_LONG = "%s should be less than %s characters long";
+    case INVALID_EMAIL_ADDRESS = 'Invalid email address';
 }

@@ -9,6 +9,7 @@ class Request
 {
     private array $params = [];
     private array $queries = [];
+    private int | null $userId = null;
 
     public function __construct() { }
 
@@ -116,5 +117,13 @@ class Request
     public function getQueries(): array
     {
         return $this->queries;
+    }
+
+    public function setUserId(?int $user_id): void {
+        $this->userId = $user_id;
+    }
+
+    public function getUserId(): int {
+        return $this->userId;
     }
 }

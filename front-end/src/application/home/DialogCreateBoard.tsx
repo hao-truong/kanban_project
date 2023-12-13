@@ -46,8 +46,8 @@ const DialogCreateBoard = ({ isOpen, setIsOpen }: itemProps) => {
   } = useForm<BoardReq>({
     resolver: yupResolver(schemaValidation),
   });
-  const onSubmit: SubmitHandler<BoardReq> = async (boardReqData) => {
-    await BoardService.createBoard(boardReqData)
+  const onSubmit: SubmitHandler<BoardReq> = (boardReqData) => {
+    BoardService.createBoard(boardReqData)
       .then(() => {
         toast.success('Create new board successfully!');
         queryClient.invalidateQueries('getMyBoards');
