@@ -17,8 +17,6 @@ class BoardService
         private readonly BoardModel     $boardModel,
         private readonly UserService    $userService,
         private readonly UserBoardModel $userBoardModel,
-        private readonly ColumnService  $columnService,
-        private readonly CardService    $cardService,
     ) {
     }
 
@@ -112,7 +110,6 @@ class BoardService
             ]
         );
         $this->userBoardModel->delete('board_id', $board_id);
-        $this->columnService->handleDeleteColumnByBoardId($board_id);
         $this->boardModel->deleteById($board_id);
     }
 

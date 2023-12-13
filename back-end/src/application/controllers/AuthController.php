@@ -48,7 +48,7 @@ class AuthController
         $user_entity->setEmail($req_data['email']);
         $user_entity->setAlias($req_data['alias']);
 
-        $this->authService->handleRegister($user_entity);
+        var_dump( $this->authService->handleRegister($user_entity));
         $this->response->content(StatusCode::CREATED, null, null, SuccessMessage::REGISTER_SUCCESSFULLY->value);
     }
 

@@ -67,7 +67,7 @@ class AuthService
     /**
      * @throws ResponseException
      */
-    public function handleLogout(int $user_id): void
+    public function handleLogout(int $user_id): array
     {
         $matched_user = $this->userModel->findOne('id', $user_id);
 
@@ -77,6 +77,6 @@ class AuthService
 
         $matched_user['access_token'] = null;
         $matched_user['refresh_token'] = null;
-        $this->userModel->update($matched_user);
+        return $this->userModel->update($matched_user);
     }
 }
