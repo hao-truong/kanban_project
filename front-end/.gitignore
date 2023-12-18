@@ -26,3 +26,4 @@ dist-ssr
 ./src/__test__/coverage
 ./src/__test__/node_modules
 ./src/node_modules
+./coverage
