@@ -10,7 +10,6 @@ use app\entities\BoardEntity;
 use app\services\BoardService;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
-use shared\handlers\SessionHandler;
 use shared\utils\Checker;
 
 class BoardController

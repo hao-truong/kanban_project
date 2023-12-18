@@ -7,7 +7,6 @@ namespace app\middlewares;
 use app\core\Request;
 use app\models\UserModel;
 use app\services\JwtService;
-use app\services\UserService;
 use shared\enums\StatusCode;
 use shared\enums\TypeJwt;
 use shared\exceptions\ResponseException;

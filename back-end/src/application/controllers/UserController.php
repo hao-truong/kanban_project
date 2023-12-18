@@ -9,7 +9,6 @@ use app\core\Response;
 use app\services\UserService;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
-use shared\handlers\SessionHandler;
 
 class UserController
 {
