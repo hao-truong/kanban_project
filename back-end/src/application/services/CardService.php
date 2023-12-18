@@ -263,6 +263,7 @@ class CardService
         $target_card = $this->checkCardInColumn($target_column_id, $target_card_id);
 
         if ($target_column_id === $original_column_id) {
+            echo "zo";
             $temp_position = $original_card['position'];
             $original_card['position'] = $target_card['position'];
             $target_card['position'] = $temp_position;

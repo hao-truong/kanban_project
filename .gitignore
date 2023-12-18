@@ -5,3 +5,8 @@ back-end/.env
 front-end/node_modules
 front-end/.env.local
 front-end/package-lock.json
+
+.DS_Store
+front-end/src/__test__/coverage
+front-end/src/__test__/node_modules
+front-end/src/node_modules

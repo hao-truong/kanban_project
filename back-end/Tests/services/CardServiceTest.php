@@ -18,14 +18,14 @@ class CardServiceTest extends TestCase
     private MockObject $converter;
     private static array $MATCHED_CARD = [
         'assigned_user' => 1,
-        'column_id' => 1,
-        'created_at' => '2023-12-11 22:28:33.019',
-        'updated_at' => '2023-12-11 22:28:33.019',
-        'description' => 'Abc description',
-        'id' => 1,
-        'position' => 1,
-        'status' => "1",
-        'title' => 'Card 1 title',
+        'column_id'     => 1,
+        'created_at'    => '2023-12-11 22:28:33.019',
+        'updated_at'    => '2023-12-11 22:28:33.019',
+        'description'   => 'Abc description',
+        'id'            => 1,
+        'position'      => 1,
+        'status'        => "1",
+        'title'         => 'Card 1 title',
     ];
 
     public function setUp(): void
@@ -38,8 +38,9 @@ class CardServiceTest extends TestCase
     public function testExistedCardFail(): void
     {
         $this->cardModel->expects($this->once())
-            ->method('findOne')
-            ->willReturn(null);
+                        ->method('findOne')
+                        ->willReturn(null)
+        ;
         $this->expectException(ResponseException::class);
         $this->expectExceptionMessage(ErrorMessage::CARD_NOT_FOUND->value);
         $this->cardService->checkExistedCard(1);
@@ -48,8 +49,9 @@ class CardServiceTest extends TestCase
     public function testExistedCardSuccess(): void
     {
         $this->cardModel->expects($this->once())
-            ->method('findOne')
-            ->willReturn(self::$MATCHED_CARD);
+                        ->method('findOne')
+                        ->willReturn(self::$MATCHED_CARD)
+        ;
         $expect_result = self::$MATCHED_CARD;
         $result = $this->cardService->checkExistedCard(1);
         $this->assertEquals($expect_result, $result);
@@ -63,8 +65,9 @@ class CardServiceTest extends TestCase
         );
         $this->cardService->__construct($this->cardModel, $this->converter);
         $this->cardService->expects($this->once())
-            ->method('checkExistedCard')
-            ->willReturn(self::$MATCHED_CARD);
+                          ->method('checkExistedCard')
+                          ->willReturn(self::$MATCHED_CARD)
+        ;
 
         $this->expectException(ResponseException::class);
         $this->expectExceptionMessage(ErrorMessage::CARD_NOT_IN_COLUMN->value);
@@ -79,8 +82,9 @@ class CardServiceTest extends TestCase
         );
         $this->cardService->__construct($this->cardModel, $this->converter);
         $this->cardService->expects($this->once())
-            ->method('checkExistedCard')
-            ->willReturn(self::$MATCHED_CARD);
+                          ->method('checkExistedCard')
+                          ->willReturn(self::$MATCHED_CARD)
+        ;
 
         $expect_result = self::$MATCHED_CARD;
         $result = $this->cardService->checkCardInColumn(1, 1);
@@ -91,14 +95,14 @@ class CardServiceTest extends TestCase
     {
         $expect_result = [
             'assigned_user' => null,
-            'column_id' => 1,
-            'created_at' => '2023-12-11 22:28:33.019',
-            'updated_at' => '2023-12-11 22:28:33.019',
-            'description' => 'Abc description',
-            'id' => 1,
-            'position' => 1,
-            'status' => "1",
-            'title' => 'Card 1 title updated',
+            'column_id'     => 1,
+            'created_at'    => '2023-12-11 22:28:33.019',
+            'updated_at'    => '2023-12-11 22:28:33.019',
+            'description'   => 'Abc description',
+            'id'            => 1,
+            'position'      => 1,
+            'status'        => "1",
+            'title'         => 'Card 1 title updated',
         ];
         $this->cardService = $this->createPartialMock(
             CardService::class,
@@ -106,11 +110,13 @@ class CardServiceTest extends TestCase
         );
         $this->cardService->__construct($this->cardModel, $this->converter);
         $this->cardService->expects($this->once())
-            ->method('checkCardInColumn')
-            ->willReturn(self::$MATCHED_CARD);
+                          ->method('checkCardInColumn')
+                          ->willReturn(self::$MATCHED_CARD)
+        ;
         $this->cardModel->expects($this->once())
-            ->method('update')
-            ->willReturn($expect_result);
+                        ->method('update')
+                        ->willReturn($expect_result)
+        ;
         $card_entity = new CardEntity();
         $card_entity->setTitle('Card 1 title updated');
         $card_entity->setColumnId(1);
@@ -129,17 +135,20 @@ class CardServiceTest extends TestCase
         );
         $this->cardService->__construct($this->cardModel, $this->converter);
         $this->cardService->expects($this->once())
-            ->method('checkExistedCard');
+                          ->method('checkExistedCard')
+        ;
         $this->cardModel->expects($this->once())
-            ->method('deleteById');
+                        ->method('deleteById')
+        ;
         $this->cardService->handleDeleteCard(1);
     }
 
     public function testCheckAssignedUserOfCardFail(): void
     {
         $this->cardModel->expects($this->once())
-            ->method('findOne')
-            ->willReturn(self::$MATCHED_CARD);
+                        ->method('findOne')
+                        ->willReturn(self::$MATCHED_CARD)
+        ;
         $this->expectException(ResponseException::class);
         $this->expectExceptionMessage(ErrorMessage::USER_WAS_ASSIGNED_USER_OF_THIS_CARD->value);
         $this->cardService->checkAssignedUserOfCard(1, 1);
@@ -148,8 +157,9 @@ class CardServiceTest extends TestCase
     public function testCheckAssignedUserOfCardSuccess(): void
     {
         $this->cardModel->expects($this->once())
-            ->method('findOne')
-            ->willReturn(self::$MATCHED_CARD);
+                        ->method('findOne')
+                        ->willReturn(self::$MATCHED_CARD)
+        ;
         $expect_result = self::$MATCHED_CARD;
         $result = $this->cardService->checkAssignedUserOfCard(2, 1);
         $this->assertEquals($expect_result, $result);
@@ -163,68 +173,72 @@ class CardServiceTest extends TestCase
         );
         $this->cardService->__construct($this->cardModel, $this->converter);
         $this->cardService->expects($this->once())
-            ->method('checkAssignedUserOfCard')
-            ->willReturn(self::$MATCHED_CARD);
+                          ->method('checkAssignedUserOfCard')
+                          ->willReturn(self::$MATCHED_CARD)
+        ;
         $this->cardModel->expects($this->once())
-            ->method('update');
+                        ->method('update')
+        ;
         $this->cardService->handleAssignMemberToBoard(2, 1);
     }
 
     public function testHandleCreateCardColumnWithEmptyCard(): void
     {
         $this->cardModel->expects($this->once())
-            ->method('find')
-            ->willReturn(
-                [
-                    [
-                        'assigned_user' => 1,
-                        'column_id' => 1,
-                        'created_at' => '2023-12-11 22:28:33.019',
-                        'updated_at' => '2023-12-11 22:28:33.019',
-                        'description' => 'Abc description',
-                        'id' => 1,
-                        'position' => 1,
-                        'status' => "1",
-                        'title' => 'Card 1 title',
-                    ],
-                    [
-                        'assigned_user' => 1,
-                        'column_id' => 1,
-                        'created_at' => '2023-12-11 22:28:33.019',
-                        'updated_at' => '2023-12-11 22:28:33.019',
-                        'description' => 'Abc description',
-                        'id' => 2,
-                        'position' => 2,
-                        'status' => "1",
-                        'title' => 'Card 2 title',
-                    ]
-                ]
-            );
+                        ->method('find')
+                        ->willReturn(
+                            [
+                                [
+                                    'assigned_user' => 1,
+                                    'column_id'     => 1,
+                                    'created_at'    => '2023-12-11 22:28:33.019',
+                                    'updated_at'    => '2023-12-11 22:28:33.019',
+                                    'description'   => 'Abc description',
+                                    'id'            => 1,
+                                    'position'      => 1,
+                                    'status'        => "1",
+                                    'title'         => 'Card 1 title',
+                                ],
+                                [
+                                    'assigned_user' => 1,
+                                    'column_id'     => 1,
+                                    'created_at'    => '2023-12-11 22:28:33.019',
+                                    'updated_at'    => '2023-12-11 22:28:33.019',
+                                    'description'   => 'Abc description',
+                                    'id'            => 2,
+                                    'position'      => 2,
+                                    'status'        => "1",
+                                    'title'         => 'Card 2 title',
+                                ]
+                            ]
+                        )
+        ;
         $this->cardModel->expects($this->once())
-            ->method('save')
-            ->willReturn(
-                [
-                    'assigned_user' => 1,
-                    'column_id' => 1,
-                    'created_at' => '2023-12-11 22:28:33.019',
-                    'updated_at' => '2023-12-11 22:28:33.019',
-                    'description' => 'Abc description',
-                    'id' => 3,
-                    'position' => 3,
-                    'status' => "1",
-                    'title' => 'Card 3 title',
-                ]
-            );
+                        ->method('save')
+                        ->willReturn(
+                            [
+                                'assigned_user' => 1,
+                                'column_id'     => 1,
+                                'created_at'    => '2023-12-11 22:28:33.019',
+                                'updated_at'    => '2023-12-11 22:28:33.019',
+                                'description'   => 'Abc description',
+                                'id'            => 3,
+                                'position'      => 3,
+                                'status'        => "1",
+                                'title'         => 'Card 3 title',
+                            ]
+                        )
+        ;
         $expect_result = [
             'assigned_user' => 1,
-            'column_id' => 1,
-            'created_at' => '2023-12-11 22:28:33.019',
-            'updated_at' => '2023-12-11 22:28:33.019',
-            'description' => 'Abc description',
-            'id' => 3,
-            'position' => 3,
-            'status' => "1",
-            'title' => 'Card 3 title',
+            'column_id'     => 1,
+            'created_at'    => '2023-12-11 22:28:33.019',
+            'updated_at'    => '2023-12-11 22:28:33.019',
+            'description'   => 'Abc description',
+            'id'            => 3,
+            'position'      => 3,
+            'status'        => "1",
+            'title'         => 'Card 3 title',
         ];
         $card_entity = new CardEntity();
         $card_entity->setColumnId(1);
@@ -236,33 +250,35 @@ class CardServiceTest extends TestCase
     public function testHandleCreateColumnWithCards(): void
     {
         $this->cardModel->expects($this->once())
-            ->method('find')
-            ->willReturn([]);
+                        ->method('find')
+                        ->willReturn([])
+        ;
         $this->cardModel->expects($this->once())
-            ->method('save')
-            ->willReturn(
-                [
-                    'assigned_user' => 1,
-                    'column_id' => 1,
-                    'created_at' => '2023-12-11 22:28:33.019',
-                    'updated_at' => '2023-12-11 22:28:33.019',
-                    'description' => 'Abc description',
-                    'id' => 1,
-                    'position' => 1,
-                    'status' => "1",
-                    'title' => 'Card 1 title',
-                ]
-            );
+                        ->method('save')
+                        ->willReturn(
+                            [
+                                'assigned_user' => 1,
+                                'column_id'     => 1,
+                                'created_at'    => '2023-12-11 22:28:33.019',
+                                'updated_at'    => '2023-12-11 22:28:33.019',
+                                'description'   => 'Abc description',
+                                'id'            => 1,
+                                'position'      => 1,
+                                'status'        => "1",
+                                'title'         => 'Card 1 title',
+                            ]
+                        )
+        ;
         $expect_result = [
             'assigned_user' => 1,
-            'column_id' => 1,
-            'created_at' => '2023-12-11 22:28:33.019',
-            'updated_at' => '2023-12-11 22:28:33.019',
-            'description' => 'Abc description',
-            'id' => 1,
-            'position' => 1,
-            'status' => "1",
-            'title' => 'Card 1 title',
+            'column_id'     => 1,
+            'created_at'    => '2023-12-11 22:28:33.019',
+            'updated_at'    => '2023-12-11 22:28:33.019',
+            'description'   => 'Abc description',
+            'id'            => 1,
+            'position'      => 1,
+            'status'        => "1",
+            'title'         => 'Card 1 title',
         ];
         $card_entity = new CardEntity();
         $card_entity->setColumnId(1);
@@ -279,61 +295,64 @@ class CardServiceTest extends TestCase
         );
         $this->cardService->__construct($this->cardModel, $this->converter);
         $this->cardService->expects($this->once())
-            ->method('checkExistedCard');
+                          ->method('checkExistedCard')
+        ;
         $this->cardModel->expects($this->once())
-            ->method('join')
-            ->willReturn([
-                [
-                    "id" => 1,
-                    "column_id" => 65,
-                    "title" => "card 2",
-                    "description" => "<p>Hello world<\/p><p><br><\/p>",
-                    "created_at" => "2023-12-11 15:42:22.095",
-                    "updated_at" => "2023-12-11 15:42:22.095",
-                    "status" => "1",
-                    "assigned_user" => 1,
-                    "assigned_user_id" => 1,
-                    "assigned_user_username" => "haotruong",
-                    "assigned_user_alias" => "Truong Van Hao",
-                    "assigned_user_email" => "truongvanhao159@gmail.com",
-                    "position" => 1
-                ]
-            ]);
+                        ->method('join')
+                        ->willReturn([
+                            [
+                                "id"                     => 1,
+                                "column_id"              => 65,
+                                "title"                  => "card 2",
+                                "description"            => "<p>Hello world<\/p><p><br><\/p>",
+                                "created_at"             => "2023-12-11 15:42:22.095",
+                                "updated_at"             => "2023-12-11 15:42:22.095",
+                                "status"                 => "1",
+                                "assigned_user"          => 1,
+                                "assigned_user_id"       => 1,
+                                "assigned_user_username" => "haotruong",
+                                "assigned_user_alias"    => "Truong Van Hao",
+                                "assigned_user_email"    => "truongvanhao159@gmail.com",
+                                "position"               => 1
+                            ]
+                        ])
+        ;
         $this->converter->expects($this->once())
-            ->method('toCardResponse')
-            ->willReturn(
-                [
-                    "id" => 1,
-                    "column_id" => 65,
-                    "title" => "card 2",
-                    "description" => "<p>Hello world<\/p><p><br><\/p>",
-                    "created_at" => "2023-12-11 15:42:22.095",
-                    "updated_at" => "2023-12-11 15:42:22.095",
-                    "status" => "1",
-                    "assigned_user" => [
-                        "id" => 25,
-                        "username" => "haotruong",
-                        "alias" => "Truong Van Hao",
-                        "email" => "truongvanhao159@gmail.com"
-                    ],
-                    "position" => 1
-                ]
-            );
+                        ->method('toCardResponse')
+                        ->willReturn(
+                            [
+                                "id"            => 1,
+                                "column_id"     => 65,
+                                "title"         => "card 2",
+                                "description"   => "<p>Hello world<\/p><p><br><\/p>",
+                                "created_at"    => "2023-12-11 15:42:22.095",
+                                "updated_at"    => "2023-12-11 15:42:22.095",
+                                "status"        => "1",
+                                "assigned_user" => [
+                                    "id"       => 25,
+                                    "username" => "haotruong",
+                                    "alias"    => "Truong Van Hao",
+                                    "email"    => "truongvanhao159@gmail.com"
+                                ],
+                                "position"      => 1
+                            ]
+                        )
+        ;
         $expect_result = [
-            "id" => 1,
-            "column_id" => 65,
-            "title" => "card 2",
-            "description" => "<p>Hello world<\/p><p><br><\/p>",
-            "created_at" => "2023-12-11 15:42:22.095",
-            "updated_at" => "2023-12-11 15:42:22.095",
-            "status" => "1",
+            "id"            => 1,
+            "column_id"     => 65,
+            "title"         => "card 2",
+            "description"   => "<p>Hello world<\/p><p><br><\/p>",
+            "created_at"    => "2023-12-11 15:42:22.095",
+            "updated_at"    => "2023-12-11 15:42:22.095",
+            "status"        => "1",
             "assigned_user" => [
-                "id" => 25,
+                "id"       => 25,
                 "username" => "haotruong",
-                "alias" => "Truong Van Hao",
-                "email" => "truongvanhao159@gmail.com"
+                "alias"    => "Truong Van Hao",
+                "email"    => "truongvanhao159@gmail.com"
             ],
-            "position" => 1
+            "position"      => 1
         ];
         $result = $this->cardService->handleGetDetailCard(1);
         $this->assertEquals($expect_result, $result);
@@ -350,15 +369,18 @@ class CardServiceTest extends TestCase
         );
         $this->cardService->__construct($this->cardModel, $this->converter);
         $this->cardService->expects($this->once())
-            ->method('checkExistedCard')
-            ->willReturn(self::$MATCHED_CARD);
+                          ->method('checkExistedCard')
+                          ->willReturn(self::$MATCHED_CARD)
+        ;
         $this->cardModel->expects($this->once())
-            ->method('find')
-            ->willReturn([]);
+                        ->method('find')
+                        ->willReturn([])
+        ;
 
         $this->cardModel->expects($this->once())
-            ->method('update')
-            ->willReturn($expect_result);
+                        ->method('update')
+                        ->willReturn($expect_result)
+        ;
         $result = $this->cardService->handleChangeColumn(1, 2);
         $this->assertEquals($expect_result, $result);
     }
@@ -374,23 +396,27 @@ class CardServiceTest extends TestCase
         );
         $this->cardService->__construct($this->cardModel, $this->converter);
         $this->cardService->expects($this->once())
-            ->method('checkExistedCard')
-            ->willReturn(self::$MATCHED_CARD);
+                          ->method('checkExistedCard')
+                          ->willReturn(self::$MATCHED_CARD)
+        ;
         $this->cardModel->expects($this->once())
-            ->method('find')
-            ->willReturn([
-                self::$MATCHED_CARD,
-                self::$MATCHED_CARD
-            ]);
+                        ->method('find')
+                        ->willReturn([
+                            self::$MATCHED_CARD,
+                            self::$MATCHED_CARD
+                        ])
+        ;
 
         $this->cardModel->expects($this->once())
-            ->method('update')
-            ->willReturn($expect_result);
+                        ->method('update')
+                        ->willReturn($expect_result)
+        ;
         $result = $this->cardService->handleChangeColumn(1, 2);
         $this->assertEquals($expect_result, $result);
     }
 
-    public function testHandleUpdateDescription(): void {
+    public function testHandleUpdateDescription(): void
+    {
         $expect_result = self::$MATCHED_CARD;
         $expect_result['description'] = 'update description';
         $this->cardService = $this->createPartialMock(
@@ -399,12 +425,156 @@ class CardServiceTest extends TestCase
         );
         $this->cardService->__construct($this->cardModel, $this->converter);
         $this->cardService->expects($this->once())
-            ->method('checkExistedCard')
-            ->willReturn(self::$MATCHED_CARD);
+                          ->method('checkExistedCard')
+                          ->willReturn(self::$MATCHED_CARD)
+        ;
         $this->cardModel->expects($this->once())
-            ->method('update')
-            ->willReturn($expect_result);
+                        ->method('update')
+                        ->willReturn($expect_result)
+        ;
         $result = $this->cardService->handleUpdateDescription(1, 'update description');
         $this->assertEquals($expect_result, $result);
+    }
+
+    public function testHandleGetCardsByColumn(): void
+    {
+        $this->cardModel->expects($this->once())
+                        ->method('join')
+                        ->willReturn([
+                            [
+                                "id"                     => 1,
+                                "column_id"              => 65,
+                                "title"                  => "card 2",
+                                "description"            => "<p>Hello world<\/p><p><br><\/p>",
+                                "created_at"             => "2023-12-11 15:42:22.095",
+                                "updated_at"             => "2023-12-11 15:42:22.095",
+                                "status"                 => "1",
+                                "assigned_user"          => 1,
+                                "assigned_user_id"       => 1,
+                                "assigned_user_username" => "haotruong",
+                                "assigned_user_alias"    => "Truong Van Hao",
+                                "assigned_user_email"    => "truongvanhao159@gmail.com",
+                                "position"               => 1
+                            ]
+                        ])
+        ;
+
+        $this->converter->expects($this->once())
+                        ->method('toCardResponse')
+                        ->willReturn(
+                            [
+                                "id"            => 1,
+                                "column_id"     => 65,
+                                "title"         => "card 2",
+                                "description"   => "<p>Hello world<\/p><p><br><\/p>",
+                                "created_at"    => "2023-12-11 15:42:22.095",
+                                "updated_at"    => "2023-12-11 15:42:22.095",
+                                "status"        => "1",
+                                "assigned_user" => [
+                                    "id"       => 25,
+                                    "username" => "haotruong",
+                                    "alias"    => "Truong Van Hao",
+                                    "email"    => "truongvanhao159@gmail.com"
+                                ],
+                                "position"      => 1
+                            ]
+                        )
+        ;
+
+        $expect_result = [
+            [
+                "id"            => 1,
+                "column_id"     => 65,
+                "title"         => "card 2",
+                "description"   => "<p>Hello world<\/p><p><br><\/p>",
+                "created_at"    => "2023-12-11 15:42:22.095",
+                "updated_at"    => "2023-12-11 15:42:22.095",
+                "status"        => "1",
+                "assigned_user" => [
+                    "id"       => 25,
+                    "username" => "haotruong",
+                    "alias"    => "Truong Van Hao",
+                    "email"    => "truongvanhao159@gmail.com"
+                ],
+                "position"      => 1
+            ]
+        ];
+        $result = $this->cardService->handleGetCardsByColumn(65);
+        $this->assertEquals($expect_result, $result);
+    }
+
+    public function testHandleMoveCardInBoardWithTheSameColumn(): void
+    {
+        $original_card = self::$MATCHED_CARD;
+        $original_card['id'] = 1;
+        $original_card['position'] = 1;
+        $target_card = self::$MATCHED_CARD;
+        $target_card['id'] = 2;
+        $target_card['position'] = 2;
+
+        $this->cardService = $this->createPartialMock(
+            CardService::class,
+            ['checkCardInColumn']
+        );
+        $this->cardService->__construct($this->cardModel, $this->converter);
+        $this->cardService->expects($this->exactly(2))
+                          ->method('checkCardInColumn')
+                          ->willReturn($original_card, $target_card)
+        ;
+        $this->cardModel->expects($this->exactly(2))
+                        ->method('update')
+        ;
+        $this->cardService->handleMoveCardInBoard(1, 1, 2, 1);
+    }
+
+    public function testHandleMoveCardInBoardWithTheDifferentColumn(): void
+    {
+        $original_card = self::$MATCHED_CARD;
+        $original_card['id'] = 1;
+        $original_card['position'] = 1;
+        $target_card = self::$MATCHED_CARD;
+        $target_card['id'] = 2;
+        $target_card['position'] = 2;
+
+        $this->cardService = $this->createPartialMock(
+            CardService::class,
+            ['checkCardInColumn']
+        );
+        $this->cardService->__construct($this->cardModel, $this->converter);
+        $this->cardService->expects($this->exactly(2))
+                          ->method('checkCardInColumn')
+                          ->willReturn($original_card, $target_card)
+        ;
+        $this->cardModel->expects($this->once())
+                        ->method('find')
+                        ->willReturn([
+                            [
+                                'assigned_user' => 1,
+                                'column_id'     => 2,
+                                'created_at'    => '2023-12-11 22:28:33.019',
+                                'updated_at'    => '2023-12-11 22:28:33.019',
+                                'description'   => 'Abc description',
+                                'id'            => 3,
+                                'position'      => 3,
+                                'status'        => "1",
+                                'title'         => 'Card 1 title',
+                            ],
+                            [
+                                'assigned_user' => 1,
+                                'column_id'     => 2,
+                                'created_at'    => '2023-12-11 22:28:33.019',
+                                'updated_at'    => '2023-12-11 22:28:33.019',
+                                'description'   => 'Abc description',
+                                'id'            => 4,
+                                'position'      => 4,
+                                'status'        => "1",
+                                'title'         => 'Card 1 title',
+                            ]
+                        ])
+        ;
+        $this->cardModel->expects($this->exactly(3))
+                        ->method('update')
+        ;
+        $this->cardService->handleMoveCardInBoard(1, 1, 2, 2);
     }
 }

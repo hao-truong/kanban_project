@@ -4,12 +4,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use app\core\Model;
-use app\entities\ColumnEntity;
 use PDO;
-use PDOException;
-use shared\enums\ErrorMessage;
-use shared\enums\StatusCode;
-use shared\exceptions\ResponseException;
 
 class ColumnModel extends Model implements IModel
 {

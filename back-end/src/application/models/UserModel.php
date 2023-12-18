@@ -5,13 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use app\core\Model;
-use app\entities\UserEntity;
-use app\models\IModel;
 use PDO;
-use PDOException;
-use shared\enums\ErrorMessage;
-use shared\enums\StatusCode;
-use shared\exceptions\ResponseException;
 
 class UserModel extends Model implements IModel
 {

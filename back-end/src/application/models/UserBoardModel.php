@@ -6,10 +6,6 @@ namespace app\models;
 
 use app\core\Model;
 use PDO;
-use PDOException;
-use shared\enums\ErrorMessage;
-use shared\enums\StatusCode;
-use shared\exceptions\ResponseException;
 
 class UserBoardModel extends Model implements IModel
 {

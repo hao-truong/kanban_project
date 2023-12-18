@@ -6,7 +6,6 @@ namespace app\models;
 
 use app\core\Model;
 use PDO;
-use PDOException;
 use shared\exceptions\ResponseException;
 
 class  BoardModel extends Model implements IModel

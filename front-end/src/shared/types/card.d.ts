@@ -7,5 +7,4 @@ type Card = {
   updated_at: Date;
   column_id: number;
   title: string;
-  status: number;
 };
