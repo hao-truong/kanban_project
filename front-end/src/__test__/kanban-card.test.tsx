@@ -2,7 +2,6 @@ import KanbanCard from '@/application/board/KanbanCard';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { any } from 'prop-types';
 
 const queryClient = new QueryClient();
 
@@ -45,6 +44,6 @@ describe('KanbanCard render', () => {
 
     // Assert that setCardNeedDrop was called with the correct arguments
     expect(mockHandleDragStart).toHaveBeenCalledWith('abcs', mockCard);
-    console.log('mockHandleDragStart calls:', mockHandleDragStart.mock.calls);
+    // console.log('mockHandleDragStart calls:', mockHandleDragStart.mock.calls);
   });
 });

@@ -63,7 +63,7 @@ class CardModel extends Model implements IModel
     {
         $this->beginTransaction();
         $query_sql = "UPDATE cards SET title = :title, created_at = :created_at, updated_at = :updated_at, assigned_user = :assigned_user, ";
-        $query_sql .= "column_id = :column_id, description = :description, status = :status, position = :position WHERE id = :id";
+        $query_sql .= "column_id = :column_id, description = :description, position = :position WHERE id = :id";
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute($entity);
         $this->commit();
