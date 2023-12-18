@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\controllers;
@@ -15,8 +16,8 @@ use shared\utils\Checker;
 class ColumnController
 {
     public function __construct(
-        private readonly Request      $request,
-        private readonly Response     $response,
+        private readonly Request $request,
+        private readonly Response $response,
         private readonly BoardColumnSerivce $boardColumnSerivce
     ) {
     }
@@ -69,7 +70,7 @@ class ColumnController
         $req_data = Checker::checkMissingFields(
             $req_data, [
             'title',
-        ],  [
+        ], [
                 'title' => 'string',
             ]
         );
@@ -110,7 +111,7 @@ class ColumnController
             $req_data, [
             'originalColumnId',
             'targetColumnId',
-        ],  [
+        ], [
                 'originalColumnId' => 'integer',
                 'targetColumnId'   => 'integer',
             ]
@@ -119,7 +120,12 @@ class ColumnController
         $user_id = $this->request->getUserId();
         $board_id = $this->request->getIntParam('boardId');
 
-        $this->boardColumnSerivce->handleSwapPositionOfCoupleColumn($user_id, $board_id, $req_data['originalColumnId'], $req_data['targetColumnId']);
+        $this->boardColumnSerivce->handleSwapPositionOfCoupleColumn(
+            $user_id,
+            $board_id,
+            $req_data['originalColumnId'],
+            $req_data['targetColumnId']
+        );
         $this->response->content(StatusCode::OK, null, null, SuccessMessage::SWAP_POSITION_SUCCESSFULLY);
     }
 }

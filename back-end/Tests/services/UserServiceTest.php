@@ -1,6 +1,8 @@
 <?php
 
 
+namespace services;
+
 use app\models\UserModel;
 use app\services\UserService;
 use PHPUnit\Framework\MockObject\MockObject;

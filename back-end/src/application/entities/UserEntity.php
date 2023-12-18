@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\entities;
@@ -49,11 +50,19 @@ class UserEntity
     public function setUsername(string $username): void
     {
         if (strlen($username) < self::$MIN_LENGTH_STRING) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, sprintf(ErrorMessage::STRING_SO_SHORT->value, 'Username', self::$MIN_LENGTH_STRING));
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                sprintf(ErrorMessage::STRING_SO_SHORT->value, 'Username', self::$MIN_LENGTH_STRING)
+            );
         }
 
         if (strlen($username) > self::$MAX_LENGTH_STRING) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, sprintf(ErrorMessage::STRING_SO_LONG->value, 'Username', self::$MAX_LENGTH_STRING));
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                sprintf(ErrorMessage::STRING_SO_LONG->value, 'Username', self::$MAX_LENGTH_STRING)
+            );
         }
 
         $this->username = $username;
@@ -67,7 +76,11 @@ class UserEntity
     public function setPassword(string $password): void
     {
         if (strlen($password) < self::$MIN_LENGTH_PASSWORD) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, sprintf(ErrorMessage::STRING_SO_SHORT->value, 'Passowrd', self::$MIN_LENGTH_PASSWORD));
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                sprintf(ErrorMessage::STRING_SO_SHORT->value, 'Passowrd', self::$MIN_LENGTH_PASSWORD)
+            );
         }
 
         $this->password = $password;
@@ -81,7 +94,11 @@ class UserEntity
     public function setEmail(string $email): void
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, ErrorMessage::INVALID_EMAIL_ADDRESS);
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                ErrorMessage::INVALID_EMAIL_ADDRESS
+            );
         }
 
         $this->email = $email;
@@ -96,11 +113,19 @@ class UserEntity
     public function setAlias(string $alias): void
     {
         if (strlen($alias) < self::$MIN_LENGTH_STRING) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, sprintf(ErrorMessage::STRING_SO_SHORT->value, 'Alias name', self::$MIN_LENGTH_STRING));
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                sprintf(ErrorMessage::STRING_SO_SHORT->value, 'Alias name', self::$MIN_LENGTH_STRING)
+            );
         }
 
         if (strlen($alias) > self::$MAX_LENGTH_ALIAS_NAME) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, sprintf(ErrorMessage::STRING_SO_LONG->value, 'Alias name', self::$MAX_LENGTH_ALIAS_NAME));
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                sprintf(ErrorMessage::STRING_SO_LONG->value, 'Alias name', self::$MAX_LENGTH_ALIAS_NAME)
+            );
         }
 
         $this->alias = $alias;

@@ -5,6 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/application" isTestSource="false" packagePrefix="app\" />
       <sourceFolder url="file://$MODULE_DIR$/src/shared" isTestSource="false" packagePrefix="shared\" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/Tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/firebase/php-jwt" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/graham-campbell/result-type" />

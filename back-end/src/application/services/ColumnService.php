@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\services;
@@ -13,14 +14,12 @@ class  ColumnService
 {
     public function __construct(
         private readonly ColumnModel $columnModel,
-        private readonly CardService $cardService,
     ) {
     }
 
     /**
      * @param ColumnEntity $column_entity
      * @return array
-     * @throws ResponseException
      */
     public function handleCreateColumn(ColumnEntity $column_entity): array
     {
@@ -43,16 +42,6 @@ class  ColumnService
     }
 
     /**
-     * @param int $board_id
-     * @return void
-     * @throws ResponseException
-     */
-    public function handleDeleteColumnByBoardId(int $board_id): void
-    {
-        $this->columnModel->delete('board_id', $board_id);
-    }
-
-    /**
      * @param int $column_id
      * @return array
      * @throws ResponseException
@@ -62,7 +51,11 @@ class  ColumnService
         $column = $this->columnModel->findOne('id', $column_id);
 
         if (!$column) {
-            throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, ErrorMessage::COLUMN_NOT_FOUND);
+            throw new ResponseException(
+                StatusCode::NOT_FOUND,
+                StatusCode::NOT_FOUND->name,
+                ErrorMessage::COLUMN_NOT_FOUND
+            );
         }
 
         return $column;
@@ -79,7 +72,11 @@ class  ColumnService
         $matched_column = $this->checkExistedColumn($column_id);
 
         if ($matched_column['board_id'] !== $board_id) {
-            throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, ErrorMessage::COLUMN_NOT_IN_BOARD);
+            throw new ResponseException(
+                StatusCode::NOT_FOUND,
+                StatusCode::NOT_FOUND->name,
+                ErrorMessage::COLUMN_NOT_IN_BOARD
+            );
         }
 
         return $matched_column;
@@ -114,7 +111,6 @@ class  ColumnService
      * @param ColumnEntity $column_first
      * @param ColumnEntity $column_second
      * @return void
-     * @throws ResponseException
      */
     public function handleSwapPositionOfCoupleColumn(ColumnEntity $column_first, ColumnEntity $column_second): void
     {

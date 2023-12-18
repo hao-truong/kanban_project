@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\services;
@@ -12,8 +13,10 @@ use shared\utils\Converter;
 
 class CardService
 {
-    public function __construct(private readonly CardModel $cardModel)
-    {
+    public function __construct(
+        private readonly CardModel $cardModel,
+        private readonly Converter $converter,
+    ) {
     }
 
     /**
@@ -26,7 +29,11 @@ class CardService
         $matched_card = $this->cardModel->findOne('id', $card_id);
 
         if (!$matched_card) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, ErrorMessage::CARD_NOT_FOUND);
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                ErrorMessage::CARD_NOT_FOUND
+            );
         }
 
         return $matched_card;
@@ -43,7 +50,11 @@ class CardService
         $matched_card = $this->checkExistedCard($card_id);
 
         if ($matched_card['column_id'] !== $column_id) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, ErrorMessage::CARD_NOT_IN_COLUMN);
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                ErrorMessage::CARD_NOT_IN_COLUMN
+            );
         }
 
         return $matched_card;
@@ -100,8 +111,9 @@ class CardService
 
         return array_map(
             function ($card) {
-                return Converter::toCardResponse($card);
-            }, $cards
+                return $this->converter->toCardResponse($card);
+            },
+            $cards
         );
     }
 
@@ -125,17 +137,8 @@ class CardService
      */
     public function handleDeleteCard(int $card_id): void
     {
+        $this->checkExistedCard($card_id);
         $this->cardModel->deleteById($card_id);
-    }
-
-    /**
-     * @param int $column_id
-     * @return void
-     * @throws ResponseException
-     */
-    public function handleDeleteCardsFollowingColumn(int $column_id): void
-    {
-        $this->cardModel->delete('column_id', $column_id);
     }
 
     /**
@@ -149,7 +152,11 @@ class CardService
         $matched_card = $this->cardModel->findOne('id', $card_id);
 
         if ($matched_card['assigned_user'] && $matched_card['assigned_user'] === $user_id) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, ErrorMessage::USER_WAS_ASSIGNED_USER_OF_THIS_CARD);
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                ErrorMessage::USER_WAS_ASSIGNED_USER_OF_THIS_CARD
+            );
         }
 
         return $matched_card;
@@ -199,7 +206,7 @@ class CardService
             ]
         );
 
-        return Converter::toCardResponse($card[0]);
+        return $this->converter->toCardResponse($card[0]);
     }
 
     /**
@@ -246,8 +253,12 @@ class CardService
      * @return void
      * @throws ResponseException
      */
-    public function handleMoveCardInBoard(int $original_car_id, int $original_column_id, int $target_card_id, int $target_column_id): void
-    {
+    public function handleMoveCardInBoard(
+        int $original_car_id,
+        int $original_column_id,
+        int $target_card_id,
+        int $target_column_id
+    ): void {
         $original_card = $this->checkCardInColumn($original_column_id, $original_car_id);
         $target_card = $this->checkCardInColumn($target_column_id, $target_card_id);
 
@@ -269,7 +280,8 @@ class CardService
                     $card['position']++;
                     $this->cardModel->update($card);
                 }
-            }, $cards_in_target_column
+            },
+            $cards_in_target_column
         );
         $this->cardModel->update($original_card);
     }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -20,17 +21,19 @@ class UserBoardModel extends Model implements IModel
 
     public function save(array $entity): array
     {
+        $this->beginTransaction();
         $query_sql = "insert into user_board (user_id, board_id) values (:user_id, :board_id)";
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute(
             $entity
         );
+        $this->commit();
 
         return $this->findOne(
             null, [
-                    'user_id'  => $entity['user_id'],
-                    'board_id' => $entity['board_id'],
-                ]
+                'user_id' => $entity['user_id'],
+                'board_id' => $entity['board_id'],
+            ]
         );
     }
 
@@ -68,7 +71,7 @@ class UserBoardModel extends Model implements IModel
             return [];
         }
 
-        $query_sql = "select * from user_board where " . $field . " = :value";
+        $query_sql = sprintf("select * from user_board where %s = :value", $field);
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute(
             [
@@ -86,14 +89,16 @@ class UserBoardModel extends Model implements IModel
      */
     public function deleteById(mixed $id): void
     {
+        $this->beginTransaction();
         $query_sql = "delete from user_board where user_id = :user_id and board_id = :board_id";
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute(
             [
-                "user_id"  => $id[0],
+                "user_id" => $id[0],
                 "board_id" => $id[1],
             ]
         );
+        $this->commit();
     }
 
     /**
@@ -103,18 +108,20 @@ class UserBoardModel extends Model implements IModel
      */
     public function delete(string $field, mixed $value): void
     {
+        $this->beginTransaction();
         if (!in_array($field, $this->ALLOW_FIELDS)) {
             error_log("Field is not allowed");
             return;
         }
 
-        $query_sql = "delete from user_board where " . $field . " = :value";
+        $query_sql = sprintf("delete from user_board where %s = :value", $field);
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute(
             [
                 "value" => $value,
             ]
         );
+        $this->commit();
     }
 
     /**
@@ -129,11 +136,13 @@ class UserBoardModel extends Model implements IModel
 
         if (!empty($fields)) {
             $query_sql .= implode(
-                ", ", array_map(
-                        function ($field) use ($tables_to_join) {
-                            return "{$tables_to_join['as']}.$field";
-                        }, $fields
-                    )
+                ", ",
+                array_map(
+                    function ($field) use ($tables_to_join) {
+                        return "{$tables_to_join['as']}.$field";
+                    },
+                    $fields
+                )
             );
         }
         $query_sql .= "\n";
@@ -158,7 +167,7 @@ class UserBoardModel extends Model implements IModel
             return 0;
         }
 
-        $query_sql = "select count(*) from user_board where " . $field . " = :value";
+        $query_sql = sprintf("select count(*) from user_board where %s = :value", $field);
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute(
             [

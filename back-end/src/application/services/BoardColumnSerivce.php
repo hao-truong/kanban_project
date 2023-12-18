@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\services;
@@ -9,7 +10,7 @@ use shared\exceptions\ResponseException;
 class BoardColumnSerivce
 {
     public function __construct(
-        private readonly BoardService  $boardService,
+        private readonly BoardService $boardService,
         private readonly ColumnService $columnService,
     ) {
     }
@@ -38,7 +39,6 @@ class BoardColumnSerivce
     {
         $this->boardService->checkExistedBoard($board_id);
         $this->boardService->checkMemberOfBoard($user_id, $board_id);
-
         return $this->columnService->handleGetColumnsOfBoard($board_id);
     }
 
@@ -52,7 +52,6 @@ class BoardColumnSerivce
     {
         $this->boardService->checkExistedBoard($column_entity->getBoardId());
         $this->boardService->checkMemberOfBoard($user_id, $column_entity->getBoardId());
-
         return $this->columnService->handleUpdateColumn($column_entity);
     }
 
@@ -77,14 +76,21 @@ class BoardColumnSerivce
      * @return void
      * @throws ResponseException
      */
-    public function handleSwapPositionOfCoupleColumn(int $user_id, int $board_id, int $column_id_first, int $column_id_second): void
-    {
+    public function handleSwapPositionOfCoupleColumn(
+        int $user_id,
+        int $board_id,
+        int $column_id_first,
+        int $column_id_second
+    ): void {
         $this->boardService->checkMemberOfBoard($user_id, $board_id);
 
         $column_first = $this->columnService->checkColumnInBoard($column_id_first, $board_id);
         $column_second = $this->columnService->checkColumnInBoard($column_id_second, $board_id);
 
         $this->boardService->checkMemberOfBoard($user_id, $column_first['board_id']);
-        $this->columnService->handleSwapPositionOfCoupleColumn(ColumnEntity::fromArray($column_first), ColumnEntity::fromArray($column_second));
+        $this->columnService->handleSwapPositionOfCoupleColumn(
+            ColumnEntity::fromArray($column_first),
+            ColumnEntity::fromArray($column_second)
+        );
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace shared\handlers;
@@ -13,7 +14,13 @@ class MigrationHandler
 
     public function runMigration(string $file_name): void
     {
-        $sql = file_get_contents(dirname(__DIR__) . "/migrations/" . $file_name);
-        $this->database->getConnection()->exec($sql);
+        $file_path = sprintf("%s/migrations%s", dirname(__DIR__), $file_name);
+
+        if (file_exists($file_path)) {
+            $sql = file_get_contents($file_path);
+            $this->database->getConnection()->exec($sql);
+        } else {
+            echo "File not found: $file_path";
+        }
     }
 }

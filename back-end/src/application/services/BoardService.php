@@ -100,16 +100,8 @@ class BoardService
      */
     public function handleDeleteBoard(int $user_id, int $board_id): void
     {
-        $board_to_delete = $this->boardModel->findOne('id', $board_id);
+        $board_to_delete = $this->checkExistedBoard($board_id);
         $this->checkOwnerOfBoard($user_id, $board_to_delete);
-
-        $this->userBoardModel->deleteById(
-            [
-                $user_id,
-                $board_id
-            ]
-        );
-        $this->userBoardModel->delete('board_id', $board_id);
         $this->boardModel->deleteById($board_id);
     }
 
@@ -121,11 +113,7 @@ class BoardService
      */
     public function handleGetBoard(int $user_id, int $board_id): array
     {
-        $board = $this->boardModel->findOne('id', $board_id);
-        if (!$board) {
-            throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, ErrorMessage::BOARD_NOT_FOUND);
-        }
-
+        $board = $this->checkExistedBoard($board_id);
         $this->checkMemberOfBoard($user_id, $board_id);
         return $board;
     }
@@ -222,7 +210,7 @@ class BoardService
      * @return void
      * @throws ResponseException
      */
-    public function checkMemberOfBoard(int $user_id, int $board_id): void
+    public function checkMemberOfBoard(int $user_id, int $board_id): bool
     {
         $is_member = $this->userBoardModel->findOne(
             null, [
@@ -234,6 +222,8 @@ class BoardService
         if (!$is_member) {
             throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, ErrorMessage::NOT_BOARD_MEMBER);
         }
+
+        return true;
     }
 
     /**
@@ -257,11 +247,13 @@ class BoardService
      * @return void
      * @throws ResponseException
      */
-    public function checkOwnerOfBoard(int $user_id, array $board): void
+    public function checkOwnerOfBoard(int $user_id, array $board): bool
     {
         if ($user_id !== $board['creator_id']) {
             throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, ErrorMessage::NOT_BOARD_OWNER);
         }
+
+        return true;
     }
 
     /**

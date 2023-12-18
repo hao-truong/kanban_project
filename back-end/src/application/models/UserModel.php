@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -28,12 +29,13 @@ class UserModel extends Model implements IModel
      */
     public function save(array $entity): array
     {
+        $this->beginTransaction();
         $query_sql = "insert into users (username, password, alias, email) values (:username, :password, :alias, :email)";
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute(
             $entity
         );
-
+        $this->commit();
         $last_insert_id = $this->database->getConnection()->lastInsertId();
         return $this->findOne('id', $last_insert_id);
     }
@@ -50,7 +52,7 @@ class UserModel extends Model implements IModel
             return null;
         }
 
-        $query_sql = "select * from users where " . $field . " = :value";
+        $query_sql = sprintf("select * from users where %s = :value", $field);
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute(
             [
@@ -68,10 +70,11 @@ class UserModel extends Model implements IModel
      */
     public function update(array $entity): array
     {
+        $this->beginTransaction();
         $query_sql = "UPDATE users SET username = :username, password = :password, alias = :alias, email = :email, access_token = :access_token, refresh_token = :refresh_token WHERE id = :id";
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute($entity);
-
+        $this->commit();
         return $this->findOne('id', $entity['id']);
     }
 
@@ -87,7 +90,7 @@ class UserModel extends Model implements IModel
             return [];
         }
 
-        $query_sql = "select * from users where " . $field . " = :value";
+        $query_sql = sprintf("select * from users where %s = :value", $field);
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute(
             [
@@ -105,6 +108,7 @@ class UserModel extends Model implements IModel
      */
     public function deleteById(mixed $id): void
     {
+        $this->beginTransaction();
         $query_sql = "delete from users where id = :user_id";
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute(
@@ -112,5 +116,6 @@ class UserModel extends Model implements IModel
                 "user_id" => $id,
             ]
         );
+        $this->commit();
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\core;
@@ -47,7 +48,9 @@ class Router
                     throw new \Exception("{$middleware_name} do not exist!");
                 }
 
-                $this->routes[$method->name][$route_element->getEndpoint()]['middlewares'][] = $this->container->get($middleware_name);
+                $this->routes[$method->name][$route_element->getEndpoint()]['middlewares'][] = $this->container->get(
+                    $middleware_name
+                );
             }
         }
 
@@ -100,7 +103,10 @@ class Router
                 }
 
                 $callback = $this->routes[$method->name][$endpoint_key]['call_back'];
-                $middlewares = array_key_exists('middlewares', $this->routes[$method->name][$endpoint_key]) ? $this->routes[$method->name][$endpoint_key]['middlewares'] : [];
+                $middlewares = array_key_exists(
+                    'middlewares',
+                    $this->routes[$method->name][$endpoint_key]
+                ) ? $this->routes[$method->name][$endpoint_key]['middlewares'] : [];
 
                 return new MatchedRouteHandler($callback, $middlewares);
             }

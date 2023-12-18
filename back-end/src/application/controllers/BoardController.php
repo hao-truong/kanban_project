@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\controllers;
@@ -15,11 +16,10 @@ use shared\utils\Checker;
 class BoardController
 {
     public function __construct(
-        private readonly Request      $request,
-        private readonly Response     $response,
+        private readonly Request $request,
+        private readonly Response $response,
         private readonly BoardService $boardService
     ) {
-
     }
 
     /**
@@ -126,7 +126,12 @@ class BoardController
         $board_id = $this->request->getIntParam('boardId');
         $user_id = $this->request->getUserId();
         $this->boardService->handleAddMemberToBoard($user_id, $board_id, $req_data['member']);
-        $this->response->content(StatusCode::OK, null, null, "Add member with username [{$req_data['member']}] to this board successfully!");
+        $this->response->content(
+            StatusCode::OK,
+            null,
+            null,
+            "Add member with username [{$req_data['member']}] to this board successfully!"
+        );
     }
 
     /**
@@ -165,7 +170,7 @@ class BoardController
         $req_queries = Checker::checkMissingFields(
             $req_queries, [
             'title',
-        ],  [
+        ], [
                 'title' => 'string',
             ]
         );

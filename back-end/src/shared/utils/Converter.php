@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace shared\utils;
@@ -9,7 +10,7 @@ class Converter
      * @param array $card
      * @return array
      */
-    public static function toCardResponse(array $card): array
+    public function toCardResponse(array $card): array
     {
         if ($card['assigned_user']) {
             $assigned_user = [

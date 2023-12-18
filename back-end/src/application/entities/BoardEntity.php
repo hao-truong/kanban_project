@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\entities;
@@ -40,11 +41,19 @@ class BoardEntity
     public function setTitle(string $title): void
     {
         if (strlen($title) < self::$MIN_LENGTH_TITLE) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, sprintf(ErrorMessage::STRING_SO_SHORT->value, 'title', self::$MIN_LENGTH_TITLE));
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                sprintf(ErrorMessage::STRING_SO_SHORT->value, 'title', self::$MIN_LENGTH_TITLE)
+            );
         }
 
         if (strlen($title) > self::$MAX_LENGTH_TITLE) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, sprintf(ErrorMessage::STRING_SO_LONG->value, 'title', self::$MAX_LENGTH_TITLE));
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                sprintf(ErrorMessage::STRING_SO_LONG->value, 'title', self::$MAX_LENGTH_TITLE)
+            );
         }
 
         $this->title = $title;

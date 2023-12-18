@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\middlewares;
@@ -13,11 +14,10 @@ use shared\exceptions\ResponseException;
 
 class AuthorizeRequest implements IMiddleware
 {
-
     public function __construct(
         private Request $request,
         private readonly JwtService $jwtService,
-        private readonly UserModel  $userModel
+        private readonly UserModel $userModel
     ) {
     }
 

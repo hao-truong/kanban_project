@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\services;
@@ -52,9 +53,17 @@ class JwtService
         try {
             return JWT::decode($token, new Key($_ENV["JWT_{$type->name}_KEY"], 'HS256'));
         } catch (Exception $exception) {
-            throw new ResponseException(StatusCode::FORBIDDEN, StatusCode::FORBIDDEN->name, ErrorMessage::UNAUTHORIZED_TOKEN);
+            throw new ResponseException(
+                StatusCode::FORBIDDEN,
+                StatusCode::FORBIDDEN->name,
+                ErrorMessage::UNAUTHORIZED_TOKEN
+            );
         } catch (ExpiredException $expiredException) {
-            throw new ResponseException(StatusCode::UNAUTHORIZED, StatusCode::UNAUTHORIZED->name, ErrorMessage::EXPIRED_TOKEN);
+            throw new ResponseException(
+                StatusCode::UNAUTHORIZED,
+                StatusCode::UNAUTHORIZED->name,
+                ErrorMessage::EXPIRED_TOKEN
+            );
         }
     }
 }

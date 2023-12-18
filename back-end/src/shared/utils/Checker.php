@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace shared\utils;
@@ -17,17 +18,21 @@ class Checker
     public static function checkMissingFields(array $data, array $fields, array $field_types): array
     {
         $missing_fields = array_diff(
-            $fields, array_keys($data)
+            $fields,
+            array_keys($data)
         );
 
         if (!empty($missing_fields)) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Missing fields: " . implode(", ", $missing_fields));
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                "Missing fields: " . implode(", ", $missing_fields)
+            );
         }
 
         $data = Checker::removeRedundantFields($data, $fields);
         Checker::checkTypeFields($data, $field_types);
         return Checker::sanitizeData($data, $field_types);
-
     }
 
     /**
@@ -40,13 +45,21 @@ class Checker
     {
         foreach ($data as $field => $value) {
             if (!array_key_exists($field, $field_types)) {
-                throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Type for field '$field' must be $field_types[$field]");
+                throw new ResponseException(
+                    StatusCode::BAD_REQUEST,
+                    StatusCode::BAD_REQUEST->name,
+                    "Type for field '$field' must be $field_types[$field]"
+                );
             }
 
             $expected_type = $field_types[$field];
 
             if (!is_null($value) && gettype($value) !== $expected_type) {
-                throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Invalid type for field '$field'. Expected '$expected_type', got '" . gettype($value) . "'.");
+                throw new ResponseException(
+                    StatusCode::BAD_REQUEST,
+                    StatusCode::BAD_REQUEST->name,
+                    "Invalid type for field '$field'. Expected '$expected_type', got '" . gettype($value) . "'."
+                );
             }
         }
     }
@@ -78,7 +91,9 @@ class Checker
                 function ($field, $value) use ($types) {
                     $type = $types[$field];
                     return Checker::sanitizeField($value, $type);
-                }, array_keys($data), $data
+                },
+                array_keys($data),
+                $data
             )
         );
     }

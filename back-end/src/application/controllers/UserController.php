@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\controllers;
@@ -13,8 +14,8 @@ use shared\handlers\SessionHandler;
 class UserController
 {
     public function __construct(
-        private readonly Request     $request,
-        private readonly Response    $response,
+        private readonly Request $request,
+        private readonly Response $response,
         private readonly UserService $userService
     ) {
     }

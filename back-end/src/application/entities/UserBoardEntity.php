@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\entities;
@@ -10,7 +11,6 @@ class UserBoardEntity
 
     public function __construct()
     {
-
     }
 
     public function getUserId(): int

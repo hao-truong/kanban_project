@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\entities;
@@ -22,7 +23,6 @@ class CardEntity
 
     public function __construct()
     {
-
     }
 
     public function getTitle(): string
@@ -33,11 +33,19 @@ class CardEntity
     public function setTitle(string $title): void
     {
         if (strlen($title) < self::$MIN_LENGTH_STRING) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, sprintf(ErrorMessage::STRING_SO_SHORT->value, 'title', self::$MIN_LENGTH_STRING));
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                sprintf(ErrorMessage::STRING_SO_SHORT->value, 'title', self::$MIN_LENGTH_STRING)
+            );
         }
 
         if (strlen($title) > self::$MAX_LENGTH_STRING) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, sprintf(ErrorMessage::STRING_SO_LONG->value, 'title', self::$MAX_LENGTH_STRING));
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                sprintf(ErrorMessage::STRING_SO_LONG->value, 'title', self::$MAX_LENGTH_STRING)
+            );
         }
 
         $this->title = $title;
@@ -61,11 +69,19 @@ class CardEntity
     public function setDescription(string $description): void
     {
         if (strlen($description) < self::$MIN_LENGTH_STRING) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, sprintf(ErrorMessage::STRING_SO_SHORT->value, 'Description', self::$MIN_LENGTH_STRING));
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                sprintf(ErrorMessage::STRING_SO_SHORT->value, 'Description', self::$MIN_LENGTH_STRING)
+            );
         }
 
         if (strlen($description) > self::$MAX_LENGTH_STRING) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, sprintf(ErrorMessage::STRING_SO_LONG->value, 'Description', self::$MAX_LENGTH_STRING));
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                sprintf(ErrorMessage::STRING_SO_LONG->value, 'Description', self::$MAX_LENGTH_STRING)
+            );
         }
 
         $this->description = $description;

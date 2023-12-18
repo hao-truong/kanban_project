@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\services;
@@ -9,11 +10,10 @@ use shared\exceptions\ResponseException;
 class ColumnCardService
 {
     public function __construct(
-        private readonly BoardService  $boardService,
+        private readonly BoardService $boardService,
         private readonly ColumnService $columnService,
-        private readonly CardService   $cardService,
-    )
-    {
+        private readonly CardService $cardService,
+    ) {
     }
 
     /**
@@ -107,8 +107,13 @@ class ColumnCardService
      * @return void
      * @throws ResponseException
      */
-    public function handleAssignMemberToCard(int $user_id, int $board_id, int $column_id, int $card_id, int $user_need_assign): void
-    {
+    public function handleAssignMemberToCard(
+        int $user_id,
+        int $board_id,
+        int $column_id,
+        int $card_id,
+        int $user_need_assign
+    ): void {
         $this->boardService->checkExistedBoard($board_id);
         $this->boardService->checkMemberOfBoard($user_id, $board_id);
         $this->boardService->checkMemberOfBoard($user_need_assign, $board_id);
@@ -142,8 +147,13 @@ class ColumnCardService
      * @return array
      * @throws ResponseException
      */
-    public function handleChangeColumnForCard(int $user_id, int $board_id, int $column_id, int $card_id, int $destination_column_id): array
-    {
+    public function handleChangeColumnForCard(
+        int $user_id,
+        int $board_id,
+        int $column_id,
+        int $card_id,
+        int $destination_column_id
+    ): array {
         $this->boardService->checkExistedBoard($board_id);
         $this->boardService->checkMemberOfBoard($user_id, $board_id);
         $this->columnService->checkColumnInBoard($column_id, $board_id);
@@ -162,8 +172,13 @@ class ColumnCardService
      * @return array
      * @throws ResponseException
      */
-    public function handleUpdateDescriptionOfCard(int $user_id, int $board_id, int $column_id, int $card_id, string $new_description): array
-    {
+    public function handleUpdateDescriptionOfCard(
+        int $user_id,
+        int $board_id,
+        int $column_id,
+        int $card_id,
+        string $new_description
+    ): array {
         $this->boardService->checkExistedBoard($board_id);
         $this->boardService->checkMemberOfBoard($user_id, $board_id);
         $this->columnService->checkColumnInBoard($column_id, $board_id);

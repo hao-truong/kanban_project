@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -23,12 +24,13 @@ class CardModel extends Model implements IModel
      */
     public function save(array $entity): array
     {
+        $this->beginTransaction();
         $query_sql = "insert into cards (title, column_id, position) values (:title, :column_id, :position)";
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute(
             $entity
         );
-
+        $this->commit();
         $last_insert_id = $this->database->getConnection()->lastInsertId();
         return $this->findOne('id', $last_insert_id);
     }
@@ -45,7 +47,7 @@ class CardModel extends Model implements IModel
             return null;
         }
 
-        $query_sql = "select * from cards where " . $field . " = :value";
+        $query_sql = sprintf("select * from cards where %s = :value", $field);
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute(
             [
@@ -63,11 +65,12 @@ class CardModel extends Model implements IModel
      */
     public function update(array $entity): array
     {
+        $this->beginTransaction();
         $query_sql = "UPDATE cards SET title = :title, created_at = :created_at, updated_at = :updated_at, assigned_user = :assigned_user, ";
         $query_sql .= "column_id = :column_id, description = :description, status = :status, position = :position WHERE id = :id";
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute($entity);
-
+        $this->commit();
         return $this->findOne('id', $entity['id']);
     }
 
@@ -83,7 +86,7 @@ class CardModel extends Model implements IModel
             return [];
         }
 
-        $query_sql = "select * from cards where " . $field . " = :value order by position ASC";
+        $query_sql = sprintf("select * from cards where %s = :value order by position ASC", $field);
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute(
             [
@@ -122,7 +125,7 @@ class CardModel extends Model implements IModel
             return 0;
         }
 
-        $query_sql = "select count(*) from cards where " . $field . " = :value";
+        $query_sql = sprintf("select count(*) from cards where %s = :value", $field);
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute(
             [
@@ -140,18 +143,20 @@ class CardModel extends Model implements IModel
      */
     public function delete(string $field, mixed $value): void
     {
+        $this->beginTransaction();
         if (!in_array($field, $this->ALLOW_FIELDS)) {
             error_log("Field is not allowed");
             return;
         }
 
-        $query_sql = "delete from cards where " . $field . " = :value";
+        $query_sql = sprintf("delete from cards where %s = :value", $field);
         $stmt = $this->database->getConnection()->prepare($query_sql);
         $stmt->execute(
             [
                 "value" => $value,
             ]
         );
+        $this->commit();
     }
 
     /**
@@ -166,11 +171,13 @@ class CardModel extends Model implements IModel
 
         if (!empty($fields)) {
             $query_sql .= implode(
-                ", ", array_map(
-                        function ($field) use ($tables_to_join) {
-                            return "{$tables_to_join['as']}.$field";
-                        }, $fields
-                    )
+                ", ",
+                array_map(
+                    function ($field) use ($tables_to_join) {
+                        return "{$tables_to_join['as']}.$field";
+                    },
+                    $fields
+                )
             );
         }
 

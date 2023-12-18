@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\core;
@@ -9,7 +10,7 @@ class Request
 {
     private array $params = [];
     private array $queries = [];
-    private int | null $userId = null;
+    private int|null $userId = null;
 
     public function __construct() { }
 
@@ -119,11 +120,13 @@ class Request
         return $this->queries;
     }
 
-    public function setUserId(?int $user_id): void {
+    public function setUserId(?int $user_id): void
+    {
         $this->userId = $user_id;
     }
 
-    public function getUserId(): int {
+    public function getUserId(): int
+    {
         return $this->userId;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\controllers;
@@ -15,8 +16,8 @@ use shared\utils\Checker;
 class CardController
 {
     public function __construct(
-        private readonly Request      $request,
-        private readonly Response     $response,
+        private readonly Request $request,
+        private readonly Response $response,
         private readonly ColumnCardService $columnCardService
     ) {
     }
@@ -31,7 +32,7 @@ class CardController
         $req_data = Checker::checkMissingFields(
             $req_data, [
             'title',
-        ],  [
+        ], [
                 'title' => 'string',
             ]
         );
@@ -73,7 +74,7 @@ class CardController
         $req_data = Checker::checkMissingFields(
             $req_data, [
             'title',
-        ],  [
+        ], [
                 'title' => 'string',
             ]
         );
@@ -133,7 +134,7 @@ class CardController
         $req_data = Checker::checkMissingFields(
             $req_data, [
             'assignToMemberId',
-        ],  [
+        ], [
                 'assignToMemberId' => 'integer',
             ]
         );
@@ -142,7 +143,13 @@ class CardController
         $board_id = $this->request->getIntParam('boardId');
         $column_id = $this->request->getIntParam('columnId');
         $card_id = $this->request->getIntParam('cardId');
-        $this->columnCardService->handleAssignMemberToCard($user_id, $board_id, $column_id, $card_id, $req_data['assignToMemberId']);
+        $this->columnCardService->handleAssignMemberToCard(
+            $user_id,
+            $board_id,
+            $column_id,
+            $card_id,
+            $req_data['assignToMemberId']
+        );
 
         $this->response->content(StatusCode::OK, null, null, SuccessMessage::ASSIGN_USER_TO_CARD_SUCCESSFULLY);
     }
@@ -174,7 +181,7 @@ class CardController
         $req_data = Checker::checkMissingFields(
             $req_data, [
             'destinationColumnId',
-        ],  [
+        ], [
                 'destinationColumnId' => 'integer',
             ]
         );
@@ -184,7 +191,13 @@ class CardController
         $column_id = $this->request->getIntParam('columnId');
         $card_id = $this->request->getIntParam('cardId');
 
-        $this->columnCardService->handleChangeColumnForCard($user_id, $board_id, $column_id, $card_id, $req_data['destinationColumnId']);
+        $this->columnCardService->handleChangeColumnForCard(
+            $user_id,
+            $board_id,
+            $column_id,
+            $card_id,
+            $req_data['destinationColumnId']
+        );
         $this->response->content(StatusCode::OK, null, null, SuccessMessage::CHANGE_COLUMN_SUCCESSFULLY);
     }
 
@@ -199,7 +212,7 @@ class CardController
         $req_data = Checker::checkMissingFields(
             $req_data, [
             'description',
-        ],  [
+        ], [
                 'description' => 'string',
             ]
         );
@@ -209,7 +222,13 @@ class CardController
         $column_id = $this->request->getIntParam('columnId');
         $card_id = $this->request->getIntParam('cardId');
 
-        $card = $this->columnCardService->handleUpdateDescriptionOfCard($user_id, $board_id, $column_id, $card_id, $req_data['description']);
+        $card = $this->columnCardService->handleUpdateDescriptionOfCard(
+            $user_id,
+            $board_id,
+            $column_id,
+            $card_id,
+            $req_data['description']
+        );
         $this->response->content(StatusCode::OK, null, null, $card);
     }
 
@@ -227,11 +246,11 @@ class CardController
             'originalColumnId',
             'targetCardId',
             'targetColumnId',
-        ],  [
-                'originalCardId'   => 'integer',
+        ], [
+                'originalCardId' => 'integer',
                 'originalColumnId' => 'integer',
-                'targetCardId'     => 'integer',
-                'targetColumnId'   => 'integer',
+                'targetCardId' => 'integer',
+                'targetColumnId' => 'integer',
             ]
         );
 

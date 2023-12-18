@@ -1,5 +1,8 @@
 <?php
+
 declare(strict_types=1);
+
+namespace services;
 
 use app\entities\UserEntity;
 use app\models\UserModel;
@@ -10,6 +13,8 @@ use PHPUnit\Framework\TestCase;
 use shared\enums\ErrorMessage;
 use shared\enums\TypeJwt;
 use shared\exceptions\ResponseException;
+
+ini_set('memory_limit', '256M');
 
 class AuthServiceTest extends TestCase
 {
@@ -129,23 +134,7 @@ class AuthServiceTest extends TestCase
         $matcher_jwt_service = $this->exactly(2);
         $this->jwtServiceMock->expects($matcher_jwt_service)
                              ->method('generateToken')
-                             ->willReturnCallback(
-                                 function (TypeJwt $type, int $user_id) use ($matcher_jwt_service) {
-                                     match ([
-                                         $type,
-                                         $user_id
-                                     ]) {
-                                         [
-                                             TypeJwt::ACCESS_TOKEN,
-                                             self::$MATCHED_USER['id']
-                                         ] => 'mockedAccessToken',
-                                         [
-                                             TypeJwt::REFRESH_TOKEN,
-                                             self::$MATCHED_USER['id']
-                                         ] => 'mockedRefreshToken'
-                                     };
-                                 }
-                             )->willReturn('mockedAccessToken', 'mockedRefreshToken')
+                             ->willReturn('mockedAccessToken', 'mockedRefreshToken')
         ;
 
         $result = $this->authService->handleLogin($user_entity);
@@ -155,7 +144,8 @@ class AuthServiceTest extends TestCase
         ];
 
         $this->assertEquals(
-            $expect_result, $result
+            $expect_result,
+            $result
         );
     }
 

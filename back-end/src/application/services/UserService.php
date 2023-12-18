@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\services;
@@ -24,7 +25,9 @@ class UserService
         $matched_user = $this->userModel->findOne('id', strval($user_id));
 
         if (!$matched_user) {
-            throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, ErrorMessage::USER_NOT_FOUND);
+            throw new ResponseException(
+                StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, ErrorMessage::USER_NOT_FOUND
+            );
         }
 
         return [
@@ -45,7 +48,9 @@ class UserService
         $matched_user = $this->userModel->findOne("username", $username);
 
         if (!$matched_user) {
-            throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, ErrorMessage::USER_NOT_FOUND);
+            throw new ResponseException(
+                StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, ErrorMessage::USER_NOT_FOUND
+            );
         }
 
         return $matched_user;

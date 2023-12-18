@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\services;
@@ -14,7 +15,7 @@ use shared\utils\Checker;
 class AuthService
 {
     public function __construct(
-        private readonly UserModel  $userModel,
+        private readonly UserModel $userModel,
         private readonly JwtService $jwtService
     ) {
     }
@@ -29,7 +30,11 @@ class AuthService
         $existed_username = $this->userModel->findOne('username', $user_entity->getUsername());
 
         if ($existed_username) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, ErrorMessage::EXISTED_USERNAME);
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                ErrorMessage::EXISTED_USERNAME
+            );
         }
 
         $user_entity->setPassword(password_hash($user_entity->getPassword(), PASSWORD_BCRYPT));
@@ -44,13 +49,21 @@ class AuthService
         $matched_user = $this->userModel->findOne('username', $user_entity->getUsername());
 
         if (!$matched_user) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, ErrorMessage::WRONG_USERNAME_OR_PASSWORD);
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                ErrorMessage::WRONG_USERNAME_OR_PASSWORD
+            );
         }
 
         $is_correct_password = password_verify($user_entity->getPassword(), $matched_user['password']);
 
         if (!$is_correct_password) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, ErrorMessage::WRONG_USERNAME_OR_PASSWORD);
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                ErrorMessage::WRONG_USERNAME_OR_PASSWORD
+            );
         }
 
         $matched_user['access_token'] = $this->jwtService->generateToken(TypeJwt::ACCESS_TOKEN, $matched_user['id']);
@@ -72,7 +85,9 @@ class AuthService
         $matched_user = $this->userModel->findOne('id', $user_id);
 
         if (!$matched_user) {
-            throw new ResponseException(StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, ErrorMessage::USER_NOT_FOUND);
+            throw new ResponseException(
+                StatusCode::NOT_FOUND, StatusCode::NOT_FOUND->name, ErrorMessage::USER_NOT_FOUND
+            );
         }
 
         $matched_user['access_token'] = null;

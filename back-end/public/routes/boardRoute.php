@@ -62,9 +62,3 @@ $app->router->addRoute(
                           'getMembersOfBoard'
                       ]
 );
-$app->router->addRoute(
-    RequestMethod::PATCH, '/boards/{boardId}/move-cards', [AuthorizeRequest::class], [
-                            BoardController::class,
-                            'moveCard'
-                        ]
-);
