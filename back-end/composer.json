@@ -5,7 +5,7 @@
   "scripts": {
     "start": [
       "Composer\\Config::disableProcessTimeout",
-      "php -S localhost:8080 -t public"
+      "php -S 10.192.30.141:8080 -t public"
     ],
     "install": "composer dump-autoload"
   },

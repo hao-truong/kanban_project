@@ -9,6 +9,7 @@ use app\core\Response;
 use app\entities\BoardEntity;
 use app\services\BoardService;
 use shared\enums\StatusCode;
+use shared\enums\SuccessMessage;
 use shared\exceptions\ResponseException;
 use shared\utils\Checker;
 
@@ -91,7 +92,7 @@ class BoardController
         $user_id = $this->request->getUserId();
 
         $this->boardService->handleDeleteBoard($user_id, $board_id);
-        $this->response->content(StatusCode::OK, null, null, "Delete board id [{$board_id}] successfully!");
+        $this->response->content(StatusCode::OK, null, null, SuccessMessage::DELETE_SUCCESSFULLY);
     }
 
     /**
@@ -129,7 +130,7 @@ class BoardController
             StatusCode::OK,
             null,
             null,
-            "Add member with username [{$req_data['member']}] to this board successfully!"
+            sprintf(SuccessMessage::ADD_MEMBER_TO_BOARD_SUCCESSFULLY->value, $req_data['member']),
         );
     }
 
@@ -143,7 +144,12 @@ class BoardController
         $user_id = $this->request->getUserId();
 
         $this->boardService->handleLeaveBoard($user_id, $board_id);
-        $this->response->content(StatusCode::OK, null, null, "Leave board with id [{$board_id}] successfully!");
+        $this->response->content(
+            StatusCode::OK,
+            null,
+            null,
+            sprintf(SuccessMessage::LEAVE_BOARD_SUCCESSFULLY->value, $board_id)
+        );
     }
 
     /**

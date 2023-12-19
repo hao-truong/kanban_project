@@ -13,4 +13,6 @@ enum SuccessMessage: string
     case ASSIGN_USER_TO_CARD_SUCCESSFULLY = 'Assign this user to card successfully!';
     case CHANGE_COLUMN_SUCCESSFULLY = 'Change column for this card successfully!';
     case SWAP_TWO_CARDS_SUCCESSFULLY = 'Move card successfully!';
+    case ADD_MEMBER_TO_BOARD_SUCCESSFULLY = "Add member with username [%s] to this board successfully!";
+    case LEAVE_BOARD_SUCCESSFULLY = "Leave board with id [%s] successfully!";
 }
