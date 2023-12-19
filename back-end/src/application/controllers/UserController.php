@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\controllers;
@@ -8,13 +9,12 @@ use app\core\Response;
 use app\services\UserService;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
-use shared\handlers\SessionHandler;
 
 class UserController
 {
     public function __construct(
-        private readonly Request     $request,
-        private readonly Response    $response,
+        private readonly Request $request,
+        private readonly Response $response,
         private readonly UserService $userService
     ) {
     }
@@ -23,9 +23,9 @@ class UserController
      * @return void
      * @throws ResponseException
      */
-   public function getProfile(): void
+    public function getProfile(): void
     {
-        $user_id = SessionHandler::getUserId();
+        $user_id = $this->request->getUserId();
         $profile = $this->userService->handleGetProfile($user_id);
         $this->response->content(StatusCode::OK, null, null, $profile);
     }

@@ -21,6 +21,12 @@ $app->router->addRoute(
                       ]
 );
 $app->router->addRoute(
+    RequestMethod::GET, '/boards/search', [AuthorizeRequest::class], [
+                          BoardController::class,
+                          'searchBoard'
+                      ]
+);
+$app->router->addRoute(
     RequestMethod::PATCH, '/boards/{boardId}', [AuthorizeRequest::class], [
                             BoardController::class,
                             'updateBoard'
@@ -55,16 +61,4 @@ $app->router->addRoute(
                           BoardController::class,
                           'getMembersOfBoard'
                       ]
-);
-$app->router->addRoute(
-    RequestMethod::GET, '/boards/{boardId}/columns', [AuthorizeRequest::class], [
-                          BoardController::class,
-                          'getColumnsOfBoard'
-                      ]
-);
-$app->router->addRoute(
-    RequestMethod::POST, '/boards/{boardId}/columns', [AuthorizeRequest::class], [
-                           BoardController::class,
-                           'createColumn'
-                       ]
 );

@@ -47,19 +47,19 @@ const DialogAddMember = ({ isOpen, setIsOpen, boardId }: itemProps) => {
   } = useForm<MemberToAddReq>({
     resolver: yupResolver(schemaValidation),
   });
-  const onSubmit: SubmitHandler<MemberToAddReq> = async (reqData) => {
-    const data = await BoardService.addMemberToBoard(boardId, reqData)
-      .then((response) => response.data)
-      .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    if (data) {
-      toast.success(data);
-      queryClient.invalidateQueries('getMyBoards');
-      reset();
-      if (dialogRef.current) {
-        dialogRef.current.close();
-      }
-    }
+  const onSubmit: SubmitHandler<MemberToAddReq> = (reqData) => {
+    BoardService.addMemberToBoard(boardId, reqData)
+      .then((response) => {
+        toast.success(response.data);
+        queryClient.invalidateQueries('getMyBoards');
+        reset();
+        if (dialogRef.current) {
+          dialogRef.current.close();
+        }
+      })
+      .catch((responseError: ResponseError) => {
+        toast.error(responseError.message);
+      });
   };
 
   useEffect(() => {

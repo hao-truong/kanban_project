@@ -57,15 +57,13 @@ const KanbanBoard = ({ board }: itemProps) => {
   } = useForm<BoardReq>({
     resolver: yupResolver(schemaValidation),
   });
-  const onSubmit: SubmitHandler<BoardReq> = async (reqData) => {
-    const data = await BoardService.updateBoard(board.id, reqData)
-      .then((response) => response.data)
+  const onSubmit: SubmitHandler<BoardReq> = (reqData) => {
+    BoardService.updateBoard(board.id, reqData)
+      .then(() => {
+        setIsClickTitle(false);
+        queryClient.invalidateQueries('getMyBoards');
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    if (data) {
-      queryClient.invalidateQueries('getMyBoards');
-      setIsClickTitle(false);
-    }
   };
 
   useEffect(() => {
@@ -88,26 +86,24 @@ const KanbanBoard = ({ board }: itemProps) => {
     }
   }, [isClickTilte, isHoverTitle]);
 
-  const handleDeleteBoard = async () => {
-    const data = await BoardService.deleteBoard(board.id)
-      .then((response) => response.data)
+  const handleDeleteBoard = () => {
+    BoardService.deleteBoard(board.id)
+      .then((response) => {
+        const { data } = response;
+        queryClient.invalidateQueries('getMyBoards');
+        toast.success(data);
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    if (data) {
-      queryClient.invalidateQueries('getMyBoards');
-      toast.success(data);
-    }
   };
 
-  const handleLeaveBoard = async () => {
-    const data = await BoardService.leaveBoard(board.id)
-      .then((response) => response.data)
+  const handleLeaveBoard = () => {
+    BoardService.leaveBoard(board.id)
+      .then((response) => {
+        const { data } = response;
+        queryClient.invalidateQueries('getMyBoards');
+        toast.success(data);
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    if (data) {
-      queryClient.invalidateQueries('getMyBoards');
-      toast.success(data);
-    }
   };
 
   return (

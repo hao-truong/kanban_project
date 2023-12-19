@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\core;
@@ -22,7 +23,11 @@ class Database
             throw new \Exception("Database cannot be connected due to wrong configuration!");
         }
 
-        $this->connection = new PDO("$database_type:host=$database_host;port=$port;dbname=$database_name", $username, $password);
+        $this->connection = new PDO(
+            "$database_type:host=$database_host;port=$port;dbname=$database_name",
+            $username,
+            $password
+        );
         $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 

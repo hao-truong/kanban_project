@@ -5,7 +5,7 @@ import {
 } from '@/shared/utils/constant';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { TextField } from '@mui/material';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import * as yup from 'yup';
@@ -37,6 +37,7 @@ const schemaValidation = yup
 
 const DialogCreateColumn = ({ isOpen, setIsOpen, boardId }: itemProps) => {
   const queryClient = useQueryClient();
+  const [error, setError] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const bodyDialogRef = useRef<HTMLDivElement | null>(null);
   const {
@@ -47,19 +48,18 @@ const DialogCreateColumn = ({ isOpen, setIsOpen, boardId }: itemProps) => {
   } = useForm<ColumnReq>({
     resolver: yupResolver(schemaValidation),
   });
-  const onSubmit: SubmitHandler<ColumnReq> = async (columnReqData) => {
-    const data = await ColumnService.createColumn(boardId, columnReqData).then(
-      (response) => response.data,
-    );
-
-    if (data) {
-      setValue('title', '');
-      toast.success('Create new columnn successfully!');
-      queryClient.invalidateQueries('getColumnsOfBoard');
-      if (dialogRef.current) {
-        dialogRef.current.close();
-      }
-    }
+  const onSubmit: SubmitHandler<ColumnReq> = (columnReqData) => {
+    ColumnService.createColumn(boardId, columnReqData)
+      .then(() => {
+        setValue('title', '');
+        setError(null);
+        toast.success('Create new columnn successfully!');
+        queryClient.invalidateQueries(`getColumnsOfBoard${boardId}`);
+        if (dialogRef.current) {
+          dialogRef.current.close();
+        }
+      })
+      .catch((responseError: ResponseError) => setError(responseError.message));
   };
 
   useEffect(() => {
@@ -88,7 +88,8 @@ const DialogCreateColumn = ({ isOpen, setIsOpen, boardId }: itemProps) => {
 
   return (
     <dialog ref={dialogRef} className=" rounded-lg p-10">
-      <div ref={bodyDialogRef} className="flex flex-col items-end justify-center gap-4">
+      <div ref={bodyDialogRef} className="flex flex-col items-center justify-center gap-4">
+        {error && <h2 className="text-red-600 text-center">{error}</h2>}
         <form
           className="min-w-[500px] text-center flex flex-col gap-5 rounded-xl"
           onSubmit={handleSubmit(onSubmit)}

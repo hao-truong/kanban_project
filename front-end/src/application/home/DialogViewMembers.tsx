@@ -1,4 +1,4 @@
-import BoardService from '@/shared/services/BoardService';
+import { getMembers } from '@/shared/services/QueryService';
 import { useGlobalState } from '@/shared/storages/GlobalStorage';
 import { Crown, Sparkle } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -44,17 +44,11 @@ interface itemProps {
   board: Board;
 }
 
-const getMembers = async (boardId: number): Promise<User[]> => {
-  const data = await BoardService.getMembers(boardId).then((response) => response.data);
-
-  return data;
-};
-
 const DialogViewMembers = ({ board, isOpen, setIsOpen }: itemProps) => {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const bodyDialogRef = useRef<HTMLDivElement | null>(null);
   const { data: members } = useQuery<User[]>('getMembersOfBoard', () => getMembers(board!.id), {
-    enabled: !!board,
+    enabled: !!board && isOpen,
   });
 
   useEffect(() => {

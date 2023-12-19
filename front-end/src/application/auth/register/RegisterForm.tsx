@@ -84,15 +84,14 @@ const RegisterForm = () => {
   } = useForm<IFormInput>({
     resolver: yupResolver(schemaValidation),
   });
-  const onSubmit: SubmitHandler<IFormInput> = async (registerReqData) => {
-    const data = await AuthService.register({ ...registerReqData })
-      .then((response) => response.data)
+  const onSubmit: SubmitHandler<IFormInput> = (registerReqData) => {
+    AuthService.register({ ...registerReqData })
+      .then((response) => {
+        const { data } = response;
+        toast.success(data);
+        navigate('/auth/sign-in');
+      })
       .catch((responseError: ResponseError) => setError(responseError.message));
-
-    if (data) {
-      toast.success(data);
-      navigate('/auth/sign-in');
-    }
   };
 
   return (
@@ -107,6 +106,7 @@ const RegisterForm = () => {
           className="w-[400px]"
           error={errors.username ? true : false}
           helperText={errors.username?.message}
+          inputProps={{ maxLength: MAX_LENGTH_INPUT_STRING }}
         />
         <TextField
           label="Email"
@@ -123,6 +123,7 @@ const RegisterForm = () => {
           className="w-[400px]"
           error={errors.alias ? true : false}
           helperText={errors.alias?.message}
+          inputProps={{ maxLength: MAX_LENGTH_INPUT_STRING }}
         />
         <TextField
           label="Password"

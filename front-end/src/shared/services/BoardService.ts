@@ -11,6 +11,14 @@ const BoardService = {
     axiosClient.post<string>(`/boards/${boardId}/members`, data),
   leaveBoard: (boardId: number) => axiosClient.delete<string>(`/boards/${boardId}/members/leave`),
   getMembers: (boardId: number) => axiosClient.get<User[]>(`/boards/${boardId}/members`),
+  moveCards: (boardId: number, data: MoveCardsReq) =>
+    axiosClient.patch<string>(`/boards/${boardId}/move-cards`, data),
+  searchBoard: (queries: SearchBoardReq) =>
+    axiosClient.get<Board[]>(`/boards/search`, {
+      params: {
+        ...queries,
+      },
+    }),
 };
 
 export default BoardService;

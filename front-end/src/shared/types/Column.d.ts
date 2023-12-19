@@ -1,7 +1,7 @@
 type Column = {
   id: number;
   board_id: number;
-  order: number;
+  position: number;
   title: string;
   creator_id: number;
   created_at: Date;

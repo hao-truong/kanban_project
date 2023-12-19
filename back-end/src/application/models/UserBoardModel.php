@@ -1,14 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
 
 use app\core\Model;
 use PDO;
-use PDOException;
-use shared\enums\ErrorMessage;
-use shared\enums\StatusCode;
-use shared\exceptions\ResponseException;
 
 class UserBoardModel extends Model implements IModel
 {
@@ -18,28 +15,21 @@ class UserBoardModel extends Model implements IModel
         'board_id'
     ];
 
-    /**
-     * @throws ResponseException
-     */
     public function save(array $entity): array
     {
+        $this->beginTransaction();
         $query_sql = "insert into user_board (user_id, board_id) values (:user_id, :board_id)";
         $stmt = $this->database->getConnection()->prepare($query_sql);
-
-        try {
-            $stmt->execute(
-                $entity
-            );
-        } catch (PDOException $exception) {
-            error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
-        }
+        $stmt->execute(
+            $entity
+        );
+        $this->commit();
 
         return $this->findOne(
             null, [
-                    'user_id'  => $entity['user_id'],
-                    'board_id' => $entity['board_id'],
-                ]
+                'user_id' => $entity['user_id'],
+                'board_id' => $entity['board_id'],
+            ]
         );
     }
 
@@ -47,30 +37,21 @@ class UserBoardModel extends Model implements IModel
      * @param mixed $field
      * @param mixed $value
      * @return array|null
-     * @throws ResponseException
      */
     public function findOne(mixed $field, mixed $value): array|null
     {
         $query_sql = "select * from user_board where user_id = :user_id and board_id = :board_id";
         $stmt = $this->database->getConnection()->prepare($query_sql);
-
-        try {
-            $stmt->execute(
-                $value
-            );
-        } catch (PDOException $exception) {
-            error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
-        }
+        $stmt->execute(
+            $value
+        );
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
         return $result ?: null;
     }
 
     public function update(array $entity): array
     {
-        // not implementation
         return [];
     }
 
@@ -78,90 +59,71 @@ class UserBoardModel extends Model implements IModel
      * @param string $field
      * @param mixed $value
      * @return array
-     * @throws ResponseException
      */
     public function find(string $field, mixed $value): array
     {
         if (!in_array($field, $this->ALLOW_FIELDS)) {
             error_log("Field is not allowed");
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
+            return [];
         }
 
-        $query_sql = "select * from user_board where " . $field . " = :value";
+        $query_sql = sprintf("select * from user_board where %s = :value", $field);
         $stmt = $this->database->getConnection()->prepare($query_sql);
-
-        try {
-            $stmt->execute(
-                [
-                    "value" => $value,
-                ]
-            );
-        } catch (PDOException $exception) {
-            error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
-        }
+        $stmt->execute(
+            [
+                "value" => $value,
+            ]
+        );
 
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
         return $result ?: [];
     }
 
     /**
      * @param mixed $id
      * @return void
-     * @throws ResponseException
      */
     public function deleteById(mixed $id): void
     {
+        $this->beginTransaction();
         $query_sql = "delete from user_board where user_id = :user_id and board_id = :board_id";
         $stmt = $this->database->getConnection()->prepare($query_sql);
-
-        try {
-            $stmt->execute(
-                [
-                    "user_id"  => $id[0],
-                    "board_id" => $id[1],
-                ]
-            );
-        } catch (PDOException $exception) {
-            error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
-        }
+        $stmt->execute(
+            [
+                "user_id" => $id[0],
+                "board_id" => $id[1],
+            ]
+        );
+        $this->commit();
     }
 
     /**
      * @param string $field
      * @param mixed $value
      * @return void
-     * @throws ResponseException
      */
     public function delete(string $field, mixed $value): void
     {
+        $this->beginTransaction();
         if (!in_array($field, $this->ALLOW_FIELDS)) {
             error_log("Field is not allowed");
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
+            return;
         }
 
-        $query_sql = "delete from user_board where " . $field . " = :value";
+        $query_sql = sprintf("delete from user_board where %s = :value", $field);
         $stmt = $this->database->getConnection()->prepare($query_sql);
-
-        try {
-            $stmt->execute(
-                [
-                    "value" => $value,
-                ]
-            );
-        } catch (PDOException $exception) {
-            error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
-        }
+        $stmt->execute(
+            [
+                "value" => $value,
+            ]
+        );
+        $this->commit();
     }
 
     /**
      * @param array $tables_to_join
      * @param array $condition
      * @return array
-     * @throws ResponseException
      */
     public function join(array $tables_to_join, array $condition): array
     {
@@ -170,11 +132,13 @@ class UserBoardModel extends Model implements IModel
 
         if (!empty($fields)) {
             $query_sql .= implode(
-                ", ", array_map(
-                        function ($field) use ($tables_to_join) {
-                            return "{$tables_to_join['as']}.$field";
-                        }, $fields
-                    )
+                ", ",
+                array_map(
+                    function ($field) use ($tables_to_join) {
+                        return "{$tables_to_join['as']}.$field";
+                    },
+                    $fields
+                )
             );
         }
         $query_sql .= "\n";
@@ -182,45 +146,30 @@ class UserBoardModel extends Model implements IModel
         $query_sql .= "join {$tables_to_join['table']} as {$tables_to_join['as']} on ub.{$tables_to_join['condition'][0]} = {$tables_to_join['as']}.{$tables_to_join['condition'][1]} \n";
         $query_sql .= "where ub.{$condition['where'][0]} = {$condition['where'][1]}";
         $stmt = $this->database->getConnection()->prepare($query_sql);
+        $stmt->execute();
 
-        try {
-            $stmt->execute();
-
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $exception) {
-            error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
-        }
-
-        return $result;
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
      * @param string $field
      * @param mixed $value
      * @return int
-     * @throws ResponseException
      */
     public function count(string $field, mixed $value): int
     {
         if (!in_array($field, $this->ALLOW_FIELDS)) {
             error_log("Field is not allowed");
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
+            return 0;
         }
 
-        $query_sql = "select count(*) from user_board where " . $field . " = :value";
+        $query_sql = sprintf("select count(*) from user_board where %s = :value", $field);
         $stmt = $this->database->getConnection()->prepare($query_sql);
-
-        try {
-            $stmt->execute(
-                [
-                    "value" => $value,
-                ]
-            );
-        } catch (PDOException $exception) {
-            error_log($exception->getMessage());
-            throw new ResponseException(StatusCode::INTERNAL_SERVER_ERROR, StatusCode::INTERNAL_SERVER_ERROR->name, ErrorMessage::INTERNAL_SERVER_ERROR);
-        }
+        $stmt->execute(
+            [
+                "value" => $value,
+            ]
+        );
 
         return $stmt->fetchColumn();
     }

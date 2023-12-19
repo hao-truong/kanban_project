@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\core;
@@ -9,6 +10,7 @@ class Request
 {
     private array $params = [];
     private array $queries = [];
+    private int|null $userId = null;
 
     public function __construct() { }
 
@@ -45,7 +47,7 @@ class Request
         $query_component_list = explode('&', $path_component);
         foreach ($query_component_list as $query_component) {
             $pair_query = explode('=', $query_component);
-            $this->queries[] = $pair_query;
+            $this->queries["$pair_query[0]"] = $pair_query[1];
         }
     }
 
@@ -68,6 +70,7 @@ class Request
 
         return $body;
     }
+
 
     /**
      * @param string $param_name
@@ -99,7 +102,8 @@ class Request
      * @return int
      * @throws \Exception
      */
-    public function getIntParam(string $param_name): int {
+    public function getIntParam(string $param_name): int
+    {
         if (!array_key_exists($param_name, $this->params)) {
             error_log("Param {$param_name} does not exist.");
             throw new \Exception("Param {$param_name} does not exist.");
@@ -114,5 +118,15 @@ class Request
     public function getQueries(): array
     {
         return $this->queries;
+    }
+
+    public function setUserId(?int $user_id): void
+    {
+        $this->userId = $user_id;
+    }
+
+    public function getUserId(): int
+    {
+        return $this->userId;
     }
 }

@@ -6,3 +6,7 @@ type Board = {
   number_of_members: number;
   creator_id: number;
 };
+
+type SearchBoardReq = {
+  title: string;
+};

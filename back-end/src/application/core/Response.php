@@ -1,9 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\core;
 
+use shared\enums\ErrorMessage;
 use shared\enums\StatusCode;
+use shared\enums\SuccessMessage;
 
 class Response
 {
@@ -26,7 +29,12 @@ class Response
             $response_content["errors"] = $errors;
         }
 
-        if(is_array($data) || $data != null) {
+        if ($data instanceof SuccessMessage) {
+            echo json_encode($data);
+            return;
+        }
+
+        if (is_array($data) || $data != null) {
             echo json_encode($data);
             return;
         }

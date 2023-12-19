@@ -1,9 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\entities;
 
 use DateTime;
+use shared\enums\ErrorMessage;
 use shared\enums\StatusCode;
 use shared\exceptions\ResponseException;
 
@@ -50,12 +52,20 @@ class ColumnEntity
 
     public function setTitle(string $title): void
     {
-        if (strlen($title) <= self::$MIN_LENGTH_TITLE) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Title should be at least " . self::$MIN_LENGTH_TITLE . " characters long");
+        if (strlen($title) < self::$MIN_LENGTH_TITLE) {
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                sprintf(ErrorMessage::STRING_SO_SHORT->value, 'title', self::$MIN_LENGTH_TITLE)
+            );
         }
 
         if (strlen($title) > self::$MAX_LENGTH_TITLE) {
-            throw new ResponseException(StatusCode::BAD_REQUEST, StatusCode::BAD_REQUEST->name, "Title should be less than " . self::$MAX_LENGTH_TITLE . " characters long");
+            throw new ResponseException(
+                StatusCode::BAD_REQUEST,
+                StatusCode::BAD_REQUEST->name,
+                sprintf(ErrorMessage::STRING_SO_LONG->value, 'title', self::$MAX_LENGTH_TITLE)
+            );
         }
 
         $this->title = $title;
@@ -104,9 +114,37 @@ class ColumnEntity
     public function toArray(): array
     {
         return [
-            'title'    => $this->title,
-            'board_id' => $this->boardId,
+            'title'      => $this->title,
+            'board_id'   => $this->boardId,
             'creator_id' => $this->creatorId,
+            'position'   => $this->position,
+        ];
+    }
+
+    public static function fromArray(array $data): ColumnEntity
+    {
+        $column_entity = new ColumnEntity();
+        $column_entity->setId($data['id']);
+        $column_entity->setPosition($data['position']);
+        $column_entity->setCreatorId($data['creator_id']);
+        $column_entity->setTitle($data['title']);
+        $column_entity->setBoardId($data['board_id']);
+        $column_entity->setCreatedAt(new DateTime($data['created_at']));
+        $column_entity->setUpdatedAt(new DateTime($data['updated_at']));
+
+        return $column_entity;
+    }
+
+    public function toFullArray(): array
+    {
+        return [
+            'id'         => $this->id,
+            'title'      => $this->title,
+            'board_id'   => $this->boardId,
+            'creator_id' => $this->creatorId,
+            'position'   => $this->position,
+            'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];
     }
 }

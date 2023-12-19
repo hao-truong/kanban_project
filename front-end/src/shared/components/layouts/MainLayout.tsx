@@ -49,15 +49,13 @@ const SignInUser = () => {
     };
   }, [userRef]);
 
-  const handleLogout = async () => {
-    const data = await AuthService.logout()
-      .then((response) => response.data)
+  const handleLogout = () => {
+    AuthService.logout()
+      .then(() => {
+        JwtStorage.deleteToken();
+        navigate('/auth/sign-in');
+      })
       .catch((responseError: ResponseError) => toast.error(responseError.message));
-
-    if (data) {
-      JwtStorage.deleteToken();
-      navigate('/auth/sign-in');
-    }
   };
 
   return (
@@ -96,7 +94,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
         <SignInUser />
       </header>
       <div className="min-h-[700px]">{children}</div>
-      <footer className="text-center">Develop by Truong Van Hao</footer>
+      <footer className="text-center py-5">Develop by Truong Van Hao</footer>
     </div>
   );
 };

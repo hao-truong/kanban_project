@@ -1,12 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use app\controllers\AuthController;
-use app\controllers\BoardController;
-use app\controllers\UserController;
 use app\core\Application;
-use app\middlewares\AuthorizeRequest;
-use shared\enums\RequestMethod;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -30,13 +25,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 $dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
 $dotenv->load();
 
-session_start();
-
 $container = require __DIR__ . '/../src/shared/configs/php-di/config.php';
 $app = $container->get(Application::class);
 
 require_once __DIR__ . '/routes/authRoute.php';
 require_once __DIR__ . '/routes/boardRoute.php';
 require_once __DIR__ . '/routes/userRoute.php';
+require_once __DIR__ . '/routes/columnRoute.php';
+require_once __DIR__ . '/routes/cardRoute.php';
 
 $app->run();
